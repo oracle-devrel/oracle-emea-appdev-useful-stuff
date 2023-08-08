@@ -88,7 +88,7 @@ public class VerifyHmacFunction {
 	public static String HMAC_SALT = null;
 	public static String HMAC_HMAC_CALCULATION_FIELD_SEPARATOR = "";
 	public static String INCOMMING_HMAC_HEADER = null;
-	private static List<String> FIELDS_TO_CALCULATE_HMAC_WITH;
+	public static List<String> FIELDS_TO_CALCULATE_HMAC_WITH;
 	// these are used to track config errors.
 	private boolean errorFound = false;
 	private String error = "";
@@ -248,14 +248,12 @@ public class VerifyHmacFunction {
 		return resp;
 	}
 
-	private final static String mungeHeader(String header) {
+	public final static String mungeHeader(String header) {
 		// replace _ with - and map to lower case
 		return header.replace('_', '-').toLowerCase();
 	}
 
-	private String processRequest(Map<String, String> fields) {
-		String error = "";
-		boolean errorFound = false;
+	String processRequest(Map<String, String> fields) {
 		boolean addedFirstField = false;
 		String dataToCheck = "";
 		for (String field : FIELDS_TO_CALCULATE_HMAC_WITH) {
