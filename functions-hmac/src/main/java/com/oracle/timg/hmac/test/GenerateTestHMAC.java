@@ -1,7 +1,14 @@
-package com.oracle.timg.hmac;
+package com.oracle.timg.hmac.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +24,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.oracle.timg.hmac.VerifyHmacFunction;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,6 +38,9 @@ public class GenerateTestHMAC {
 	private static Option keyOption;
 	private static Option algorithmOption;
 	private static Option separatorOption;
+	private static Option urlOption;
+	private static Option hmacHeaderOption;
+	private static Option httpRequestOption;
 
 	public static void main(String[] args) throws IOException {
 		// build the input string, the options are
@@ -42,15 +54,60 @@ public class GenerateTestHMAC {
 		// -k / --key the shared secret defaults to Secret
 		// -a / --algorithm the algorithm name to use (default to HmacMD5)
 		// -p / --separator the separator to use when building the input, defaults to
+		// -u / --url the url to use as a test call if missing then no test call will be
+		// -m / --hmacheader the http header to hold the calculated hmac when making a
+		// test request defaults to hmac
+		// -r / --httprequest the http request type defaults to POST
+		// made
 		// empty string)
 		// these are
 		VerifyHmacFunction vhm = new VerifyHmacFunction();
-		Map<String, String> fields = getDataOptions(args, vhm);
+		CommandLine commandLine = getCommandLine(args);
+		Map<String, String> headers = getDataOptions(commandLine, args, vhm);
+		Map<String, String> fields = new HashMap<>(headers);
+		// the fields map is used in the HMAC calculation, so add any required fields to
+		// that
+		addHMACCalculationEntries(commandLine, fields);
 		log.info("Retrieved the following fields\n" + fields);
-		log.info("Calculated HMAC is " + vhm.processRequest(fields));
+		String calculatedHmac = vhm.processRequest(fields);
+		log.info("Calculated HMAC is " + calculatedHmac);
+		if (commandLine.hasOption(urlOption)) {
+			// this must have a value to have got here
+			String url = commandLine.getOptionValue(urlOption);
+			String hmacHeader = commandLine.getOptionValue(hmacHeaderOption, "hmac");
+			headers.put(hmacHeader, calculatedHmac);
+			String requestMethod = commandLine.getOptionValue(httpRequestOption, "POST");
+			callUrl(requestMethod, url, headers, readFile(commandLine.getOptionValue(bodyOption, "body.txt")));
+		}
 	}
 
-	private static Map<String, String> getDataOptions(String args[], VerifyHmacFunction vhm) throws IOException {
+	private static void callUrl(String requestMethod, String url, Map<String, String> headers, String body) {
+		log.info("Making " + requestMethod + "\nCalling " + url + "\nWith headers" + headers + "\nrequest body is\n"
+				+ body);
+		HttpClient client = HttpClient.newHttpClient();
+		URI uri;
+		try {
+			uri = new URI(url);
+		} catch (URISyntaxException e) {
+			log.error("Provided URL " + url + " does not parse properly because " + e.getLocalizedMessage());
+			return;
+		}
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.method(requestMethod, BodyPublishers.ofString(body)).uri(uri);
+		headers.entrySet().stream().forEach(entry -> requestBuilder.header(entry.getKey(), entry.getValue()));
+		HttpRequest request = requestBuilder.build();
+		HttpResponse<String> response;
+		try {
+			response = client.send(request, BodyHandlers.ofString());
+		} catch (IOException | InterruptedException e) {
+			log.error("Exception making the http call:" + e.getLocalizedMessage());
+			return;
+		}
+		log.info("Response status code is " + response.statusCode());
+		log.info("Responde body is:\n" + response.body());
+	}
+
+	private static CommandLine getCommandLine(String args[]) {
 		Options options = setupCommandLineOptions();
 		DefaultParser parser = new DefaultParser();
 		CommandLine commandLine = null;
@@ -63,6 +120,16 @@ public class GenerateTestHMAC {
 					options);
 			System.exit(-1);
 		}
+		return commandLine;
+	}
+
+	private static void addHMACCalculationEntries(CommandLine commandLine, Map<String, String> fields)
+			throws IOException {
+		fields.put("BODY", readFile(commandLine.getOptionValue(bodyOption, "body.txt")));
+		fields.put("SALT", commandLine.getOptionValue(saltOption, ""));
+	}
+
+	private static Map<String, String> getDataOptions(CommandLine commandLine, String args[], VerifyHmacFunction vhm) {
 		// the fields to process
 		Map<String, String> fields = new HashMap<>();
 		// extract the headers
@@ -74,8 +141,6 @@ public class GenerateTestHMAC {
 			String headerEntry[] = header.split(":");
 			fields.put(VerifyHmacFunction.mungeHeader(headerEntry[0]), headerEntry[1]);
 		}
-		fields.put("BODY", readFile(commandLine.getOptionValue(bodyOption, "body.txt")));
-		fields.put("SALT", commandLine.getOptionValue(saltOption, ""));
 
 		VerifyHmacFunction.FIELDS_TO_CALCULATE_HMAC_WITH = new ArrayList<>();
 		Collections.addAll(VerifyHmacFunction.FIELDS_TO_CALCULATE_HMAC_WITH,
@@ -110,8 +175,15 @@ public class GenerateTestHMAC {
 				.desc("The HMAC algorithm key to use, defaults to HmacMD5.").build();
 		separatorOption = Option.builder("p").longOpt("separator").optionalArg(true).hasArg()
 				.desc("The field separator to use when building the data, defaults to empty string.").build();
+		urlOption = Option.builder("u").longOpt("url").optionalArg(true).hasArg()
+				.desc("URL To call to test request, if missing no test call will be made").build();
+		hmacHeaderOption = Option.builder("m").longOpt("hmacheader").optionalArg(true).hasArg()
+				.desc("Header to place the calculoated HMAC in when making a test request, defaults to hmac").build();
+		httpRequestOption = Option.builder("r").longOpt("httprequest").optionalArg(true).hasArg()
+				.desc("HTTP request method to call, defaults to POST").build();
 		Options options = new Options().addOption(headerOption).addOption(bodyOption).addOption(saltOption)
-				.addOption(fieldsOption).addOption(keyOption).addOption(algorithmOption).addOption(separatorOption);
+				.addOption(fieldsOption).addOption(keyOption).addOption(algorithmOption).addOption(separatorOption)
+				.addOption(urlOption).addOption(hmacHeaderOption).addOption(httpRequestOption);
 		return options;
 	}
 }

@@ -253,7 +253,7 @@ public class VerifyHmacFunction {
 		return header.replace('_', '-').toLowerCase();
 	}
 
-	String processRequest(Map<String, String> fields) {
+	public String processRequest(Map<String, String> fields) {
 		boolean addedFirstField = false;
 		String dataToCheck = "";
 		for (String field : FIELDS_TO_CALCULATE_HMAC_WITH) {
