@@ -22,6 +22,8 @@ fn -v deploy --app <app-name>
 
 ## Setup the function configuration
 
+**IMPORTANT** Note that when a field is combined into the data to be check-summed be aware that the code will remove any whitespace around that source field before combining it, thus if there are whitespace characters around the body (e.g. a trailing newline) those must have been removed when the original "input" HMAC was calculated. See the `hmac-input-fields-trim` config option.
+
 Use the function configuration to define the way the function will behave. This function supports the following configuration options :
 
   - `hmac-algorithm` Optional. The HMAC algorythm to be used to calculate the HMAC. This only supports the algorithms used in the apache commons `org.apache.commons.codec.digest.HmacUtils` class. Defaults to `HmacMD5`
@@ -36,7 +38,10 @@ Use the function configuration to define the way the function will behave. This 
   
   - `salt` - Optional. If specified in the fields to include this can be used as an additional piece of shared configuration that is added to the HMAC calculation
   
-  - `separate-input-fields-using` Optional. If specified will be used to separate the input fields, using the example if For example if `separate-input-fields-using` is set to `::` and `calculate-hmac-using` set to `SALT,timestamp,BODY` with the salt set to `12345`, the timestamp of `2023-12-25-12:00:00+00:00` and a request body set to `{"data":"value"}` would result in the HMAC calculation being done against `12345::2023-12-25-12:00:00+00:00::{"data":"value"}` Defaults to an empty string (so no separation)
+  - `separate-input-fields-using` Optional. If specified will be used to separate the input fields, using the example if For example if `separate-input-fields-using` is set to `::` and `calculate-hmac-using` set to `SALT,timestamp,BODY` with the salt set to `12345`, the timestamp of `2023-12-25-12:00:00+00:00` and a request body set to `{"data":"value"}` would result in the HMAC calculation being done against `12345::2023-12-25-12:00:00+00:00::{"data":"value"}` The separator is only implemented between the fields, and not at the end of the input. Defaults to an empty string (so no separation between the fields)
+  
+  - `hmac-input-fields-trim` Optional. If specified controls if whitespace at the start / end of an input field is removed when combining the fields to calculate the HMAC. Valid options are `true` and `false`. If not specified defaults to `true`.
+  
 
 ## Functions dynamic group and policies to access vault secrets 
 

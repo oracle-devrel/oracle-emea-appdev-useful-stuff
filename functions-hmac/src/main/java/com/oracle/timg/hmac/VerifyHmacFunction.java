@@ -66,6 +66,7 @@ public class VerifyHmacFunction {
 
 	public final static String CONFIG_HMAC_SALT = "salt";
 	public final static String CONFIG_HMAC_ALGORITHM = "hmac-algorithm";
+	public final static String CONFIG_HMAC_INPUT_FIELDS_TRIM = "hmac-input-fields-trim";
 	// if set must be set to the value if one of the constants HMAC_SOURCE_CONFIG or
 	// HMAC_SOURCE_VAULT (case ignored)
 	// if set to HMAC_SOURCE_CONFIG the text in hmac-secret is used
@@ -83,6 +84,7 @@ public class VerifyHmacFunction {
 	public final static String CALCULATE_HMAC_BODY_NAME = "BODY";
 	public final static String CALCULATE_HMAC_SALT_NAME = "SALT";
 	public static String HMAC_ALGORITHM = null;
+	public static boolean HMAC_INPUT_FIELDS_TRIM;
 	public static String HMAC_SECRET_SOURCE = null;
 	public static String HMAC_SECRET = null;
 	public static String HMAC_SALT = null;
@@ -101,6 +103,8 @@ public class VerifyHmacFunction {
 		HMAC_SECRET = ctx.getConfigurationByKey(CONFIG_HMAC_SECRET).orElse(null);
 		INCOMMING_HMAC_HEADER = ctx.getConfigurationByKey(CONFIG_INCOMMING_HMAC_HEADER).orElse(null);
 		HMAC_SALT = ctx.getConfigurationByKey(CONFIG_HMAC_SALT).orElse(null);
+		HMAC_INPUT_FIELDS_TRIM = Boolean
+				.parseBoolean(ctx.getConfigurationByKey(CONFIG_HMAC_INPUT_FIELDS_TRIM).orElse("true"));
 		HMAC_HMAC_CALCULATION_FIELD_SEPARATOR = ctx.getConfigurationByKey(CONFIG_HMAC_CALCULATION_FIELD_SEPARATOR)
 				.orElse("");
 		// Note that the CONFIG_FIELDS_TO_CALCULATE_HMAC_WITH is case insensitive FOR
@@ -182,7 +186,7 @@ public class VerifyHmacFunction {
 	 * @return
 	 */
 	public AuthResponse handleAPIGWAuthenticationRequest(AuthRequest request) {
-		log.info("Recieved auth request is " + request);
+		log.debug("Recieved auth request is " + request);
 		Map<String, String> fields = request.getData();
 		AuthResponse response = new AuthResponse();
 		response.setActive(false);
@@ -206,11 +210,18 @@ public class VerifyHmacFunction {
 			log.info("No input HMAC header found");
 			return response;
 		}
-		String calculatedHmac = processRequest(request.getData());
+		String calculatedHmac = "";
+		try {
+			calculatedHmac = processRequest(request.getData());
+		} catch (Exception e) {
+			log.error("Exception generating source HMAC " + e.getLocalizedMessage());
+			return response;
+		}
 		boolean hmacok = calculatedHmac.equalsIgnoreCase(inputHmac);
 		log.info("Calculated hmac is :" + calculatedHmac + "\nSpecified hmac is :" + inputHmac + "\nThey are "
 				+ (hmacok ? "Identical" : "Not Identical"));
 		response.setActive(hmacok);
+		log.info("Returned response is " + hmacok);
 		return response;
 	}
 
@@ -229,7 +240,7 @@ public class VerifyHmacFunction {
 		// processing easier.
 		// if there had been a header in there named Body or other combination then it
 		// will have been replaced with body (lower case)
-		// so this won;t overrite it.
+		// so this won't overwrite it.
 		if (body != null) {
 			fields.put(CALCULATE_HMAC_BODY_NAME, body);
 		}
@@ -238,7 +249,12 @@ public class VerifyHmacFunction {
 		}
 
 		String inputHmac = fields.get(INCOMMING_HMAC_HEADER);
-		String calculatedHmac = processRequest(fields);
+		String calculatedHmac = "";
+		try {
+			calculatedHmac = processRequest(fields);
+		} catch (Exception e) {
+			log.error("Exception generating calculate HMAC " + e.getLocalizedMessage());
+		}
 		if (inputHmac == null) {
 			return "No input HMAC header found\nCalculatedHmac is " + calculatedHmac;
 		}
@@ -253,7 +269,7 @@ public class VerifyHmacFunction {
 		return header.replace('_', '-').toLowerCase();
 	}
 
-	String processRequest(Map<String, String> fields) {
+	public String processRequest(Map<String, String> fields) throws Exception {
 		boolean addedFirstField = false;
 		String dataToCheck = "";
 		for (String field : FIELDS_TO_CALCULATE_HMAC_WITH) {
@@ -277,17 +293,20 @@ public class VerifyHmacFunction {
 					if (errorFound) {
 						error += "\n";
 					}
-					error += "Header " + field + " is missing, but it's included in the MAC comparisson";
+					error += "Header " + field
+							+ " is missing, but it's specified as being included in the MAC comparisson";
 					errorFound = true;
 				} else {
-					dataToCheck += inputHeader;
+					log.info("Adding field " + field + " length " + inputHeader.length());
+					// if requested trim the input field
+					dataToCheck += (HMAC_INPUT_FIELDS_TRIM ? inputHeader.trim() : inputHeader);
 				}
 			}
 		}
 		if (errorFound) {
-			return error;
+			throw new Exception(error);
 		}
-		log.info("Data to check is " + dataToCheck);
+		log.info("Data length is " + dataToCheck.length() + "\nData is " + dataToCheck);
 		return calculateHMAC(HMAC_ALGORITHM, dataToCheck, HMAC_SECRET);
 	}
 
