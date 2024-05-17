@@ -46,7 +46,7 @@ SOFTWARE. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.cliparser>1.5.0</version.cliparser>
 		<fdk.version>1.0.177</fdk.version>
-		<version.lombok>1.18.28</version.lombok>
+		<version.lombok>1.18.30</version.lombok>
 		<version.ocisdk>3.17.0</version.ocisdk>
 		<version.slf4j>1.7.33</version.slf4j>
 		<version.apache-commons>1.15</version.apache-commons>
