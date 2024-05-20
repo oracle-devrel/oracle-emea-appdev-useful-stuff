@@ -1,0 +1,1842 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:y="http://www.yworks.com/xml/graphml"
+	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+	<key for="node" id="d0" yfiles.type="nodegraphics" />
+	<key for="edge" id="d1" yfiles.type="edgegraphics" />
+	<graph id="dependencies" edgedefault="directed">
+		<node id="584724454">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						com.oracle.labs.helidon.fileio:filewriter:jar:1.0.0</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="269145726">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.bundles:helidon-microprofile-core:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1899640261">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.server:helidon-microprofile-server:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1655627208">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver.observe:helidon-webserver-observe:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1899640261" target="1655627208">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="293108580">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.cdi:helidon-microprofile-cdi:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1460139539">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>io.helidon:helidon:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="293108580" target="1460139539">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2008249643">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.weld:weld-se-core:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1667737224">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.weld:weld-core-impl:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2008249643" target="1667737224">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="831931099">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.weld.environment:weld-environment-common:jar:5.1.1.SP2:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2008249643" target="831931099">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1497992596">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.jboss.weld:weld-api:jar:5.0.SP3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2008249643" target="1497992596">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="901751227">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.jboss.weld:weld-spi:jar:5.0.SP3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2008249643" target="901751227">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="293108580" target="2008249643">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1798443618">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.classfilewriter:jboss-classfilewriter:jar:1.3.0.Final:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="293108580" target="1798443618">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1756435781">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.weld:weld-lite-extension-translator:jar:5.1.1.SP2:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="2097217770">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.logging:jboss-logging-processor:jar:2.2.1.Final:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="897303688">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.logging:jboss-logging-annotations:jar:2.2.1.Final:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2097217770" target="897303688">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1319203143">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.jdeparser:jdeparser:jar:2.0.3.Final:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2097217770" target="1319203143">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1756435781" target="2097217770">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="293108580" target="1756435781">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="786058987">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common.features:helidon-common-features:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1537805706">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common.features:helidon-common-features-api:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="786058987" target="1537805706">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="293108580" target="786058987">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="293108580">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="815648243">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver:helidon-webserver:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1970518510">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-socket:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="1970518510">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="161615037">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-key-util:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="161615037">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="452236638">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-security:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="452236638">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1146626470">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-task:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="1146626470">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="739003402">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-tls:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="739003402">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="902982354">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.http.media:helidon-http-media:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="902982354">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="196237139">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.http.encoding:helidon-http-encoding:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="815648243" target="196237139">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="815648243">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="249696914">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver:helidon-webserver-static-content:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1899640261" target="249696914">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1086350168">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.enterprise:jakarta.enterprise.cdi-api:jar:4.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1726092648">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.enterprise:jakarta.enterprise.lang-model:jar:4.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1086350168" target="1726092648">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2138295848">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>jakarta.el:jakarta.el-api:jar:5.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1086350168" target="2138295848">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="1086350168">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1629173206">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.http.media:helidon-http-media-jsonp:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1899640261" target="1629173206">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="578961422">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver:helidon-webserver-context:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1899640261" target="578961422">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1413306467">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="903794242">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.inject:helidon-inject-api:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="231995562">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-types:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="903794242" target="231995562">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1413306467" target="903794242">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="1413306467">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1029790510">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.jersey:helidon-jersey-server:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="60945057">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.core:jersey-server:jar:3.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1087279177">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.validation:jakarta.validation-api:jar:3.0.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="60945057" target="1087279177">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1029790510" target="60945057">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="1029790510">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1388979794">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config-yaml:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1899640261" target="1388979794">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1707458318">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.ext.cdi:jersey-weld2-se:jar:3.1.5:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1769827821">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.ext.cdi:jersey-cdi1x:jar:3.1.5:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1707458318" target="1769827821">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="1707458318">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1560671315">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.jersey:helidon-jersey-media-jsonp:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1593749783">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.media:jersey-media-json-processing:jar:3.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="369838089">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.eclipse.parsson:parsson-media:jar:1.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1593749783" target="369838089">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1560671315" target="1593749783">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1899640261" target="1560671315">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="269145726" target="1899640261">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="345722144">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.config:helidon-microprofile-config:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1716421772">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config-mp:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="345722144" target="1716421772">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1301542747">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config-encryption:jar:4.0.6:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="18130400">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-crypto:jar:4.0.6:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1301542747" target="18130400">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="345722144" target="1301542747">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1328028335">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config-object-mapping:jar:4.0.6:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="345722144" target="1328028335">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="269145726" target="345722144">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="269145726">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1565560098">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.openapi:helidon-microprofile-openapi:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="254513404">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.openapi:helidon-openapi:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="733224796">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-config:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="616990183">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-mapper:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="733224796" target="616990183">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="254513404" target="733224796">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2108044736">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-media-type:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="254513404" target="2108044736">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1565560098" target="254513404">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="786036472">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.eclipse.microprofile.config:microprofile-config-api:jar:3.0.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1565560098" target="786036472">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="622609024">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.eclipse.microprofile.openapi:microprofile-openapi-api:jar:3.1.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1565560098" target="622609024">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="895812217">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver:helidon-webserver-service-common:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="2040609056">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver:helidon-webserver-cors:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="405700314">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>io.helidon.cors:helidon-cors:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2040609056" target="405700314">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="895812217" target="2040609056">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1565560098" target="895812217">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1600206621">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.service-common:helidon-microprofile-service-common:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1565560098" target="1600206621">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1107984450">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.smallrye:smallrye-open-api-core:jar:3.3.4:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="848484634">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.jboss.logging:jboss-logging:jar:3.5.3.Final:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1107984450" target="848484634">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1565560098" target="1107984450">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1495382332">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.smallrye:smallrye-open-api-jaxrs:jar:3.3.4:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1565560098" target="1495382332">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="263103706">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.yaml:snakeyaml:jar:2.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1565560098" target="263103706">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="1565560098">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="430976509">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.health:helidon-microprofile-health:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1036938712">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.eclipse.microprofile.health:microprofile-health-api:jar:4.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="430976509" target="1036938712">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1777519364">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver.observe:helidon-webserver-observe-health:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="430976509" target="1777519364">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="327170708">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.health:helidon-health:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="430976509" target="327170708">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="430976509">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="189215452">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.json.bind:jakarta.json.bind-api:jar:3.0.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="584724454" target="189215452">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1160326849">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.media:jersey-media-json-binding:jar:3.1.5:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="981231499">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.core:jersey-common:jar:3.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="683327178">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.ws.rs:jakarta.ws.rs-api:jar:3.1.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="981231499" target="683327178">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="450476243">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.annotation:jakarta.annotation-api:jar:2.1.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="981231499" target="450476243">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="378196591">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.inject:jakarta.inject-api:jar:2.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="981231499" target="378196591">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1335082762">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.hk2:osgi-resource-locator:jar:1.0.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="981231499" target="1335082762">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1160326849" target="981231499">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="841090268">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>jakarta.json:jakarta.json-api:jar:2.1.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1160326849" target="841090268">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1701461355">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.eclipse.parsson:parsson:jar:1.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1160326849" target="1701461355">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="632521219">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.eclipse:yasson:jar:3.0.3:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1160326849" target="632521219">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="1160326849">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2005537360">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.logging:helidon-logging-jul:jar:4.0.6:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1437396121">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-context:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2005537360" target="1437396121">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1629032994">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.logging:helidon-logging-common:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2005537360" target="1629032994">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1484994456">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2005537360" target="1484994456">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="2005537360">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2134681162">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>io.smallrye:jandex:jar:3.1.2:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="584724454" target="2134681162">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1296450832">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.activation:jakarta.activation-api:jar:2.1.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="584724454" target="1296450832">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1692915352">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.eclipse.microprofile.metrics:microprofile-metrics-api:jar:5.0.1:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="622396011">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						jakarta.interceptor:jakarta.interceptor-api:jar:2.1.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1692915352" target="622396011">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="1692915352">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1066270324">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.metrics:helidon-microprofile-metrics:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1075593808">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.webserver.observe:helidon-webserver-observe-metrics:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="445976541">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.metrics.providers:helidon-metrics-providers-micrometer:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="2003979454">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.micrometer:micrometer-core:jar:1.11.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="668754554">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.micrometer:micrometer-commons:jar:1.11.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2003979454" target="668754554">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="91273747">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.micrometer:micrometer-observation:jar:1.11.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2003979454" target="91273747">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="933869191">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.hdrhistogram:HdrHistogram:jar:2.1.12:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2003979454" target="933869191">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1381702512">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.latencyutils:LatencyUtils:jar:2.0.3:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2003979454" target="1381702512">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="445976541" target="2003979454">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="382762227">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.micrometer:micrometer-registry-prometheus:jar:1.11.3:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="384887832">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.prometheus:simpleclient_common:jar:0.16.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1821867471">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>io.prometheus:simpleclient:jar:0.16.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1713204150">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.prometheus:simpleclient_tracer_otel:jar:0.16.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1821867471" target="1713204150">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1933554786">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.prometheus:simpleclient_tracer_otel_agent:jar:0.16.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1821867471" target="1933554786">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="384887832" target="1821867471">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="382762227" target="384887832">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="445976541" target="382762227">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1648231985">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.prometheus:simpleclient_tracer_common:jar:0.16.0:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="445976541" target="1648231985">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1075593808" target="445976541">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1066270324" target="1075593808">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="898655932">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.metrics:helidon-metrics-api:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="945683299">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>io.helidon.http:helidon-http:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="911201454">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-configurable:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="945683299" target="911201454">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="609375192">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-buffers:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="945683299" target="609375192">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="306279528">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-uri:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1167066016">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.common:helidon-common-parameters:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="306279528" target="1167066016">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="945683299" target="306279528">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="898655932" target="945683299">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="221402392">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.builder:helidon-builder-api:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="898655932" target="221402392">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1066270324" target="898655932">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="994581493">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.metrics:helidon-metrics-system-meters:jar:4.0.6:runtime</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1066270324" target="994581493">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>runtime</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="1066270324">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="573819584">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.junit.jupiter:junit-jupiter-api:jar:5.9.3:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="1744523301">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.opentest4j:opentest4j:jar:1.2.0:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="573819584" target="1744523301">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2021540695">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.junit.platform:junit-platform-commons:jar:1.9.3:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="573819584" target="2021540695">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="59930654">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.apiguardian:apiguardian-api:jar:1.1.2:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="573819584" target="59930654">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="573819584">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1070319462">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.microprofile.testing:helidon-microprofile-testing-junit5:jar:4.0.6:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="42783426">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.jersey:helidon-jersey-client:jar:4.0.6:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="149052735">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.core:jersey-client:jar:3.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="42783426" target="149052735">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="413177525">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.jersey.inject:jersey-hk2:jar:3.1.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="2041676336">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.glassfish.hk2:hk2-locator:jar:3.0.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<node id="491738374">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						org.glassfish.hk2.external:aopalliance-repackaged:jar:3.0.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2041676336" target="491738374">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="132048949">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.glassfish.hk2:hk2-api:jar:3.0.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2041676336" target="132048949">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="458736453">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.glassfish.hk2:hk2-utils:jar:3.0.5:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="2041676336" target="458736453">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="413177525" target="2041676336">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1845654045">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.javassist:javassist:jar:3.29.2-GA:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="413177525" target="1845654045">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="42783426" target="413177525">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="1070319462" target="42783426">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="151190974">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>
+						io.helidon.config:helidon-config-yaml-mp:jar:4.0.6:compile</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="1070319462" target="151190974">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>compile</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<edge source="584724454" target="1070319462">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="2037199851">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.hamcrest:hamcrest-all:jar:1.3:test</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="584724454" target="2037199851">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>test</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+		<node id="1543871080">
+			<data key="d0">
+				<y:ShapeNode>
+					<y:NodeLabel>org.projectlombok:lombok:jar:1.18.30:provided</y:NodeLabel>
+				</y:ShapeNode>
+			</data>
+		</node>
+		<edge source="584724454" target="1543871080">
+			<data key="d1">
+				<y:PolyLineEdge>
+					<y:EdgeLabel>provided</y:EdgeLabel>
+				</y:PolyLineEdge>
+			</data>
+		</edge>
+	</graph>
+</graphml>
