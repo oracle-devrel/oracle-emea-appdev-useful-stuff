@@ -31,3 +31,7 @@ Temporary Items
 .crt
 .csr
 .pem
+functions-hmac/.settings/org.eclipse.jdt.core.prefs
+functions-hmac/.settings/org.eclipse.jdt.apt.core.prefs
+functions-hmac/.factorypath
+functions-hmac/.classpath
