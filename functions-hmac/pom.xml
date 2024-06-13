@@ -50,6 +50,7 @@ SOFTWARE. -->
 		<version.ocisdk>3.17.0</version.ocisdk>
 		<version.slf4j>1.7.33</version.slf4j>
 		<version.apache-commons>1.15</version.apache-commons>
+		<version.junit>4.13.1</version.junit>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -83,7 +84,7 @@ SOFTWARE. -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${version.junit}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
