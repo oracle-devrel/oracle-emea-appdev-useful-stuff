@@ -1,0 +1,18 @@
+{
+    "customerCode": "808080",
+    "customerName": "LOGIPE FINTECH PRIVATE LIMITED - DEMO through APIGW",
+    "productCode": "UPICOLL",
+    "productDescription": "Regular",
+    "poolingAccountNumber": "10089295611",
+    "transactionType": "Collections",
+    "dataKey": "751 10204 28-01-2023L00147700340000000001",
+    "batchAmt": "100.00",
+    "batchAmtCcd": "INR",
+    "vaNumber": "8080809837148839",
+    "utrNo": "302876436829",
+    "creditGenerationTime": "28-JAN-23 04.59.33.488870 AM",
+    "remitterName": "BALVANTSINGHSOMAKKHANSINGH",
+    "remitterAccountNumber": "15900100013792",
+    "remittingBankName": "BANK OF BARODA",
+    "ifscCode": "BARB0JASPUR"
+}
