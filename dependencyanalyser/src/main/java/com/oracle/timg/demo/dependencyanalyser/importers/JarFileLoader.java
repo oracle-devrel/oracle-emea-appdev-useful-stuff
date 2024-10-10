@@ -108,7 +108,7 @@ public class JarFileLoader extends MavenPomXMLLoader {
 			// if we loaded the jar details then we will use them later, but if we didn't
 			// then fall back to trying to get them from the pom
 			if (jarFileIdentifiedJarVerion == null) {
-				if (pomXMLEntry.isEmpty()) {
+				if (!pomXMLEntry.isPresent()) {
 					throw new JarFIleProcessorException("Unfortunately jar file " + sourceFile.getPath()
 							+ " does not containe a usable pom.properties file or pom.xml file, cannot process this jar file");
 				}
@@ -131,7 +131,7 @@ public class JarFileLoader extends MavenPomXMLLoader {
 			}
 			// have to check for the pom file directly as we may have gotten the info from
 			// the pom.properties file
-			if (pomXMLEntry.isEmpty()) {
+			if (!pomXMLEntry.isPresent()) {
 				throw new JarFIleProcessorException("Unfortunately jar file " + sourceFile.getPath()
 						+ " does not containe a pom.xml file, cannot process this jar file");
 			}
