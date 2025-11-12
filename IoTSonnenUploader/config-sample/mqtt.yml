@@ -21,7 +21,7 @@ mqtt:
     clean-session: true
     automatic-reconnect: true
     connection-timeout: "PT30s"
-    keep-alive-interval: "PT60s"
+    keep-alive-interval: 60
 
     will-message:
       topic: home/sonnen/will/${mqtt.device.id}
