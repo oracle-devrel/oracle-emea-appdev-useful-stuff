@@ -47,6 +47,7 @@ import lombok.extern.java.Log;
 @Log
 @MqttSubscriber
 @Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
 public class MqttUploadMonitor {
 	@Topic("house/sonnen/configuration/${" + MqttDeviceSettings.PREFIX + ".id}")
 	public void receiveConfig(SonnenConfiguration config) {

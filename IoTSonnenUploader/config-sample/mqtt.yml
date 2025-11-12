@@ -1,4 +1,6 @@
 mqtt:
+  monitoruploads:
+    enabled: true
   device:
     id: tims
   broker:
