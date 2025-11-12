@@ -46,6 +46,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 
 @Client(id = "sonnenbattery", path = "/api/v2")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
@@ -54,9 +55,11 @@ import io.micronaut.http.client.annotation.Client;
 public interface SonnenBatteryClient {
 
 	@Get("/configurations")
-	public SonnenConfiguration fetchConfiguration();
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenConfiguration fetchConfiguration() throws HttpClientException;
 
 	@Get("/status")
-	public SonnenStatus fetchStatus();
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenStatus fetchStatus() throws HttpClientException;
 
 }

@@ -44,6 +44,7 @@ import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublishe
 import com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller.SonnenBatteryClient;
 
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
@@ -63,7 +64,14 @@ public class Uploader {
 	@Scheduled(fixedRate = "120s", initialDelay = "5s")
 	@ExecuteOn(TaskExecutors.IO)
 	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf = client.fetchConfiguration();
+		SonnenConfiguration conf;
+		try {
+			conf = client.fetchConfiguration();
+		} catch (HttpClientException e) {
+			log.warning("HttpClientException getting configuration from sonnen, no data to upload for service "
+					+ e.getServiceId());
+			return null;
+		}
 		log.info("Retrieved configuration from battery : " + conf);
 		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
 		publishResp.thenRun(() -> log.info("Published configuration as object"));
@@ -73,7 +81,14 @@ public class Uploader {
 	@Scheduled(fixedRate = "10s", initialDelay = "10s")
 	@ExecuteOn(TaskExecutors.IO)
 	public SonnenStatus processStatus() {
-		SonnenStatus status = client.fetchStatus();
+		SonnenStatus status;
+		try {
+			status = client.fetchStatus();
+		} catch (HttpClientException e) {
+			log.warning("HttpClientExcepton getting configuration from sonnen, no data to upload, for service "
+					+ e.getServiceId());
+			return null;
+		}
 		log.info("Retrieved status from battery : " + status);
 		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenStatus(status);
 		publishResp.thenRun(() -> log.info("Published status as object"));
