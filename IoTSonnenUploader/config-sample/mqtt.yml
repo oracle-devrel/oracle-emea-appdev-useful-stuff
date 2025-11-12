@@ -1,0 +1,28 @@
+mqtt:
+  device:
+    id: tims
+  broker:
+    host: localhost
+    port: 1883
+  client:
+    # Unique identifier for this MQTT client
+    client-id: ${random.uuid}
+
+    # MQTT broker connection
+    server-uri: tcp://${mqtt.broker.host}:${mqtt.broker.port}
+
+    # Authentication
+    user-name: tims
+    password: ExamplePassword
+
+    # Optional connection settings
+    clean-session: true
+    automatic-reconnect: true
+    connection-timeout: "PT30s"
+    keep-alive-interval: "PT60s"
+
+    will-message:
+      topic: home/sonnen/will/${mqtt.device.id}
+      payload: Device ${mqtt.device.id} is unavailable
+      qos: 0
+      retained: true
