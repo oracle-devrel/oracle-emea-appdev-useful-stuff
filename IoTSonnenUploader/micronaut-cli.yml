@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.oracle.demo.timg.iot
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [app-name, http-client, java, java-application, junit, logback, maven, maven-enforcer-plugin, micronaut-aot, micronaut-http-validation, mqtt, netty-server, properties, readme, serialization-jackson, shade, static-resources, test-resources]
