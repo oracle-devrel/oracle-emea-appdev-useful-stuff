@@ -1,6 +1,14 @@
 mqtt:
   monitoruploads:
+    enabled: false
+  statusupload:
     enabled: true
+    frequency: "10s"
+    initialdelay: "10s"
+  configurationupload:
+    enabled: true
+    frequency: "10s"
+    initialdelay: "5s"
   device:
     id: tims
   broker:
@@ -14,7 +22,7 @@ mqtt:
     server-uri: tcp://${mqtt.broker.host}:${mqtt.broker.port}
 
     # Authentication
-    user-name: tims
+    user-name: ${mqtt.device.id}
     password: ExamplePassword
 
     # Optional connection settings

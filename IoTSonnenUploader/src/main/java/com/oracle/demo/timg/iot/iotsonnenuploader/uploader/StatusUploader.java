@@ -38,11 +38,11 @@ package com.oracle.demo.timg.iot.iotsonnenuploader.uploader;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
 import com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller.SonnenBatteryClient;
 
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -55,38 +55,22 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-public class Uploader {
+@Requires(property = "mqtt.statusupload.enabled", value = "true", defaultValue = "true")
+public class StatusUploader {
 	@Inject
 	private SonnenBatteryClient client;
 	@Inject
 	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
-	@Scheduled(fixedRate = "120s", initialDelay = "5s")
 	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
-		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, no data to upload for service "
-					+ e.getServiceId());
-			return null;
-		}
-		log.info("Retrieved configuration from battery : " + conf);
-		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-		publishResp.thenRun(() -> log.info("Published configuration as object"));
-		return conf;
-	}
-
-	@Scheduled(fixedRate = "10s", initialDelay = "10s")
-	@ExecuteOn(TaskExecutors.IO)
+	@Scheduled(fixedRate = "${mqtt.statusupload.frequency:10s}", initialDelay = "${mqtt.statusupload.initialdelay:10s}")
 	public SonnenStatus processStatus() {
 		SonnenStatus status;
 		try {
 			status = client.fetchStatus();
 		} catch (HttpClientException e) {
-			log.warning("HttpClientExcepton getting configuration from sonnen, no data to upload, for service "
-					+ e.getServiceId());
+			log.warning("HttpClientExcepton getting configuration from sonnen due to " + e.getLocalizedMessage()
+					+ ", no data to upload, for service " + e.getServiceId());
 			return null;
 		}
 		log.info("Retrieved status from battery : " + status);
@@ -97,6 +81,6 @@ public class Uploader {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received");
+		log.info("Startup event received for status uploader");
 	}
 }
