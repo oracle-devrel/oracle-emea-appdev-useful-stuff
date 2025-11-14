@@ -69,7 +69,7 @@ public class StatusUploader {
 		try {
 			status = client.fetchStatus();
 		} catch (HttpClientException e) {
-			log.warning("HttpClientExcepton getting configuration from sonnen due to " + e.getLocalizedMessage()
+			log.warning("HttpClientExcepton getting status from sonnen due to " + e.getLocalizedMessage()
 					+ ", no data to upload, for service " + e.getServiceId());
 			return null;
 		}
