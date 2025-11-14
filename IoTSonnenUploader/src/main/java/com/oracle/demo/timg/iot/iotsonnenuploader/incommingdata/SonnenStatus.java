@@ -46,21 +46,86 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenStatus {
-	@JsonProperty("BackupBuffer")
-	private int reservedBatteryCapacity;
+
+	// This is a Jackson de-serialisation "cheat" is effectively allows us to have
+	// two property names in the inbound JSON for reservedBatteryCapacity,
+	// BackupBuffer is the one used by the sonnen and will be used when
+	// de-serializing the JSON from the sonnen, but reservedBatteryCapacity will be
+	// used when serializing and is also used in the default de-serializing process
+	@JsonProperty(value = "BackupBuffer")
+	public void setReservedBatteryCapacityPercentageFromSonnen(int reservedBatteryCapacityPercentage) {
+		this.reservedBatteryCapacityPercentage = reservedBatteryCapacityPercentage;
+	}
+
+	// the default serialization / de-serialization will use reservedBatteryCapacity
+	// for the JSON property name
+	private int reservedBatteryCapacityPercentage;
+
+	@JsonProperty(value = "RSOC")
+	public void setCurrentBatteryCapacityFromSonnen(int currentBatteryCapacityPercentage) {
+		this.currentBatteryCapacityPercentage = currentBatteryCapacityPercentage;
+	}
+
+	private int currentBatteryCapacityPercentage;
+
+	@JsonProperty(value = "RemainingCapacity_W")
+	public void setRemainingBatteryCapacityWattHoursFromSonnen(int remainingBatteryCapacityWattHours) {
+		this.remainingBatteryCapacityWattHours = remainingBatteryCapacityWattHours;
+	}
+
+	private int remainingBatteryCapacityWattHours;
+
+	// do this renaming so the generated JSON will follow a consistent
+	// capitalization pattern
 	@JsonProperty("BatteryCharging")
+	public void setBatteryChargingFromSonnen(boolean batteryCharging) {
+		this.batteryCharging = batteryCharging;
+	}
+
 	private boolean batteryCharging;
+
 	@JsonProperty("BatteryDischarging")
+	public void setBatteryDischargingFromSonnen(boolean batteryDischarging) {
+		this.batteryDischarging = batteryDischarging;
+	}
+
 	private boolean batteryDischarging;
+
 	@JsonProperty("Consumption_Avg")
-	private int consumptionAvgLastMinute;
+	public void setConsumptionAvgLastMinuteFromSonnen(int consumptionAvgWattsLastMinute) {
+		this.consumptionAvgWattsLastMinute = consumptionAvgWattsLastMinute;
+	}
+
+	private int consumptionAvgWattsLastMinute;
+
 	@JsonProperty("Consumption_W")
-	private int consumptionPointInTime;
+	public void setConsumptionWattsPointInTimeFromSonnen(int consumptionWattsPointInTime) {
+		this.consumptionWattsPointInTime = consumptionWattsPointInTime;
+	}
+
+	private int consumptionWattsPointInTime;
+
 	@JsonProperty("GridFeedIn_W")
-	private int gridConsumption;
+	// note that this is measuring feed in as a positive number, so if we want grid
+	// consumption we need to invert if
+	public void setGridFeedInWattsPointInTimeFromSonnen(int gridFeedInWattsPointInTime) {
+		this.gridConsumptionWattsPointInTime = gridFeedInWattsPointInTime * -1;
+	}
+
+	private int gridConsumptionWattsPointInTime;
+
 	@JsonProperty("OperatingMode")
+	public void setOperatingMod(int operatingMode) {
+		this.operatingMode = operatingMode;
+	}
+
 	private int operatingMode;
+
 	@JsonProperty("Production_W")
-	private int solarProduction;
+	public void setProductionWattsPointInTimeFromSonnen(int consumptionWattsPointInTime) {
+		this.consumptionWattsPointInTime = consumptionWattsPointInTime;
+	}
+
+	private int solarProductionWattsPointInTime;
 
 }

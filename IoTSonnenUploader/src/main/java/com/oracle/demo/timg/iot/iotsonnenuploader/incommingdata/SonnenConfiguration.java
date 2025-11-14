@@ -46,13 +46,18 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenConfiguration {
-	@JsonProperty("EM_USOC")
-	private int reservedBatteryCapacity;
-	@JsonProperty("EM_OperatingMode")
-	private int operatingMode;
 	@JsonProperty("EM_ToU_Schedule")
-	private String touSchedule;
+	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
+		this.timeOfUseSchedule = timeOfUseSchedule;
+	}
+
+	private String timeOfUseSchedule;
+
 	@JsonProperty("DE_Software")
+	public void setSoftwareVersionFromSonnen(String softwareVersion) {
+		this.softwareVersion = softwareVersion;
+	}
+
 	private String softwareVersion;
 
 }
