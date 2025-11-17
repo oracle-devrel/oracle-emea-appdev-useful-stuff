@@ -1,4 +1,6 @@
 mqtt:
+  monitorreference:
+    enabled: false
   monitoruploads:
     enabled: false
   statusupload:
