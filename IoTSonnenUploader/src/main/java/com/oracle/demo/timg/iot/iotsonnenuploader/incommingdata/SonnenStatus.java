@@ -36,6 +36,8 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
 
+import java.time.ZonedDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -46,6 +48,8 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenStatus {
+
+	public ZonedDateTime timestamp = ZonedDateTime.now();
 
 	// This is a Jackson de-serialisation "cheat" is effectively allows us to have
 	// two property names in the inbound JSON for reservedBatteryCapacity,
@@ -61,12 +65,19 @@ public class SonnenStatus {
 	// for the JSON property name
 	private int reservedBatteryCapacityPercentage;
 
-	@JsonProperty(value = "RSOC")
-	public void setCurrentBatteryCapacityFromSonnen(int currentBatteryCapacityPercentage) {
+	@JsonProperty(value = "USOC")
+	public void setCurrentBatteryCapacityUserFromSonnen(int currentBatteryCapacityPercentage) {
 		this.currentBatteryCapacityPercentage = currentBatteryCapacityPercentage;
 	}
 
 	private int currentBatteryCapacityPercentage;
+
+	@JsonProperty(value = "RSOC")
+	public void setCurrentBatteryCapacitySystemFromSonnen(int currentBatteryCapacitySystemPercentage) {
+		this.currentBatteryCapacitySystemPercentage = currentBatteryCapacitySystemPercentage;
+	}
+
+	private int currentBatteryCapacitySystemPercentage;
 
 	@JsonProperty(value = "RemainingCapacity_W")
 	public void setRemainingBatteryCapacityWattHoursFromSonnen(int remainingBatteryCapacityWattHours) {

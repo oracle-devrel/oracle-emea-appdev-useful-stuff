@@ -36,6 +36,8 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
 
+import java.time.ZonedDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -46,6 +48,8 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenConfiguration {
+	public ZonedDateTime timestamp = ZonedDateTime.now();
+
 	@JsonProperty("EM_ToU_Schedule")
 	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
 		this.timeOfUseSchedule = timeOfUseSchedule;
