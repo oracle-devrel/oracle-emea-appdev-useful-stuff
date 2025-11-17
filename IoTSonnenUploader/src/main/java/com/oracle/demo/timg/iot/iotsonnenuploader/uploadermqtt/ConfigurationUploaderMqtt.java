@@ -75,7 +75,7 @@ public class ConfigurationUploaderMqtt {
 		}
 		log.info("Retrieved configuration from battery : " + conf);
 		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-		publishResp.thenRun(() -> log.info("Published configuration as object"));
+		publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
 		return conf;
 	}
 
