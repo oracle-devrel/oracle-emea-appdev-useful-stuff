@@ -34,13 +34,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploader;
+package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
 
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller.SonnenBatteryClient;
+import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
@@ -55,15 +55,15 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = "mqtt.statusupload.enabled", value = "true", defaultValue = "true")
-public class StatusUploader {
+@Requires(property = "mqtt.statusuploadmqtt.enabled", value = "true", defaultValue = "false")
+public class StatusUploaderMqtt {
 	@Inject
 	private SonnenBatteryClient client;
 	@Inject
 	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
 	@ExecuteOn(TaskExecutors.IO)
-	@Scheduled(fixedRate = "${mqtt.statusupload.frequency:10s}", initialDelay = "${mqtt.statusupload.initialdelay:10s}")
+	@Scheduled(fixedRate = "${mqtt.statusuploadmqtt.frequency:10s}", initialDelay = "${mqtt.statusuploadmqtt.initialdelay:10s}")
 	public SonnenStatus processStatus() {
 		SonnenStatus status;
 		try {
