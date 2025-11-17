@@ -1,0 +1,63 @@
+device:
+  id: tims
+  
+mqtt:
+  monitorreference:
+    enabled: true
+  monitoruploads:
+    enabled: false
+  statusuploadhttps:
+    enabled: false
+    frequency: "10s"
+    initialdelay: "10s"
+  configurationuploadhttps:
+    enabled: false
+    frequency: "120s"
+    initialdelay: "5s"
+  statusuploadmqtt:
+    enabled: false
+    frequency: "10s"
+    initialdelay: "10s"
+  configurationuploadmqtt:
+    enabled: false
+    frequency: "120s"
+    initialdelay: "5s"
+  broker:
+    host: localhost
+    port: 1883
+  client:
+    # Unique identifier for this MQTT client
+    client-id: ${random.uuid}
+
+    # MQTT broker connection
+    server-uri: tcp://${mqtt.broker.host}:${mqtt.broker.port}
+
+    # Authentication
+    user-name: ${device.id}
+    password: ExamplePassword
+
+    # Optional connection settings
+    clean-session: true
+    automatic-reconnect: true
+    connection-timeout: "PT30s"
+    keep-alive-interval: 60
+
+    will-message:
+      topic: home/sonnen/will/${device.id}
+      payload: Device ${device.id} is unavailable
+      qos: 0
+      retained: true
+
+iotservice:
+  statusuploadhttps:
+    enabled: true
+    frequency: "10s"
+    initialdelay: "10s"
+  configurationuploadhttps:
+    enabled: false
+    frequency: "120s"
+    initialdelay: "5s"
+  # Authentication
+  user-name: ${device.id}
+  # the password must be in base 64, the program will decode it before use
+  password: ExamplePassword

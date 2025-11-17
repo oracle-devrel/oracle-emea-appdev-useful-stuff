@@ -41,6 +41,7 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandResponse;
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
@@ -55,9 +56,9 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
-@MqttProperties({ @MqttProperty(name = "username", value = "tims"),
+@MqttProperties({ @MqttProperty(name = "username", value = "${device.id}"),
 		@MqttProperty(name = "password", value = "ExamplePassword") })
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@Requires(property = DeviceSettings.PREFIX + ".id")
 public class MqttCommandHandler {
 	@Inject
 	public MqttCommandResponsePublisher responsePublisher;
@@ -65,7 +66,7 @@ public class MqttCommandHandler {
 	private ObjectMapper mapper;
 
 	@ExecuteOn(TaskExecutors.IO)
-	@Topic("house/sonnen/command/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnen/command/${" + DeviceSettings.PREFIX + ".id}")
 	public void receive(String command) throws IOException {
 		if (command.length() == 0) {
 			log.info("Monitor recieved zero length config");

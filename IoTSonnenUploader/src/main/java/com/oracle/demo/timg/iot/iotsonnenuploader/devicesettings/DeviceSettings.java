@@ -34,16 +34,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
+package com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
 import lombok.Data;
 
-@ConfigurationProperties(MqttDeviceSettings.PREFIX)
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@ConfigurationProperties(DeviceSettings.PREFIX)
+@Requires(property = DeviceSettings.PREFIX + ".id")
 @Data
-public class MqttDeviceSettings {
-	public static final String PREFIX = "mqtt.device";
+public class DeviceSettings {
+	public static final String PREFIX = "device";
 	private String id;
 }

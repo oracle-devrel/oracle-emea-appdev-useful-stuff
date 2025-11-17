@@ -36,6 +36,7 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
@@ -46,15 +47,15 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
 public class MqttUploadMonitor {
-	@Topic("house/sonnen/configuration/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnen/configuration/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveConfig(SonnenConfiguration config) {
 		log.info("Monitor recieved config " + config);
 	}
 
-	@Topic("house/sonnen/status/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnen/status/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveStatus(SonnenStatus status) {
 		log.info("Monitor recieved status " + status);
 	}

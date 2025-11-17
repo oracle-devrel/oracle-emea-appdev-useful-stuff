@@ -36,6 +36,8 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
+
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
@@ -43,20 +45,20 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.monitorreference.enabled", value = "true", defaultValue = "false")
 /*
- * get the data sent to the topics as a string, this means ytou can then use it
+ * get the data sent to the topics as a string, this means you can then use it
  * for examples entries in the IoT adaptors
  * 
  */
 public class MqttReferenceMonitor {
-	@Topic("house/sonnen/configuration/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnen/configuration/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveConfig(String config) {
 		log.info("Reference recieved config " + config);
 	}
 
-	@Topic("house/sonnen/status/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnen/status/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveStatus(String status) {
 		log.info("Reference recieved status " + status);
 	}

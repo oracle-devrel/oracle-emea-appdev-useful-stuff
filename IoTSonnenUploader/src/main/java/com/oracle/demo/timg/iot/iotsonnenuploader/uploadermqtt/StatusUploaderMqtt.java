@@ -55,7 +55,7 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = "mqtt.statusuploadmqtt.enabled", value = "true", defaultValue = "false")
+@Requires(property = "mqtt.statusupload.enabled", value = "true", defaultValue = "false")
 public class StatusUploaderMqtt {
 	@Inject
 	private SonnenBatteryClient client;
@@ -63,7 +63,7 @@ public class StatusUploaderMqtt {
 	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
 	@ExecuteOn(TaskExecutors.IO)
-	@Scheduled(fixedRate = "${mqtt.statusuploadmqtt.frequency:10s}", initialDelay = "${mqtt.statusuploadmqtt.initialdelay:10s}")
+	@Scheduled(fixedRate = "${mqtt.statusupload.frequency:10s}", initialDelay = "${mqtt.statusupload.initialdelay:10s}")
 	public SonnenStatus processStatus() {
 		SonnenStatus status;
 		try {

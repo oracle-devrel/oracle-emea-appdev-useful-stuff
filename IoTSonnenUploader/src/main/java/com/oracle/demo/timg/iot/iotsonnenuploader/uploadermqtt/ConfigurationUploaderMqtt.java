@@ -55,14 +55,14 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = "mqtt.configurationuploadmqtt.enabled", value = "true", defaultValue = "false")
+@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
 public class ConfigurationUploaderMqtt {
 	@Inject
 	private SonnenBatteryClient client;
 	@Inject
 	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
-	@Scheduled(fixedRate = "${mqtt.configurationuploadmqtt.frequency:120s}", initialDelay = "${mqtt.configurationuploadmqtt.initialdelay:5s}")
+	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
 	@ExecuteOn(TaskExecutors.IO)
 	public SonnenConfiguration processConfiguration() {
 		SonnenConfiguration conf;
