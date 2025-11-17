@@ -34,30 +34,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller;
+package com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient;
+
+import static io.micronaut.http.HttpHeaders.ACCEPT;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
+import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
+import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.ClientFilter;
-import io.micronaut.http.annotation.RequestFilter;
-import jakarta.inject.Inject;
-import lombok.extern.java.Log;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 
-@ClientFilter(patterns = "/api/**")
+@Client(id = "sonnenbattery", path = "/api/v2")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+@Header(name = ACCEPT, value = "application/json")
 @Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
-@Log
-public class SonnenBatteryRequestFilter {
-	public final static String HEADER_AUTH_TOKEN = "Auth-Token";
-	private final SonnenBatteryHttpClientSettings clientSettings;
+public interface SonnenBatteryClient {
 
-	@Inject
-	public SonnenBatteryRequestFilter(SonnenBatteryHttpClientSettings clientSettings) {
-		this.clientSettings = clientSettings;
-	}
+	@Get("/configurations")
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenConfiguration fetchConfiguration() throws HttpClientException;
 
-	@RequestFilter
-	public void doFilter(MutableHttpRequest<?> request) {
-		log.finer("Adding header " + HEADER_AUTH_TOKEN);
-		request.getHeaders().add(HEADER_AUTH_TOKEN, clientSettings.getAuthToken());
-	}
+	@Get("/status")
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenStatus fetchStatus() throws HttpClientException;
+
 }

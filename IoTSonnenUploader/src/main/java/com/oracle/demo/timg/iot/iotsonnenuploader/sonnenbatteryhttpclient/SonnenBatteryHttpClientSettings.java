@@ -34,32 +34,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller;
+package com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient;
 
-import static io.micronaut.http.HttpHeaders.ACCEPT;
-import static io.micronaut.http.HttpHeaders.USER_AGENT;
-
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
-
+import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.client.annotation.Client;
-import io.micronaut.http.client.exceptions.HttpClientException;
+import lombok.Data;
 
-@Client(id = "sonnenbattery", path = "/api/v2")
-@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
-@Header(name = ACCEPT, value = "application/json")
+@ConfigurationProperties(SonnenBatteryHttpClientSettings.PREFIX)
 @Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
-public interface SonnenBatteryClient {
-
-	@Get("/configurations")
-	// @Error(exception = ReadTimeoutException.class)
-	public SonnenConfiguration fetchConfiguration() throws HttpClientException;
-
-	@Get("/status")
-	// @Error(exception = ReadTimeoutException.class)
-	public SonnenStatus fetchStatus() throws HttpClientException;
-
+@Data
+public class SonnenBatteryHttpClientSettings {
+	public static final String PREFIX = "sonnenbattery";
+	private String authToken;
 }
