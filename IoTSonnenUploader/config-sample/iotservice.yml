@@ -48,16 +48,27 @@ mqtt:
       qos: 0
       retained: true
 
-iotservice:
-  statusuploadhttps:
+iotservicehttps:
+  statusupload:
     enabled: true
     frequency: "10s"
     initialdelay: "10s"
-  configurationuploadhttps:
-    enabled: false
+    # must be PLAIN or JSON
+    sendtype: PLAIN
+  configurationupload:
+    enabled: true
     frequency: "120s"
     initialdelay: "5s"
+    # must be PLAIN or JSON
+    sendtype: PLAIN
   # Authentication
-  user-name: ${device.id}
+  username: ${device.id}
   # the password must be in base 64, the program will decode it before use
-  password: ExamplePassword
+  password: <PasswordInBase64>
+    
+micronaut:
+  http:
+    services:
+      iotservicehttps:
+        # the URL is of the format https://<domain-short-id>.device.iot.<oci region id>.oci.oraclecloud.com
+        url: https://<domain-short-id>.device.iot.<oci region id>.oci.oraclecloud.com
