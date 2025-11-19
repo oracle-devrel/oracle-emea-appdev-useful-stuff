@@ -81,6 +81,6 @@ public class ConfigurationUploaderMqtt {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for configuration uploader");
+		log.info("Startup event received for configuration mqtt uploader");
 	}
 }

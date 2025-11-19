@@ -81,6 +81,6 @@ public class StatusUploaderMqtt {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for status uploader");
+		log.info("Startup event received for status mqtt uploader");
 	}
 }
