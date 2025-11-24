@@ -1,0 +1,23 @@
+{
+  "reference-endpoint": "house/sonnen/status",
+  "reference-payload": {
+         "data": {
+           "batteryCharging": false,
+           "batteryDischarging": false,
+           "consumptionAvgWattsLastMinute": 0,
+           "consumptionWattsPointInTime": 0,
+           "currentBatteryCapacityPercentage": 0,
+           "gridConsumptionWattsPointInTime": 0,
+           "operatingMode": 0,
+           "remainingBatteryCapacityWattHours": 0,
+           "reservedBatteryCapacityPercentage": 0,
+           "solarProductionWattsPointInTime": 0,
+		   "time": 123456,
+           "timestamp": "2025-11-18T16:23:52.081763412Z"
+         },
+         "data-format": "JSON"
+  },
+  "envelope-mapping": {
+    "timeObserved": "$.time"
+  }
+}

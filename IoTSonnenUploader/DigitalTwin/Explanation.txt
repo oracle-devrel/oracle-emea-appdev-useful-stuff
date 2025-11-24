@@ -1,0 +1,14 @@
+These files defint the various elements of the digital twin process for the Oracle IoT cloud service
+They are written in the Digital Twin Definition Language v3 (DTDLv3)- see the specification at https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v3/DTDL.Specification.v3.md
+Identifiers are based on the Digital Twin Modeling Identifier (DTMI) - see https://github.com/Azure/opendigitaltwins-dtdl/tree/master/DTMI
+Items that do not use a full DTMI identifier are the elements defined in standard schemas at https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v3/DTDL.Specification.v3.md#standard-schemas
+Note that the context may use extentions, see the list of extensions at https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v3/DTDL.v3.md#language-extensions
+
+the reference data for the configuration is
+{"softwareVersion":"1.18.4","timeOfUseSchedule":"[{\"start\":\"23:30\",\"stop\":\"00:00\",\"threshold_p_max\":22500},{\"start\":\"00:00\",\"stop\":\"05:30\",\"threshold_p_max\":20000}]","timestamp":"2025-11-18T16:47:32.900336Z[Europe/London]"}
+
+the reference data for the status is
+{"consumptionAvgWattsLastMinute":339,"consumptionWattsPointInTime":333,"currentBatteryCapacityPercentage":59,"currentBatteryCapacitySystemPercentage":62,"gridConsumptionWattsPointInTime":41,"operatingMode":2,"remainingBatteryCapacityWattHours":9102,"reservedBatteryCapacityPercentage":5,"solarProductionWattsPointInTime":131,"time":1763981430279,"timestamp":"2025-11-24T10:50:30.279369Z[Europe/London]","batteryCharging":false,"batteryDischarging":true}
+
+Note that these will be updated over time. to get this data use a loval mqtt server and set the property mqtt.monitorreference.enabled to true (if missing it defaults to false.
+Then as the status and configuration are published they wil be displayed as the contents string

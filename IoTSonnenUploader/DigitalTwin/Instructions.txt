@@ -1,0 +1,275 @@
+All examples below use the default oci config entry
+Make sure you have the latest OCI command line client 370.1 works as may earlier versions, buyt 3.45 does not. On Macos you can use homebrew - https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#InstallingCLI__macos_homebrew other instrucitons are at  - see https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/climanualinst.htm
+
+Make sure you havce setup a group and policies as per https://docs.oracle.com/en-us/iaas/Content/internet-of-things/overview.htm#prerequisites
+
+If needed create a compartment to operate in, or chose a existing compartment, set the environment variable IOT_COMPARTMENT_OCID to be the ocid of the compartment
+export IOT_COMPARTMENT_OCID=<compartment ocid>
+# change these names as required
+export IOT_DOMAIN_GROUP_NAME=iot-domain-group-timg
+export IOT_DOMAIN_NAME=iot-domain-timg
+
+# Create the IoT Domain Group imstructions at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/create-domain-group.htm
+# to make sure it's in a ready state
+oci iot domain-group create --compartment-id $IOT_COMPARTMENT_OCID --display_name $IOT_DOMAIN_GROUP_NAME --wait-for-state SUCCEEDED --wait-for-state FAILED
+# this will return on success or fail, also this may start a work request, which runs in the background, use this command to see if it's created 
+oci iot domain-group list --display-name $IOT_DOMAIN_GROUP_NAME --compartment-id $IOT_COMPARTMENT_OCID
+# get the domain group ocid (only run this once' it's created)
+export IOT_DOMAIN_GROUP_OCID=`oci iot domain-group list --display-name $IOT_DOMAIN_GROUP_NAME --compartment-id $IOT_COMPARTMENT_OCID | jq -r '.data.items[0].id'`
+# get the data host
+export IOD_DOMAIN_GROUP_DATA_HOST=`oci iot domain-group get --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID | jq -r '.data."data-host"'`
+
+#Create the IoT domain within the group
+oci iot domaincreate --compartment-id $IOT_COMPARTMENT_OCID --display_name $IOT_DOMAIN_NAME --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID --wait-for-state SUCCEEDED --wait-for-state FAILED
+# this will return on success or fail, also this may start a work request, which runs in the background, use this command to see if it's created 
+oci iot domain list --display-name $IOT_DOMAIN_NAME --compartment-id $IOT_COMPARTMENT_OCID --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID
+#Get the OCID we will need
+export IOT_DOMAIN_OCID=`oci iot domain list --display-name $IOT_DOMAIN_NAME --compartment-id $IOT_COMPARTMENT_OCID --iot-domain-group-id $IOTDOMAIN_GROUP_OCID | jq -r '.data.items[0].id'`
+export IOT_DOMAIN_HOST=`oci iot domain get --iot-domain-id $IOT_DOMAIN_OCID | jq -r '.data."device-host"'`
+
+export IOT_DOMAIN_SHORT_ID=`echo $IOT_DOMAIN_HOST| tr '.' ' ' | awk '{print $1}'`
+###########
+The IoT core is now in place, the underlyign DB and Kubernrtes runtime has been created and configured along with the MQTT server
+
+
+ setup the OCI vault and a secret within it containing the password you want to use for the device
+ export DEVICE_VAULT_SECRET_OCID=<the ocid>
+ 
+ set the id that will be used to identify the device
+ export DEVICE_ID=tims
+ now create the digital twin to be linked to the device - this is for unstructured data only
+ oci iot digital-twin-instance create --iot-domain-id $IOT_DOMAIN_OCID --auth-id $DEVICE_VAULT_SECRET_OCID --display-name $DEVICE_ID
+ 
+ # get the OCID of the digital twin
+ export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[0].id'`
+ 
+ get it's external key
+ export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance list  --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DEVICE_ID | jq -r '.data.items[0]."external-key"'`
+ 
+ we can test sending some external unstructured data now
+ export DEVICE_SECRET_BASE64=`oci secrets secret-bundle get --secret-id $DEVICE_VAULT_SECRET_OCID --stage CURRENT | jq -r '.data."secret-bundle-content".content'`
+ export DEVICE_SECRET=`echo $DEVICE_SECRET_BASE64 | base64 --decode`
+
+curl -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOST/sampletopic -H 'Content-Type: plain-text' -d "I am some test data"
+
+ Go into the and setup APEX using the data access options
+export IOT_APEX_INITIAL_PASSWORD=<your password>
+oci iot domain configure-apex-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-workspace-admin-initial-password $IOT_APEX_INITIAL_PASSWORD
+
+#Get the apex URL 
+echo APEX_URL "https://$IOD_DOMAIN_GROUP_DATA_HOST/ords/apex/"
+#get the user id and workspace
+echo APEX_Workspace  "$IOT_DOMAIN_SHORT_ID"__WKSP
+echo APEX_User  "$IOT_DOMAIN_SHORT_ID"__WKSP
+echo APEX_Schema  "$IOT_DOMAIN_SHORT_ID"__IOT
+
+switch to the IOT Scheme (upper right)
+
+select the raw data content orded by the most recent to oldest
+select * from RAW_DATA order by TIME_RECEIVED DESC
+
+have the Client code send some data, you will need to make changes to the configuration file
+device.id to $DEVICE_ID
+iotserverhttps.username to $DEVICE_EXTERNAL_KEY
+iotserverhttps.password to $DEVICE_SECRET_BASE64
+micronaut.http.services.iotservicehttps.url https://$IOT_DOMAIN_HOST
+
+
+make sure that this is set to true
+iotservicehttps.statusupload.enabled
+
+make sure that these are set to PLAIN
+iotservicehttps.statusupload.sendtype
+
+make sure that these is set to false
+iotservicehttps.configurationupload.enabled
+mqtt.statusupload.enabled
+mqtt.configurationupload.enabled
+mqtt.monitorreference.enabled
+mqtt.monitoruploads.enabled
+
+Run the simulation, it should happily upload the data if the above is set (and of course you have access to a sonnen and have set the approipriate settings in the battery.properties file)
+
+can use the CLI to get the most recent data snapshot and see it changing as the simulator sends events
+oci iot digital-twin-instance get-content --digital-twin-instance-id  $DIGITAL_TWIN_INSTANCE_OCID
+
+Use APEX or SQL Developer WEB to look at the uploaded data - note that the payload is BLOB so you van't see it, but this command will let see the contents with most recent first
+select TIME_RECEIVED, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) from RAW_DATA order by TIME_RECEIVED DESC
+
+
+delete the basic digital twin
+oci iot digital-twin-instance delete --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID --force --wait-for-state DELETED
+
+
+now let's setup a digital twin model - this uses the exact field names in the data being uploaded
+
+export DIGITAL_TWIN_MODEL_NAME=sonnenbattery
+export DIGITAL_TWIN_MODEL_FILE_NAME=SonnenSpecificDTMI.json
+export DIGITAL_TWIN_MODEL_FILE=file://$DIGITAL_TWIN_MODEL_FILE_NAME
+# Create the digntal twin model, note this is the simple version, run from within the DigitalTwin folder
+oci iot digital-twin-model create --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME --spec $DIGITAL_TWIN_MODEL_FILE --wait-for-state ACTIVE
+
+ 
+# get the id of the model you just created
+export DIGTAL_TWIN_MODEL_ID=`oci iot digital-twin-model list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME | jq  -r '.data.items[0].id'`
+
+# to replace the model with a new one you have to delete the old one then create a new one
+oci iot digital-twin-model delete --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID --force --wait-for-state DELETED
+export DIGTAL_TWIN_MODEL_ID=`oci iot digital-twin-model create --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME --query data.id --raw-output --spec $DIGITAL_TWIN_MODEL_FILE`
+
+
+# to get the current spec to edit it
+oci iot digital-twin-model get-spec --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID
+
+get the model identifier
+export DIGITAL_TWIN_MODEL_IDENTIFIER=`cat $DIGITAL_TWIN_MODEL_FILE_NAME | jq -r '.["@id"]'`
+export DIGITAL_TWIN_ADAPTER_NAME="$DIGITAL_TWIN_MODEL_NAME"_adapter
+
+now create the adapter. For the sonnenbattery model as we use exactly the same field names we don't need to worry about setting up any mappings, 
+oci iot digital-twin-adapter create --iot-domain-id $IOT_DOMAIN_OCID --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID  --display-name $DIGITAL_TWIN_ADAPTER_NAME --wait-for-state ACTIVE
+
+export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DIGITAL_TWIN_ADAPTER_NAME | jq -r '.data.items[0].id'`
+
+to see the adaptor contents
+oci iot digital-twin-adapter get  --digital-twin-adapter-id  $DIGITAL_TWIN_ADAPTER_OCID
+
+if needed to delete the adaptor
+oci iot digital-twin-adapter delete --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --force --wait-for-state DELETED
+
+now let's re-create our device using the adaptor to process structured data
+oci iot digital-twin-instance create --iot-domain-id $IOT_DOMAIN_OCID --auth-id $DEVICE_VAULT_SECRET_OCID --display-name $DEVICE_ID --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --wait-for-state ACTIVE
+ 
+ # get the OCID of the digital twin
+ export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[0].id'`
+ 
+ # get it's external key
+ export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance list  --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DEVICE_ID | jq -r '.data.items[0]."external-key"'`
+ 
+ let's send some sample JSON data, the iot has set this up to accept data on any inbound path, so let's use the one we will use for the structured data
+ curl -i -X POST -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOST/home/sonnenstatus/$DEVICE_ID -H "Content-Type:application/json"  -d '{"consumptionAvgWattsLastMinute":566,"consumptionWattsPointInTime":141,"currentBatteryCapacityPercentage":97,"currentBatteryCapacitySystemPercentage":97,"gridConsumptionWattsPointInTime":63,"operatingMode":2,"remainingBatteryCapacityWattHours":0,"reservedBatteryCapacityPercentage":5,"solarProductionWattsPointInTime":0,"timestamp":"2025-11-18T16:22:58.348041Z","batteryCharging":false,"batteryDischarging":true}'
+
+ check it's in the raw data table
+ select * from RAW_DATA order by TIME_RECEIVED DESC
+ 
+ check the rejected data to make sure it didn't fail
+ select * from REJECTED_DATA order by TIME_RECEIVED DESC
+ 
+ check the data from the snapshot data - this will be the most recent data sent by the device
+ select * from SNAPSHOT_DATA
+ 
+ check the data from the history data - as we've only sent one item this will be the most recent data sent by the device for now
+select * from HISTORIZED_DATA
+
+
+run the simulator so we get a set of history data, you will need to make changes to the configuration file (this assumes you have already made the changes above for previously using the simulator
+iotserverhttps.username to $DEVICE_EXTERNAL_KEY
+
+make sure that these are set to JSON
+iotservicehttps.statusupload.sendtype
+
+now let's look at the snapshot data, refresh this a few times, it will be updating (if there were multiple instances this will prioritise the most reecent data)  
+select DIGITAL_TWIN_INSTANCE_ID, CONTENT_PATH, VALUE, TIME_OBSERVED from snapshot_data
+order by time_observed desc;
+
+the snapshot is only the most recent, let's look at the history, notice it's changing over time (if there were multiple instances this will prioritise the most reecent data) 
+select DIGITAL_TWIN_INSTANCE_ID, VALUE, TIME_OBSERVED from HISTORIZED_DATA 
+where CONTENT_PATH = 'consumptionAvgWattsLastMinute'
+order by time_observed desc;
+
+can now delete the items we have just created (not strictly needed, but helps to remove unwanted items to keep things tidy, note that this does not destroy the data in the database itself)
+
+oci iot digital-twin-instance delete --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID --force --wait-for-state DELETED
+oci iot digital-twin-adapter delete --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --force --wait-for-state DELETED
+oci iot digital-twin-model delete --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID --force --wait-for-state DELETED
+
+
+This however is assuming that the digital twin model is an exact match for the data comming from the device, this is an ideal use case, but what if you wanted to model a generic home battery but with different homke betteries, you will need to map the data to the model
+Let's create a new model that had generic names for the attributes.
+
+export DIGITAL_TWIN_MODEL_NAME=homebattery
+export DIGITAL_TWIN_MODEL_FILE_NAME=HomeBatteryDTMI.json
+export DIGITAL_TWIN_MODEL_FILE=file://$DIGITAL_TWIN_MODEL_FILE_NAME
+# Create the digtal twin model, note this is the simple version, run from within the DigitalTwin folder
+oci iot digital-twin-model create --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME --spec $DIGITAL_TWIN_MODEL_FILE --wait-for-state ACTIVE
+
+ 
+# get the id of the model you just created
+export DIGTAL_TWIN_MODEL_ID=`oci iot digital-twin-model list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME | jq  -r '.data.items[0].id'`
+# and the models name
+export DIGITAL_TWIN_MODEL_IDENTIFIER=`cat $DIGITAL_TWIN_MODEL_FILE_NAME | jq -r '.["@id"]'`
+
+Now we need to setup mappings from the data format comming in to the model we will use, this means an adaptor, let's install it
+export DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-single-route.json
+export DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-envelope.json
+export DIGITAL_TWIN_ADAPTER_NAME=sonnen-single-route
+
+
+# create the adaptor using the route file, even though our envelope mapping is the default we actually still have to specify it sadly.
+# note that as the file contents is inlined into the JSON request then the stricture of the JSON files MUST be OK (if not you'll get missing param errors, even though you have specifried all fo the actual flags correctly
+
+oci iot digital-twin-adapter create --iot-domain-id $IOT_DOMAIN_OCID --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID  --inbound-routes $DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE  --display-name $DIGITAL_TWIN_ADAPTER_NAME  --inbound-envelope $DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE   --wait-for-state ACTIVE
+# get the OCID of the new adaptor
+export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DIGITAL_TWIN_ADAPTER_NAME | jq -r '.data.items[0].id'`
+
+
+Finally we create a didital twin instance using the mapping based adaptor
+oci iot digital-twin-instance create --iot-domain-id $IOT_DOMAIN_OCID --auth-id $DEVICE_VAULT_SECRET_OCID --display-name $DEVICE_ID --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --wait-for-state ACTIVE
+ 
+ # get the OCID of the digital twin
+ export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[0].id'`
+ 
+ # get it's external key
+ export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance list  --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DEVICE_ID | jq -r '.data.items[0]."external-key"'`
+ 
+ 
+curl -i -X POST -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOST/home/sonnenstatus/$DEVICE_ID -H "Content-Type:application/json"  -d '{"consumptionAvgWattsLastMinute":339,"consumptionWattsPointInTime":333,"currentBatteryCapacityPercentage":59,"currentBatteryCapacitySystemPercentage":62,"gridConsumptionWattsPointInTime":41,"operatingMode":2,"remainingBatteryCapacityWattHours":9102,"reservedBatteryCapacityPercentage":5,"solarProductionWattsPointInTime":131,"time":1763981430279,"timestamp":"2025-11-24T10:50:30.279369Z[Europe/London]","batteryCharging":false,"batteryDischarging":true}'
+
+can get the most resent snapshot using the oci cli as well
+
+oci iot digital-twin-instance get-content  --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID | jq -r '.data'
+
+this is just tracking the status data, we also want to be able to track the configuration data as well, to do that we need to look ath the mdifferent paths the requests are arriving on
+
+delete the current instance and adapter, the model will stay the same
+
+oci iot digital-twin-instance delete --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID --force --wait-for-state DELETED
+oci iot digital-twin-adapter delete --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --force --wait-for-state DELETED
+
+let's setup a new adaptor that can handle both these, note we use different endpoints to separate the mappings
+
+export DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-multiple-routes.json
+export DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-envelope.json
+export DIGITAL_TWIN_ADAPTER_NAME=sonnen-multiple-routes
+
+# create the adaptor using the multiple routes file.
+# note that as the file contents is inlined into the JSON request then the stricture of the JSON files MUST be OK (if not you'll get missing param errors, even though you have specifried all fo the actual flags correctly
+oci iot digital-twin-adapter create --iot-domain-id $IOT_DOMAIN_OCID --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID  --inbound-routes $DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE  --display-name $DIGITAL_TWIN_ADAPTER_NAME  --inbound-envelope $DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE   --wait-for-state ACTIVE
+# get the OCID of the new adaptor
+
+export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DIGITAL_TWIN_ADAPTER_NAME | jq -r '.data.items[0].id'`
+
+
+Finally we create a digital twin instance using the mapping based adaptor
+oci iot digital-twin-instance create --iot-domain-id $IOT_DOMAIN_OCID --auth-id $DEVICE_VAULT_SECRET_OCID --display-name $DEVICE_ID --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --wait-for-state ACTIVE
+ 
+ # get the OCID of the digital twin
+ export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[0].id'`
+ 
+ # get it's external key
+ export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance list  --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DEVICE_ID | jq -r '.data.items[0]."external-key"'`
+ 
+# make sure we can post the status data
+curl -i -X POST -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOST/home/sonnenstatus/$DEVICE_ID -H "Content-Type:application/json"  -d '{"consumptionAvgWattsLastMinute":488,"consumptionWattsPointInTime":517,"currentBatteryCapacityPercentage":25,"currentBatteryCapacitySystemPercentage":30,"gridConsumptionWattsPointInTime":44,"operatingMode":10,"remainingBatteryCapacityWattHours":4775,"reservedBatteryCapacityPercentage":5,"solarProductionWattsPointInTime":0,"time":1764004104225,"timestamp":"2025-11-24T17:08:24.225022Z[Europe/London]","batteryCharging":false,"batteryDischarging":true}'
+ 
+ 
+check it's been uploaded in the snapshots data - use the sqldeveloper web UI for this
+select * from snapshot_data order by TIME_OBSERVED desc
+
+check if we have any config info
+select * from snapshot_data where content_path in ('SoftwareVersion', 'TimeOfUseSchedule', 'ConfigurationTimestamp') order by TIME_OBSERVED desc
+now upload the config data, note that this has not been previously uploaded so when we look at the snapshot again is should be new data
+curl -i -X POST -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOST/home/sonnenconfiguration/$DEVICE_ID -H "Content-Type:application/json"  -d '{"softwareVersion":"1.18.4","time":1764010812994,"timeOfUseSchedule":"[{\"start\":\"23:30\",\"stop\":\"00:00\",\"threshold_p_max\":22500},{\"start\":\"00:00\",\"stop\":\"05:30\",\"threshold_p_max\":20000}]","timestamp":"2025-11-24T19:00:12.994906Z[Europe/London]"}'
+
+check that this has been uploaded
+select * from snapshot_data where content_path in ('SoftwareVersion', 'TimeOfUseSchedule', 'ConfigurationTimestamp') order by TIME_OBSERVED desc
+

@@ -1,0 +1,152 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homebattery;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Status Data timestamp",
+			"name": "StatusTimestamp",
+			"schema": "dateTime"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Battery Operating Mode",
+			"name": "OperatingMode",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Current Battery Charge Percentage",
+			"name": "CurrentChargePercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Reserved Battery Charge Percentage",
+			"name": "ReservedChargePercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Energy"
+			],
+			"displayName": "Remaining Power In Battery",
+			"name": "CapacityRemaining",
+			"schema": "integer",
+			"unit": "wattHour"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Battery Is Charging",
+			"name": "BatteryCharging",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Battery Is Discharging",
+			"name": "BatteryDischarging",
+			"schema": "boolean"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Battery Power Supplied 1 min average",
+			"name": "DischargeRateAvgLastMinute",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Battery Power Supplied Point In Time",
+			"name": "DischargePower",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Grid Consumption Point In Time",
+			"name": "GridFlowPointInTime",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Solar Power Production Point In Time",
+			"name": "SolarGeneration",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Configuration Data timestamp",
+			"name": "ConfigurationTimestamp",
+			"schema": "dateTime"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Software Version",
+			"name": "SoftwareVersion",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Time Of Use Schedule",
+			"name": "TimeOfUseSchedule",
+			"schema": "string"
+		}
+	]
+}

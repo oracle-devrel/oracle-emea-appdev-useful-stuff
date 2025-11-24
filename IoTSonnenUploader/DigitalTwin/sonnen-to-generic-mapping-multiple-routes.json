@@ -1,0 +1,55 @@
+[
+	{
+		"condition": "${endpoint(2) == \"sonnenstatus\"}",
+		"description": "Handle status messages",
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"consumptionAvgWattsLastMinute": 339,
+				"consumptionWattsPointInTime": 333,
+				"currentBatteryCapacityPercentage": 59,
+				"currentBatteryCapacitySystemPercentage": 62,
+				"gridConsumptionWattsPointInTime": 41,
+				"operatingMode": 2,
+				"remainingBatteryCapacityWattHours": 9102,
+				"reservedBatteryCapacityPercentage": 5,
+				"solarProductionWattsPointInTime": 131,
+				"time": 1763981430279,
+				"timestamp": "2025-11-24T10:50:30.279369Z[Europe/London]",
+				"batteryCharging": false,
+				"batteryDischarging": true
+			}
+		},
+		"payload-mapping": {
+			"$.BatteryCharging": "$.batteryCharging",
+			"$.BatteryDischarging": "$.batteryDischarging",
+			"$.DischargeRateAvgLastMinute": "$.consumptionAvgWattsLastMinute",
+			"$.DischargePower": "$.consumptionWattsPointInTime",
+			"$.CurrentChargePercentage": "$.currentBatteryCapacityPercentage",
+			"$.GridFlowPointInTime": "$.gridConsumptionWattsPointInTime",
+			"$.OperatingMode": "${if (.operatingMode == 1)  then \"Manual\" elif (.operatingMode == 2) then \"Automatic - Self-Consumption\" elif (.operatingMode == 6) then \"Battery-Module-Extension (30%)\" elif (.operatingMode == 10) then \"Time-Of-Use\" else \"Unknown Mode\" end}",
+			"$.CapacityRemaining": "$.remainingBatteryCapacityWattHours",
+			"$.ReservedChargePercentage": "$.reservedBatteryCapacityPercentage",
+			"$.SolarGeneration": "$.solarProductionWattsPointInTime",
+			"$.StatusTimestamp": "$.timestamp"
+		}
+	},
+	{
+		"condition": "${endpoint(2) == \"sonnenconfiguration\"}",
+		"description": "Handle configuration messages",
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"softwareVersion": "1.18.4",
+				"time": 1764004099418,
+				"timeOfUseSchedule": "[{\"start\":\"23:30\",\"stop\":\"00:00\",\"threshold_p_max\":22500},{\"start\":\"00:00\",\"stop\":\"05:30\",\"threshold_p_max\":20000}]",
+				"timestamp": "2025-11-24T17:08:19.41809Z[Europe/London]"
+			}
+		},
+		"payload-mapping": {
+			"$.SoftwareVersion": "$.softwareVersion",
+			"$.TimeOfUseSchedule": "$.timeOfUseSchedule",
+			"$.ConfigurationTimestamp": "$.timestamp"
+		}
+	}
+]
