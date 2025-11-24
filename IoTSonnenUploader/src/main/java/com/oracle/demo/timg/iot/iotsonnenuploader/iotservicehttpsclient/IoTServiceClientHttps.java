@@ -41,6 +41,7 @@ import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
@@ -52,23 +53,24 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
 
-@Client(id = "iotservicehttps", path = "/home/sonnen")
+@Client(id = "iotservicehttps", path = "/home")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 @Header(name = ACCEPT, value = "application/json")
+@Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = IoTServiceHttpClientSettings.PREFIX + ".username")
 @Requires(property = IoTServiceHttpClientSettings.PREFIX + ".password")
 public interface IoTServiceClientHttps {
-
-	@Post(value = "/unstructured/configuration", consumes = MediaType.TEXT_PLAIN)
+	@Post(value = "/sonnenunstructuredconfiguration/${" + DeviceSettings.PREFIX
+			+ ".id}", consumes = MediaType.TEXT_PLAIN)
 	public CompletableFuture<Void> sendConfigurationPlainText(@Body String config) throws HttpClientException;
 
-	@Post(value = "/unstructured/status", consumes = MediaType.TEXT_PLAIN)
+	@Post(value = "/sonnenunstructuredstatus/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.TEXT_PLAIN)
 	public CompletableFuture<Void> sendStatusPlainText(@Body String status) throws HttpClientException;
 
-	@Post(value = "/configuration", consumes = MediaType.APPLICATION_JSON)
+	@Post(value = "/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.APPLICATION_JSON)
 	public CompletableFuture<Void> sendConfigurationJson(@Body SonnenConfiguration config) throws HttpClientException;
 
-	@Post(value = "/status", consumes = MediaType.APPLICATION_JSON)
+	@Post(value = "/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.APPLICATION_JSON)
 	public CompletableFuture<Void> sendStatusJson(@Body SonnenStatus status) throws HttpClientException;
 
 }

@@ -51,11 +51,11 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 @MqttPublisher
 @Requires(property = DeviceSettings.PREFIX + ".id")
 public interface MqttSonnenBatteryPublisher {
-	@Topic("house/sonnen/configuration/${" + DeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishSonnenConfiguration(SonnenConfiguration data);
 
-	@Topic("house/sonnen/status/${" + DeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishSonnenStatus(SonnenStatus data);
 }

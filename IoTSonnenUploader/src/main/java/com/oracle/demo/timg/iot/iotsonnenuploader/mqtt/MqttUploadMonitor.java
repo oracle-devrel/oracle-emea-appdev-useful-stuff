@@ -47,15 +47,14 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
-@Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
 public class MqttUploadMonitor {
-	@Topic("house/sonnen/configuration/${" + DeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveConfig(SonnenConfiguration config) {
 		log.info("Monitor recieved config " + config);
 	}
 
-	@Topic("house/sonnen/status/${" + DeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveStatus(SonnenStatus status) {
 		log.info("Monitor recieved status " + status);
 	}

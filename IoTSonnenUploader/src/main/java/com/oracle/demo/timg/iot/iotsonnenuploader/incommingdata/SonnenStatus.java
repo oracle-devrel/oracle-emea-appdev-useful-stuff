@@ -36,7 +36,6 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
 
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -52,7 +51,7 @@ public class SonnenStatus {
 	// store this in two formats as the IoT service uses the Unix time, but we might
 	// want to process it based on time zone data
 	public ZonedDateTime timestamp = ZonedDateTime.now();
-	public long time = Instant.now().getEpochSecond();
+	public long time = System.currentTimeMillis();
 
 	// This is a Jackson de-serialisation "cheat" is effectively allows us to have
 	// two property names in the inbound JSON for reservedBatteryCapacity,
