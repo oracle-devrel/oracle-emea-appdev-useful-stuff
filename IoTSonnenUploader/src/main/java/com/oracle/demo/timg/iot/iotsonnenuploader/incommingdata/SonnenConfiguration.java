@@ -48,6 +48,7 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenConfiguration {
+	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
 	// store this in two formats as the IoT service uses the Unix time, but we might
 	// want to process it based on time zone data
 	public ZonedDateTime timestamp = ZonedDateTime.now();
@@ -66,5 +67,7 @@ public class SonnenConfiguration {
 	}
 
 	private String softwareVersion;
+
+	private String commandDemoPlaceholder = PLACE_HOLDER_VALUE;
 
 }

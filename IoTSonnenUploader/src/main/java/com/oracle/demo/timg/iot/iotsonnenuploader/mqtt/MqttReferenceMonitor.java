@@ -54,12 +54,17 @@ import lombok.extern.java.Log;
  */
 public class MqttReferenceMonitor {
 	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveConfig(String config) {
+	public void referenceMonitorConfig(String config) {
 		log.info("Reference recieved config " + config);
 	}
 
 	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveStatus(String status) {
+	public void seferenceMonitorStatus(String status) {
 		log.info("Reference recieved status " + status);
+	}
+
+	@Topic("house/sonnencommandresponse/${" + DeviceSettings.PREFIX + ".id}")
+	public void referenceMonitorCommandresponse(String commandresponse) {
+		log.info("Reference recieved commandresponse " + commandresponse);
 	}
 }

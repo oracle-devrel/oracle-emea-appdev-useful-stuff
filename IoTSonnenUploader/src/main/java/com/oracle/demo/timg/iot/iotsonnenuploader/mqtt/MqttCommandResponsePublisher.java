@@ -38,6 +38,7 @@ package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandResponse;
 import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 
 import io.micronaut.context.annotation.Requires;
@@ -49,7 +50,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 @MqttPublisher
 @Requires(property = DeviceSettings.PREFIX + ".id")
 public interface MqttCommandResponsePublisher {
-	@Topic("house/sonnen/commandresponse/${" + DeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnencommandresponse/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishCommandResponse(byte[] responsebytes);
+	public CompletableFuture<Void> publishCommandResponse(CommandResponse response);
 }

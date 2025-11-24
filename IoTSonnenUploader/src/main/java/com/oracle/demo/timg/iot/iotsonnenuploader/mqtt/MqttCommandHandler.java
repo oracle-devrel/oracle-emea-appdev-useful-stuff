@@ -40,8 +40,11 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandReceived;
 import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandResponse;
+import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandStatus;
 import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
+import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
@@ -66,18 +69,29 @@ public class MqttCommandHandler {
 	private ObjectMapper mapper;
 
 	@ExecuteOn(TaskExecutors.IO)
-	@Topic("house/sonnen/command/${" + DeviceSettings.PREFIX + ".id}")
-	public void receive(String command) throws IOException {
-		if (command.length() == 0) {
-			log.info("Monitor recieved zero length config");
+	@Topic("house/sonnencommand/${" + DeviceSettings.PREFIX + ".id}")
+	public void receive(CommandReceived command) throws IOException {
+		ZonedDateTime cmdReceived = ZonedDateTime.now();
+		log.info("Received command " + command);
+		// process it
+		CommandResponse resp;
+		switch (command.getCommandIdentifier()) {
+		case SET_PLACEHOLDER:
+			// change the placeholder in the configuration
+			SonnenConfiguration.PLACE_HOLDER_VALUE = command.getData();
+			resp = CommandResponse.builder().cmdReceived(cmdReceived).cmdActioned(ZonedDateTime.now())
+					.cmdStatus(CommandStatus.SUCEEDED)
+					.cmdResponse("Set SonnenConfiguration status to " + command.getData()).build();
+			break;
+		default:
+			resp = CommandResponse.builder().cmdReceived(cmdReceived).cmdActioned(ZonedDateTime.now())
+					.cmdStatus(CommandStatus.UNKNOWN)
+					.cmdResponse("Command with identifier " + command.getCommandIdentifier() + " is unknown").build();
+			break;
+
 		}
-		log.info("Recieved command " + command);
-		CommandResponse resp = CommandResponse.builder().cmdReceived(ZonedDateTime.now())
-				.cmdActioned(ZonedDateTime.now().plusSeconds(5)).cmdLength(command.length()).cmdStatus(true)
-				.cmdResponse("Completed command " + command).build();
-		log.info("Sending response " + resp);
-		String respString = mapper.writeValueAsString(resp);
-		CompletableFuture<Void> publishResp = responsePublisher.publishCommandResponse(respString.getBytes());
-		publishResp.thenRun(() -> log.info("Sent response " + respString));
+		log.info("Sending command response " + resp);
+		CompletableFuture<Void> publishResp = responsePublisher.publishCommandResponse(resp);
+		publishResp.thenRun(() -> log.info("Sent command response " + resp));
 	}
 }
