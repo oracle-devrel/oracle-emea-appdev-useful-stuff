@@ -47,7 +47,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
-@ClientFilter(patterns = "/home/sonnen/**")
+@ClientFilter(patterns = { "/home/sonnenstatus/**", "/home/sonnenconfiguration/**" })
 @Requires(property = IoTServiceHttpClientSettings.PREFIX + ".username")
 @Requires(property = IoTServiceHttpClientSettings.PREFIX + ".password")
 @Log
