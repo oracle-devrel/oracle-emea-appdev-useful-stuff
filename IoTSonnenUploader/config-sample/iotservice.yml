@@ -1,6 +1,20 @@
 device:
   id: tims
-  
+
+
+datacapture:
+  enabled: false
+  configurationsave:
+    enabled: false
+    frequency: "3600s"
+    filename: "./saveddata/configuration-capturedata.json"
+  statussave:
+    enabled: false
+    frequency: "10s"
+    filename: "./saveddata/status-capturedata.json"
+  starttimestamp: "2025-11-24T20:52:00"
+  captureduration: "12h"
+    
 mqtt:
   monitorreference:
     enabled: true
