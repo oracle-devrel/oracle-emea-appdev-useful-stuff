@@ -47,8 +47,10 @@ import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.serde.ObjectMapper;
@@ -95,5 +97,10 @@ public class MqttCommandHandler {
 		log.info("Sending command response " + resp);
 		CompletableFuture<Void> publishResp = responsePublisher.publishCommandResponse(resp);
 		publishResp.thenRun(() -> log.info("Sent command response " + resp));
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Started command handler");
 	}
 }

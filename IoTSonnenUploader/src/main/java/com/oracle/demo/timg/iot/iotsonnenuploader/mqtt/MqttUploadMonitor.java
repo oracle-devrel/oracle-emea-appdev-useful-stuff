@@ -41,8 +41,10 @@ import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfigurat
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.runtime.event.annotation.EventListener;
 import lombok.extern.java.Log;
 
 @Log
@@ -61,5 +63,10 @@ public class MqttUploadMonitor {
 	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveStatus(SonnenStatus status) {
 		log.info("Monitor recieved status " + status);
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Started upload monitor");
 	}
 }

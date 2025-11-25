@@ -39,8 +39,10 @@ package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.runtime.event.annotation.EventListener;
 import lombok.extern.java.Log;
 
 @Log
@@ -70,5 +72,10 @@ public class MqttReferenceMonitor {
 	@Topic("house/sonnencommandresponse/${" + DeviceSettings.PREFIX + ".id}")
 	public void referenceMonitorCommandresponse(String commandresponse) {
 		log.info("Reference recieved commandresponse " + commandresponse);
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Started reference monitor");
 	}
 }
