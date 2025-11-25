@@ -46,6 +46,7 @@ import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandStatus;
 import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 
+import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
@@ -71,6 +72,9 @@ public class MqttCommandHandler {
 	public MqttCommandResponsePublisher responsePublisher;
 	@Inject
 	private ObjectMapper mapper;
+
+	@Property(name = DeviceSettings.PREFIX + ".id")
+	private String deviceId;
 
 	@ExecuteOn(TaskExecutors.IO)
 	@Topic("house/sonnencommand/${" + DeviceSettings.PREFIX + ".id}")
@@ -101,6 +105,6 @@ public class MqttCommandHandler {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Started command handler");
+		log.info("Started command handler monitoring : house/sonnencommand/" + deviceId);
 	}
 }
