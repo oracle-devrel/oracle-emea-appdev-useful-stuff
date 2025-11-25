@@ -43,13 +43,15 @@
 				"softwareVersion": "1.18.4",
 				"time": 1764004099418,
 				"timeOfUseSchedule": "[{\"start\":\"23:30\",\"stop\":\"00:00\",\"threshold_p_max\":22500},{\"start\":\"00:00\",\"stop\":\"05:30\",\"threshold_p_max\":20000}]",
-				"timestamp": "2025-11-24T17:08:19.41809Z[Europe/London]"
+				"timestamp": "2025-11-24T17:08:19.41809Z[Europe/London]",
+				"commandDemoPlaceholder": "Placeholder"
 			}
 		},
 		"payload-mapping": {
 			"$.SoftwareVersion": "$.softwareVersion",
 			"$.TimeOfUseSchedule": "$.timeOfUseSchedule",
-			"$.ConfigurationTimestamp": "$.timestamp"
+			"$.ConfigurationTimestamp": "$.timestamp",
+			"$.CommandDemoPlaceholder": "$.commandDemoPlaceholder"
 		}
 	}
 ]

@@ -147,6 +147,14 @@
 			"displayName": "Time Of Use Schedule",
 			"name": "TimeOfUseSchedule",
 			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Command Demo Placeholder",
+			"name": "CommandDemoPlaceholder",
+			"schema": "string"
 		}
 	]
 }
