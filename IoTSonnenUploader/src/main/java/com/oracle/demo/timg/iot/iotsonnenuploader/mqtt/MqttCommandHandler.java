@@ -49,8 +49,6 @@ import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfigurat
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.MqttSubscriber;
 import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.mqtt.annotation.v5.MqttProperties;
-import io.micronaut.mqtt.annotation.v5.MqttProperty;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.serde.ObjectMapper;
@@ -59,10 +57,13 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
-@MqttProperties({ @MqttProperty(name = "username", value = "${device.id}"),
-		@MqttProperty(name = "password", value = "ExamplePassword") })
+
 @Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.commandhandler.enabled", value = "true", defaultValue = "true")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
 public class MqttCommandHandler {
 	@Inject
 	public MqttCommandResponsePublisher responsePublisher;

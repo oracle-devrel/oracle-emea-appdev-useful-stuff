@@ -48,6 +48,10 @@ import lombok.extern.java.Log;
 @Log
 @MqttSubscriber
 @Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
 public class MqttUploadMonitor {
 	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
 	public void receiveConfig(SonnenConfiguration config) {

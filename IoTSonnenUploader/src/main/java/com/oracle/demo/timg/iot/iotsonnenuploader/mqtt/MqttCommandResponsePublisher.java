@@ -49,6 +49,10 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 
 @MqttPublisher
 @Requires(property = DeviceSettings.PREFIX + ".id")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
 public interface MqttCommandResponsePublisher {
 	@Topic("house/sonnencommandresponse/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)

@@ -47,6 +47,10 @@ import lombok.extern.java.Log;
 @MqttSubscriber
 @Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.monitorreference.enabled", value = "true", defaultValue = "false")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
 /*
  * get the data sent to the topics as a string, this means you can then use it
  * for examples entries in the IoT adaptors
