@@ -212,7 +212,7 @@ oci iot digital-twin-adapter create --iot-domain-id $IOT_DOMAIN_OCID --digital-t
 export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DIGITAL_TWIN_ADAPTER_NAME | jq -r '.data.items[0].id'`
 
 
-Finally we create a didital twin instance using the mapping based adaptor
+Finally we create a digital twin instance using the mapping based adaptor
 oci iot digital-twin-instance create --iot-domain-id $IOT_DOMAIN_OCID --auth-id $DEVICE_VAULT_SECRET_OCID --display-name $DEVICE_ID --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --wait-for-state ACTIVE
  
  # get the OCID of the digital twin
@@ -273,3 +273,39 @@ curl -i -X POST -u "$DEVICE_EXTERNAL_KEY:$DEVICE_SECRET" https://$IOT_DOMAIN_HOS
 check that this has been uploaded
 select * from snapshot_data where content_path in ('SoftwareVersion', 'TimeOfUseSchedule', 'ConfigurationTimestamp') order by TIME_OBSERVED desc
 
+We have now sucesfully uploaded data using http(s) in unstructured, default structured and mapped structured format, but what it we want to send commands back to the device and have it change it's behaviour
+
+First let's get the mqtt connection setup (you may want to test this using mqttx or similar)
+In the config file enable the mqtt configuration and status uploaders
+mqtt.configurationupload.enabled: true
+mqtt.statusupload.enabled: true
+set the port, broker host, broker username and broker password
+mqtt.broker.protocol: ssl
+mqtt.broker.host: the **DEVICE (NOT DATA)) hostname - $IOT_DOMAIN_HOST
+mqtt.broker.port: 8883
+mqtt.client.user-name: $DEVICE_EXTERNAL_KEY
+mqtt.client.password: $DEVICE_SECRET
+
+disable http uploads
+iotservicehttps.configurationupload.enabled: false
+iotservicehttps.statusupload.enabled: false
+
+Now just run the simulator again, the iot services automatically runs the mqtt server, and the adaprot sees the mqtt topic in the same way as the http path, so the iot servcie behaviour is the same
+you can se the  data updating
+oci iot digital-twin-instance get-content  --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID | jq -r '.data'
+
+
+but what if we want to send a command to the IOT service to pass on to the device, for example changing it's configuration? In the data you'll have seen the telemetry value CommandDemoPlaceholder with the value "CommandTestPlaceholder" let's use MQTT to change that. 
+
+Before you do this you **MUST** ensure that the client is running as it sets up  subscription to the mqtt server, without that then the mqtt topics used to send the command and receive the do not exist and the request will be rejected by the IOT Service.
+
+While it's running look at the output and check that the CommandDemoPlaceholder is set to the default, do this using the output of the client OR the SQL interface or by getting the content of the instance :
+oci iot digital-twin-instance get-content  --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID | jq -r '.data'
+
+Let's upload the command to the IOT service
+oci iot digital-twin-instance invoke-raw-json-command --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID --request-endpoint house/sonnencommand/tims --request-data '{"commandIdentifier": "SET_PLACEHOLDER", "data":"I am another placeholder"}' --request-data-content-type application/json --request-duration PT10M --response-duration PT10M --response-endpoint house/sonnencommandresponse/tims
+
+you will see the client receive the command and process it and send the response, you can also check the database contents using SQL developer :
+select * from RAW_COMMAND_DATA order by time_created desc
+
+note the command will (briefly) show "SENT" in the status before switching to "COMPLETED"
