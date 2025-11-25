@@ -62,6 +62,7 @@ import lombok.extern.java.Log;
 @MqttProperties({ @MqttProperty(name = "username", value = "${device.id}"),
 		@MqttProperty(name = "password", value = "ExamplePassword") })
 @Requires(property = DeviceSettings.PREFIX + ".id")
+@Requires(property = "mqtt.commandhandler.enabled", value = "true", defaultValue = "true")
 public class MqttCommandHandler {
 	@Inject
 	public MqttCommandResponsePublisher responsePublisher;
