@@ -34,69 +34,83 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploader;
+package com.oracle.demo.timg.iot.iotsonnenuploader.uploaderhttps;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
-import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller.SonnenBatteryClient;
+import com.oracle.demo.timg.iot.iotsonnenuploader.iotservicehttpsclient.IoTServiceClientHttps;
+import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
 
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.scheduling.annotation.Scheduled;
+import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Log
 @Singleton
-public class Uploader {
+@Requires(property = "iotservicehttps.statusupload.enabled", value = "true", defaultValue = "false")
+public class StatusUploaderHttps {
 	@Inject
-	private SonnenBatteryClient client;
+	private SonnenBatteryClient sonnenClient;
 	@Inject
-	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
+	private IoTServiceClientHttps iotServiceClient;
 
-	@Scheduled(fixedRate = "120s", initialDelay = "5s")
-	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
-		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, no data to upload for service "
-					+ e.getServiceId());
-			return null;
-		}
-		log.info("Retrieved configuration from battery : " + conf);
-		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-		publishResp.thenRun(() -> log.info("Published configuration as object"));
-		return conf;
-	}
+	@Property(name = "iotservicehttps.statusupload.sendtype", defaultValue = "PLAIN")
+	private SendType sendType;
 
-	@Scheduled(fixedRate = "10s", initialDelay = "10s")
+	@Inject
+	private ObjectMapper mapper;
+
 	@ExecuteOn(TaskExecutors.IO)
+	@Scheduled(fixedRate = "${iotservicehttps.statusupload.frequency:10s}", initialDelay = "${iotservicehttps.statusupload.initialdelay:10s}")
 	public SonnenStatus processStatus() {
 		SonnenStatus status;
 		try {
-			status = client.fetchStatus();
+			status = sonnenClient.fetchStatus();
 		} catch (HttpClientException e) {
-			log.warning("HttpClientExcepton getting configuration from sonnen, no data to upload, for service "
-					+ e.getServiceId());
+			log.warning("HttpClientExcepton getting status from sonnen due to " + e.getLocalizedMessage()
+					+ ", no data to upload, for service " + e.getServiceId());
 			return null;
 		}
 		log.info("Retrieved status from battery : " + status);
-		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenStatus(status);
-		publishResp.thenRun(() -> log.info("Published status as object"));
+		CompletableFuture<Void> publishResp;
+		try {
+			switch (sendType) {
+			case PLAIN:
+				publishResp = iotServiceClient.sendStatusPlainText(mapper.writeValueAsString(status));
+				break;
+			case JSON:
+				publishResp = iotServiceClient.sendStatusJson(status);
+				break;
+			default:
+				log.severe("Unknown sendtype " + sendType + " cannot upload to IOT Service");
+				return null;
+			}
+		} catch (IOException e) {
+			log.warning("Unable to serialize status object to a string " + status);
+			return null;
+		}
+		publishResp.thenRun(() -> log.info("Published status using http with payload type " + sendType))
+				.exceptionally(e -> {
+					log.warning("Problem sending status using http with payload type " + sendType
+							+ ", exception details " + e.getLocalizedMessage());
+					return null;
+				});
 		return status;
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received");
+		log.info("Startup event received for status https uploader, sendtype=" + sendType);
 	}
 }

@@ -34,39 +34,53 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
+package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
+import java.util.concurrent.CompletableFuture;
+
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
+import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
+import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.mqtt.annotation.MqttSubscriber;
-import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Log
-@MqttSubscriber
-@Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
-@Requires(property = "mqtt.client.client-id")
-@Requires(property = "mqtt.client.user-name")
-@Requires(property = "mqtt.client.password")
-@Requires(property = "mqtt.client.server-uri")
-public class MqttUploadMonitor {
-	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveConfig(SonnenConfiguration config) {
-		log.info("Monitor recieved config " + config);
-	}
+@Singleton
+@Requires(property = "mqtt.statusupload.enabled", value = "true", defaultValue = "false")
+public class StatusUploaderMqtt {
+	@Inject
+	private SonnenBatteryClient client;
+	@Inject
+	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
-	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveStatus(SonnenStatus status) {
-		log.info("Monitor recieved status " + status);
+	@ExecuteOn(TaskExecutors.IO)
+	@Scheduled(fixedRate = "${mqtt.statusupload.frequency:10s}", initialDelay = "${mqtt.statusupload.initialdelay:10s}")
+	public SonnenStatus processStatus() {
+		SonnenStatus status;
+		try {
+			status = client.fetchStatus();
+		} catch (HttpClientException e) {
+			log.warning("HttpClientExcepton getting status from sonnen due to " + e.getLocalizedMessage()
+					+ ", no data to upload, for service " + e.getServiceId());
+			return null;
+		}
+		log.info("Retrieved status from battery : " + status);
+		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenStatus(status);
+		publishResp.thenRun(() -> log.info("Published status to mqtt"));
+		return status;
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Started upload monitor");
+		log.info("Startup event received for status mqtt uploader");
 	}
 }

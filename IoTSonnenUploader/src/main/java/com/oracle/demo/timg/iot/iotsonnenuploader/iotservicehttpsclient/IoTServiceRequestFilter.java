@@ -34,16 +34,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
+package com.oracle.demo.timg.iot.iotsonnenuploader.iotservicehttpsclient;
 
-import io.micronaut.context.annotation.ConfigurationProperties;
+import java.util.Base64;
+
 import io.micronaut.context.annotation.Requires;
-import lombok.Data;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Inject;
+import lombok.extern.java.Log;
 
-@ConfigurationProperties(MqttDeviceSettings.PREFIX)
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
-@Data
-public class MqttDeviceSettings {
-	public static final String PREFIX = "mqtt.device";
-	private String id;
+@ClientFilter(patterns = { "/home/sonnenstatus/**", "/home/sonnenconfiguration/**" })
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".username")
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".password")
+@Log
+public class IoTServiceRequestFilter {
+	private final String username;
+	private final String password;
+
+	@Inject
+	public IoTServiceRequestFilter(IoTServiceHttpClientSettings clientSettings) {
+		this.username = clientSettings.getUsername();
+		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
+	}
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.finer("Adding user auth username=" + this.username);
+		request.basicAuth(this.username, this.password);
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for IoTServiceRequestFilter username=" + this.username);
+	}
 }

@@ -34,77 +34,84 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
+package com.oracle.demo.timg.iot.iotsonnenuploader.uploaderhttps;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandReceived;
-import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandResponse;
-import com.oracle.demo.timg.iot.iotsonnenuploader.commanddata.CommandStatus;
-import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
+import com.oracle.demo.timg.iot.iotsonnenuploader.iotservicehttpsclient.IoTServiceClientHttps;
+import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.mqtt.annotation.MqttSubscriber;
-import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.scheduling.annotation.Scheduled;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Log
-@MqttSubscriber
-
-@Requires(property = DeviceSettings.PREFIX + ".id")
-@Requires(property = "mqtt.commandhandler.enabled", value = "true", defaultValue = "true")
-@Requires(property = "mqtt.client.client-id")
-@Requires(property = "mqtt.client.user-name")
-@Requires(property = "mqtt.client.password")
-@Requires(property = "mqtt.client.server-uri")
-public class MqttCommandHandler {
+@Singleton
+@Requires(property = "iotservicehttps.configurationupload.enabled", value = "true", defaultValue = "false")
+public class ConfigurationUploaderHttps {
+	public final String SEND_TYPE_PLAIN = "plain";
 	@Inject
-	public MqttCommandResponsePublisher responsePublisher;
+	private SonnenBatteryClient sonnenClient;
+	@Inject
+	private IoTServiceClientHttps iotServiceClient;
+
+	@Property(name = "iotservicehttps.configurationupload.sendtype", defaultValue = "PLAIN")
+	private SendType sendType;
+
 	@Inject
 	private ObjectMapper mapper;
 
-	@Property(name = DeviceSettings.PREFIX + ".id")
-	private String deviceId;
-
+	@Scheduled(fixedRate = "${iotservicehttps.configurationupload.frequency:120s}", initialDelay = "${iotservicehttps.configurationupload.initialdelay:5s}")
 	@ExecuteOn(TaskExecutors.IO)
-	@Topic("house/sonnencommand/${" + DeviceSettings.PREFIX + ".id}")
-	public void receive(CommandReceived command) throws IOException {
-		ZonedDateTime cmdReceived = ZonedDateTime.now();
-		log.info("Received command " + command);
-		// process it
-		CommandResponse resp;
-		switch (command.getCommandIdentifier()) {
-		case SET_PLACEHOLDER:
-			// change the placeholder in the configuration
-			SonnenConfiguration.PLACE_HOLDER_VALUE = command.getData();
-			resp = CommandResponse.builder().cmdReceived(cmdReceived).cmdActioned(ZonedDateTime.now())
-					.cmdStatus(CommandStatus.SUCEEDED)
-					.cmdResponse("Set SonnenConfiguration status to " + command.getData()).build();
-			break;
-		default:
-			resp = CommandResponse.builder().cmdReceived(cmdReceived).cmdActioned(ZonedDateTime.now())
-					.cmdStatus(CommandStatus.UNKNOWN)
-					.cmdResponse("Command with identifier " + command.getCommandIdentifier() + " is unknown").build();
-			break;
-
+	public SonnenConfiguration processConfiguration() {
+		SonnenConfiguration conf;
+		try {
+			conf = sonnenClient.fetchConfiguration();
+		} catch (HttpClientException e) {
+			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
+					+ "no data to upload for service " + e.getServiceId());
+			return null;
 		}
-		log.info("Sending command response " + resp);
-		CompletableFuture<Void> publishResp = responsePublisher.publishCommandResponse(resp);
-		publishResp.thenRun(() -> log.info("Sent command response " + resp));
+		log.info("Retrieved configuration from battery : " + conf);
+		CompletableFuture<Void> publishResp;
+		try {
+			switch (sendType) {
+			case PLAIN:
+				publishResp = iotServiceClient.sendConfigurationPlainText(mapper.writeValueAsString(conf));
+				break;
+			case JSON:
+				publishResp = iotServiceClient.sendConfigurationJson(conf);
+				break;
+			default:
+				log.severe("Unknown sendtype " + sendType + " cannot upload to IOT Service");
+				return null;
+			}
+		} catch (IOException e) {
+			log.warning("Unable to serialize configuration object to a string " + conf);
+			return null;
+		}
+		publishResp.thenRun(() -> log.info("Published configuration using http with payload type " + sendType))
+				.exceptionally(e -> {
+					log.warning("Problem configuration status using http with payload type " + sendType
+							+ ", exception details " + e.getLocalizedMessage());
+					return null;
+				});
+		return conf;
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Started command handler monitoring : house/sonnencommand/" + deviceId);
+		log.info("Startup event received for configuration https uploader, sendtype=" + sendType);
 	}
 }

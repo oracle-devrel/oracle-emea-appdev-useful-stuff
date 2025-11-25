@@ -1,0 +1,85 @@
+device:
+  id: tims
+
+datacapture:
+  enabled: false
+  configurationsave:
+    enabled: false
+    frequency: "3600s"
+    filename: "./saveddata/configuration.json"
+  statussave:
+    enabled: false
+    frequency: "10s"
+    filename: "./saveddata/status.json"
+  starttimestamp: "2025-11-25T11:30:00"
+  captureduration: "12h"
+
+mqtt:
+  commandhandler:
+    enabled: false
+  monitorreference:
+    enabled: false
+  monitoruploads:
+    enabled: false
+  statusupload:
+    enabled: false
+    frequency: "10s"
+    initialdelay: "10s"
+  configurationupload:
+    enabled: false
+    frequency: "120s"
+    initialdelay: "5s"
+  broker:
+    # for testing with mosquito use localhost, for IOT you need the device host
+    host: <domain-short-id>.device.iot.<oci region id>.oci.oraclecloud.com
+    # for local host (mosquito) this is 1883, but for iot service it's 8883)
+    port: 8883
+    # mqtt protocol - either tcp for local mosquitto or ssl for the IoT service
+    protocol: ssl
+  client:
+    # Unique identifier for this MQTT client
+    client-id: ${device.id}
+
+    # MQTT broker connection
+    server-uri: ${mqtt.broker.protocol}://${mqtt.broker.host}:${mqtt.broker.port}
+
+    # Authentication
+    user-name: <device external key>
+    password: <device shared secret value>
+
+    # Optional connection settings
+    clean-session: true
+    automatic-reconnect: true
+    connection-timeout: "PT30s"
+    keep-alive-interval: 60
+
+    will-message:
+      topic: home/sonnenwill/${device.id}
+      payload: Device ${device.id} is unavailable
+      qos: 0
+      retained: true
+
+iotservicehttps:
+  statusupload:
+    enabled: true
+    frequency: "10s"
+    initialdelay: "10s"
+    # must be PLAIN or JSON
+    sendtype: JSON
+  configurationupload:
+    enabled: true
+    frequency: "120s"
+    initialdelay: "5s"
+    # must be PLAIN or JSON
+    sendtype: JSON
+  # Authentication
+  username: <device external key>
+  # the <device shared secret value> in base 64, the program will decode it before use
+  password: <base64 password>
+  
+micronaut:
+  http:
+    services:
+      iotservicehttps:
+        # the URL is of the format https://<domain-short-id>.device.iot.<oci region id>.oci.oraclecloud.com
+        url: https://<data domain name>.device.iot.<region>.oci.oraclecloud.com

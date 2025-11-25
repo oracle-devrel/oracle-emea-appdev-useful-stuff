@@ -34,29 +34,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.utils;
+package com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.context.annotation.Requires;
+import lombok.Data;
 
-public class PasswordConverter {
-	public static void main(String[] args) {
-		for (int i = 0; i < args.length; i++) {
-			byte[] argBytes = args[i].getBytes();
-			String argBytesString = "";
-			for (int j = 0; j < argBytes.length; j++) {
-				if (j > 0) {
-					argBytesString += ",";
-				}
-				argBytesString += argBytes[j];
-			}
-			// String b64 =
-			// Base64.getEncoder().encodeToString(args[i].getBytes(StandardCharsets.UTF_8));
-			String b64 = new String(Base64.getEncoder().encode(args[i].getBytes(StandardCharsets.UTF_8)),
-					StandardCharsets.UTF_8);
-			System.out.println("Arg[" + i + "] has value " + args[i] + " as bytes " + args[i].getBytes()
-					+ ", as byte array " + argBytesString + ", as base 64 " + b64);
-		}
-	}
-
+@ConfigurationProperties(DeviceSettings.PREFIX)
+@Requires(property = DeviceSettings.PREFIX + ".id")
+@Data
+public class DeviceSettings {
+	public static final String PREFIX = "device";
+	private String id;
 }

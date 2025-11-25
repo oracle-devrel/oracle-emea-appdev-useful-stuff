@@ -34,39 +34,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
+package com.oracle.demo.timg.iot.iotsonnenuploader.iotservicehttpsclient;
+
+import static io.micronaut.http.HttpHeaders.ACCEPT;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
+import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.event.StartupEvent;
-import io.micronaut.mqtt.annotation.MqttSubscriber;
-import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.runtime.event.annotation.EventListener;
-import lombok.extern.java.Log;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 
-@Log
-@MqttSubscriber
-@Requires(property = "mqtt.monitoruploads.enabled", value = "true", defaultValue = "false")
-@Requires(property = "mqtt.client.client-id")
-@Requires(property = "mqtt.client.user-name")
-@Requires(property = "mqtt.client.password")
-@Requires(property = "mqtt.client.server-uri")
-public class MqttUploadMonitor {
-	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveConfig(SonnenConfiguration config) {
-		log.info("Monitor recieved config " + config);
-	}
+@Client(id = "iotservicehttps", path = "/home")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+@Header(name = ACCEPT, value = "application/json")
+@Requires(property = DeviceSettings.PREFIX + ".id")
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".username")
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".password")
+public interface IoTServiceClientHttps {
+	@Post(value = "/sonnenunstructuredconfiguration/${" + DeviceSettings.PREFIX
+			+ ".id}", consumes = MediaType.TEXT_PLAIN)
+	public CompletableFuture<Void> sendConfigurationPlainText(@Body String config) throws HttpClientException;
 
-	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
-	public void receiveStatus(SonnenStatus status) {
-		log.info("Monitor recieved status " + status);
-	}
+	@Post(value = "/sonnenunstructuredstatus/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.TEXT_PLAIN)
+	public CompletableFuture<Void> sendStatusPlainText(@Body String status) throws HttpClientException;
 
-	@EventListener
-	public void onStartup(StartupEvent event) {
-		log.info("Started upload monitor");
-	}
+	@Post(value = "/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.APPLICATION_JSON)
+	public CompletableFuture<Void> sendConfigurationJson(@Body SonnenConfiguration config) throws HttpClientException;
+
+	@Post(value = "/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}", consumes = MediaType.APPLICATION_JSON)
+	public CompletableFuture<Void> sendStatusJson(@Body SonnenStatus status) throws HttpClientException;
+
 }

@@ -38,6 +38,7 @@ package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
@@ -48,13 +49,17 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
 @MqttPublisher
-@Requires(property = MqttDeviceSettings.PREFIX + ".id")
+@Requires(property = DeviceSettings.PREFIX + ".id")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
 public interface MqttSonnenBatteryPublisher {
-	@Topic("house/sonnen/configuration/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishSonnenConfiguration(SonnenConfiguration data);
 
-	@Topic("house/sonnen/status/${" + MqttDeviceSettings.PREFIX + ".id}")
+	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishSonnenStatus(SonnenStatus data);
 }

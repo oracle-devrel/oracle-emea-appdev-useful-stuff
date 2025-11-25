@@ -1,0 +1,151 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:sonnenbattery;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Data timestamp",
+			"name": "timestamp",
+			"schema": "dateTime"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Operating Mode",
+			"name": "operatingMode",
+			"schema": "integer"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Current Battery Charge Percentage",
+			"name": "currentBatteryCapacityPercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Reserved Battery Charge Percentage",
+			"name": "reservedBatteryCapacityPercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Energy"
+			],
+			"displayName": "Remaining Power In Battery",
+			"name": "remainingBatteryCapacityWattHours",
+			"schema": "integer",
+			"unit": "wattHour"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Battery Is Charging",
+			"name": "batteryCharging",
+			"schema": "boolean"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Battery Is Discharging",
+			"name": "batteryDischarging",
+			"schema": "boolean"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Battery Power Supplied 1 min average",
+			"name": "consumptionAvgWattsLastMinute",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Battery Power Supplied Point In Time",
+			"name": "consumptionWattsPointInTime",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Grid Consumption Point In Time",
+			"name": "gridConsumptionWattsPointInTime",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Solar Production Point In Time",
+			"name": "solarProductionWattsPointInTime",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Software Version",
+			"name": "softwareVersion",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Time Of Use Schedule",
+			"name": "timeOfUseSchedule",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry"
+			],
+			"displayName": "Command Demo Placeholder",
+			"name": "commandDemoPlaceholder",
+			"schema": "string"
+		}
+	]
+}

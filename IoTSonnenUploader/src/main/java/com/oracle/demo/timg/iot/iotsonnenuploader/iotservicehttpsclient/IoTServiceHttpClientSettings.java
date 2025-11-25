@@ -34,30 +34,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller;
+package com.oracle.demo.timg.iot.iotsonnenuploader.iotservicehttpsclient;
 
+import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.ClientFilter;
-import io.micronaut.http.annotation.RequestFilter;
-import jakarta.inject.Inject;
-import lombok.extern.java.Log;
+import lombok.Data;
 
-@ClientFilter(patterns = "/api/**")
-@Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
-@Log
-public class SonnenBatteryRequestFilter {
-	public final static String HEADER_AUTH_TOKEN = "Auth-Token";
-	private final SonnenBatteryHttpClientSettings clientSettings;
-
-	@Inject
-	public SonnenBatteryRequestFilter(SonnenBatteryHttpClientSettings clientSettings) {
-		this.clientSettings = clientSettings;
-	}
-
-	@RequestFilter
-	public void doFilter(MutableHttpRequest<?> request) {
-		log.finer("Adding header " + HEADER_AUTH_TOKEN);
-		request.getHeaders().add(HEADER_AUTH_TOKEN, clientSettings.getAuthToken());
-	}
+@ConfigurationProperties(IoTServiceHttpClientSettings.PREFIX)
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".username")
+@Requires(property = IoTServiceHttpClientSettings.PREFIX + ".password")
+@Data
+public class IoTServiceHttpClientSettings {
+	public static final String PREFIX = "iotservicehttps";
+	private String username;
+	private String password;
 }

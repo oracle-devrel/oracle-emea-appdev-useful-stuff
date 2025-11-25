@@ -48,7 +48,6 @@ import lombok.Data;
 public class CommandResponse {
 	private ZonedDateTime cmdReceived;
 	private ZonedDateTime cmdActioned;
-	private int cmdLength;
-	private boolean cmdStatus;
+	private CommandStatus cmdStatus;
 	private String cmdResponse;
 }

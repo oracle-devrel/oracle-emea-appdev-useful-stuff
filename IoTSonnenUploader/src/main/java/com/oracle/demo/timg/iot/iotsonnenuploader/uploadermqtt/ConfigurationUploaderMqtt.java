@@ -34,32 +34,53 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.sonnencontroller;
+package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
 
-import static io.micronaut.http.HttpHeaders.ACCEPT;
-import static io.micronaut.http.HttpHeaders.USER_AGENT;
+import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
+import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
+import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.client.annotation.Client;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
+import io.micronaut.runtime.event.annotation.EventListener;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 
-@Client(id = "sonnenbattery", path = "/api/v2")
-@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
-@Header(name = ACCEPT, value = "application/json")
-@Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
-public interface SonnenBatteryClient {
+@Log
+@Singleton
+@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
+public class ConfigurationUploaderMqtt {
+	@Inject
+	private SonnenBatteryClient client;
+	@Inject
+	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
 
-	@Get("/configurations")
-	// @Error(exception = ReadTimeoutException.class)
-	public SonnenConfiguration fetchConfiguration() throws HttpClientException;
+	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
+	@ExecuteOn(TaskExecutors.IO)
+	public SonnenConfiguration processConfiguration() {
+		SonnenConfiguration conf;
+		try {
+			conf = client.fetchConfiguration();
+		} catch (HttpClientException e) {
+			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
+					+ "no data to upload for service " + e.getServiceId());
+			return null;
+		}
+		log.info("Retrieved configuration from battery : " + conf);
+		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
+		publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
+		return conf;
+	}
 
-	@Get("/status")
-	// @Error(exception = ReadTimeoutException.class)
-	public SonnenStatus fetchStatus() throws HttpClientException;
-
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for configuration mqtt uploader");
+	}
 }

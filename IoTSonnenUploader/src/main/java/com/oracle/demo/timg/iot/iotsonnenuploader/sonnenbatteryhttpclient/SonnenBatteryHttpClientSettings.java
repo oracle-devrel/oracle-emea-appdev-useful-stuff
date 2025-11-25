@@ -34,40 +34,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
+package com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient;
 
-import java.time.ZonedDateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.context.annotation.Requires;
 import lombok.Data;
 
-@Serdeable
+@ConfigurationProperties(SonnenBatteryHttpClientSettings.PREFIX)
+@Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SonnenConfiguration {
-	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
-	// store this in two formats as the IoT service uses the Unix time, but we might
-	// want to process it based on time zone data
-	public ZonedDateTime timestamp = ZonedDateTime.now();
-	public long time = System.currentTimeMillis();
-
-	@JsonProperty("EM_ToU_Schedule")
-	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
-		this.timeOfUseSchedule = timeOfUseSchedule;
-	}
-
-	private String timeOfUseSchedule;
-
-	@JsonProperty("DE_Software")
-	public void setSoftwareVersionFromSonnen(String softwareVersion) {
-		this.softwareVersion = softwareVersion;
-	}
-
-	private String softwareVersion;
-
-	private String commandDemoPlaceholder = PLACE_HOLDER_VALUE;
-
+public class SonnenBatteryHttpClientSettings {
+	public static final String PREFIX = "sonnenbattery";
+	private String authToken;
 }

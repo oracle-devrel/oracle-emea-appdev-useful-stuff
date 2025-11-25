@@ -34,40 +34,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
+package com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient;
 
-import java.time.ZonedDateTime;
+import static io.micronaut.http.HttpHeaders.ACCEPT;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
+import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenStatus;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 
-@Serdeable
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SonnenConfiguration {
-	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
-	// store this in two formats as the IoT service uses the Unix time, but we might
-	// want to process it based on time zone data
-	public ZonedDateTime timestamp = ZonedDateTime.now();
-	public long time = System.currentTimeMillis();
+@Client(id = "sonnenbattery", path = "/api/v2")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+@Header(name = ACCEPT, value = "application/json")
+@Requires(property = SonnenBatteryHttpClientSettings.PREFIX + ".authToken")
+public interface SonnenBatteryClient {
 
-	@JsonProperty("EM_ToU_Schedule")
-	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
-		this.timeOfUseSchedule = timeOfUseSchedule;
-	}
+	@Get("/configurations")
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenConfiguration fetchConfiguration() throws HttpClientException;
 
-	private String timeOfUseSchedule;
-
-	@JsonProperty("DE_Software")
-	public void setSoftwareVersionFromSonnen(String softwareVersion) {
-		this.softwareVersion = softwareVersion;
-	}
-
-	private String softwareVersion;
-
-	private String commandDemoPlaceholder = PLACE_HOLDER_VALUE;
+	@Get("/status")
+	// @Error(exception = ReadTimeoutException.class)
+	public SonnenStatus fetchStatus() throws HttpClientException;
 
 }

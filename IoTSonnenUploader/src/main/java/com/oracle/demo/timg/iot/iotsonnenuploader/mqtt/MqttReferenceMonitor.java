@@ -34,40 +34,48 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
+package com.oracle.demo.timg.iot.iotsonnenuploader.mqtt;
 
-import java.time.ZonedDateTime;
+import com.oracle.demo.timg.iot.iotsonnenuploader.devicesettings.DeviceSettings;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.mqtt.annotation.MqttSubscriber;
+import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.runtime.event.annotation.EventListener;
+import lombok.extern.java.Log;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-
-@Serdeable
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SonnenConfiguration {
-	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
-	// store this in two formats as the IoT service uses the Unix time, but we might
-	// want to process it based on time zone data
-	public ZonedDateTime timestamp = ZonedDateTime.now();
-	public long time = System.currentTimeMillis();
-
-	@JsonProperty("EM_ToU_Schedule")
-	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
-		this.timeOfUseSchedule = timeOfUseSchedule;
+@Log
+@MqttSubscriber
+@Requires(property = DeviceSettings.PREFIX + ".id")
+@Requires(property = "mqtt.monitorreference.enabled", value = "true", defaultValue = "false")
+@Requires(property = "mqtt.client.client-id")
+@Requires(property = "mqtt.client.user-name")
+@Requires(property = "mqtt.client.password")
+@Requires(property = "mqtt.client.server-uri")
+/*
+ * get the data sent to the topics as a string, this means you can then use it
+ * for examples entries in the IoT adaptors
+ * 
+ */
+public class MqttReferenceMonitor {
+	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
+	public void referenceMonitorConfig(String config) {
+		log.info("Reference recieved config " + config);
 	}
 
-	private String timeOfUseSchedule;
-
-	@JsonProperty("DE_Software")
-	public void setSoftwareVersionFromSonnen(String softwareVersion) {
-		this.softwareVersion = softwareVersion;
+	@Topic("house/sonnenstatus/${" + DeviceSettings.PREFIX + ".id}")
+	public void seferenceMonitorStatus(String status) {
+		log.info("Reference recieved status " + status);
 	}
 
-	private String softwareVersion;
+	@Topic("house/sonnencommandresponse/${" + DeviceSettings.PREFIX + ".id}")
+	public void referenceMonitorCommandresponse(String commandresponse) {
+		log.info("Reference recieved commandresponse " + commandresponse);
+	}
 
-	private String commandDemoPlaceholder = PLACE_HOLDER_VALUE;
-
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Started reference monitor");
+	}
 }
