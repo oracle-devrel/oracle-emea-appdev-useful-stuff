@@ -1,0 +1,45 @@
+setup ORDS data access as described in the documentation at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-iot-ords.htm
+
+# get the various system values from the setup and use them here
+# sub steps are from "Step 1: Create a Confidential Application for your Identity Domain"
+# in the URL above.
+# note that for the IOT_ORDS_IDSC_PASSWORD you may need to create a non admin user and set a password for them as well as assigning them to your group if creating your own domain as an admin (rather than using a user in an existing one)
+# If using the administrator user you created for tyhe domain then under the domain users tab select tt user then in the actions dropdown for users chose reset password and a password email will be sent
+# unclear if the user name and password relate to the new identify domain or the main once for the tenancy 
+
+export IOT_ORDS_IDCS_USERNAME=<email address or other id used for the user in the identity domain e.g. john.doe@oracle.com or iotuser for a local user>
+export IOT_ORDS_IDCS_PASSWORD=<password set in the IDCS for the user>
+export IOT_ORDS_OAUTH_ID=<Client id from OAUTH Integrated application config page - shown at step 18/19>
+export IOT_ORDS_OAUTH_SECRET=<Client secret from OAUTH Integrated application config page - shown at step 18/19>
+export IOT_IDENTITY_DOMAIN_HOST=<From the identity details at step 31>
+
+# this uses the above to get the token and so on
+export IOT_IDENTITY_DOMAIN_HOST_SHORT=`echo $IOT_IDENTITY_DOMAIN_HOST | tr '.' ' ' | awk '{print $1}'`
+export IOT_IDENTITY_DOMAIN_URL=https://$IOT_IDENTITY_DOMAIN_HOST:443/oauth2/v1/token
+# the IOT_DOMAIN_GROUP_SHORT_ID and IOT_DOMAIN_SHORT_ID were set in the Instructions.txt 
+export IOT_ORDS_AUTH_DETAILS=`curl -s --request POST --url "${IOT_IDENTITY_DOMAIN_URL}" --header 'Content-Type: application/x-www-form-urlencoded'  --user "${IOT_ORDS_OAUTH_ID}:${IOT_ORDS_OAUTH_SECRET}"   --data "scope=/${IOT_DOMAIN_GROUP_SHORT_ID}/iot/${IOT_DOMAIN_SHORT_ID}"   --data "grant_type=password"   --data "username=${IOT_ORDS_IDCS_USERNAME}"  --data "password=${IOT_ORDS_IDCS_PASSWORD}"`
+export IOT_ORDS_AUTH_ACCESS_TOKEN=`echo $IOT_ORDS_AUTH_DETAILS | jq -r '.access_token'`
+export IOT_ORDS_AUTH_TOKEN_DURATION=`echo $IOT_ORDS_AUTH_DETAILS | jq -r '.expires_in'`
+export IOT_ORDS_AUTH_TOKEN_TYPE=`echo $IOT_ORDS_AUTH_DETAILS | jq -r '.token_type'`
+
+# lets get a couple of data objects
+# this will get a couple of the raw  data irtems (limiting it to 2)
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/rawData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=2 | jq '.items'
+# we can put a query in place - let's limit it to raw data for the specific digital twin
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/rawData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=2  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}]}"' | jq '.items'
+
+
+# we can of course access the other data tables, this is the snapshot data, we'll retrieve the most recent 20 as each data item in the upload is in its own row
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/snapshotData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=20  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}]}"' | jq '.items'
+
+# The historized data isn't so helpfull, were just getting one content path
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/historizedData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=20  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}]}"' | jq '.items'
+
+# let's add an additional quesy item to the quest to also focus on SolarGeneration
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/historizedData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=20  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}, {"content_path":"SolarGeneration"}]}"' | jq '.items'
+
+# that was the data we wanted, but not very useful as it was some pretty random items, let's try and order it, we'll include some poer draw numbers as well
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/historizedData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=20  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}, {"content_path":"SolarGeneration"}],"$orderby":{"time_observed":"desc"}}"' | jq '.items'
+
+# of course we may want multiple data items, so let's get both thye SolarGeneration and the DischargePower - it's up to thge called to look at the returned data and decide which what resulting rows relate to which data item of course
+curl -k -s --get   --location "https://${IOT_DOMAIN_GROUP_DATA_HOST}/ords/$IOT_DOMAIN_SHORT_ID/20250531/historizedData"   --header "Authorization: Bearer ${IOT_ORDS_AUTH_ACCESS_TOKEN}"   --header "Content-Type: application/json" --data-urlencode offset=0  --data-urlencode limit=20  --data-urlencode  'q={"$and":[{"digital_twin_instance_id":"'$DIGITAL_TWIN_INSTANCE_OCID'"}, {"content_path": {"$in": ["SolarGeneration", "DischargePower"]}}],"$orderby":{"time_observed":"desc"}}"' | jq '.items'

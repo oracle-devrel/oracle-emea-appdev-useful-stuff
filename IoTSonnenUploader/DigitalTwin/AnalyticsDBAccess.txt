@@ -1,0 +1,41 @@
+you must have setup the IoT instance
+You must have completed the instructions for Srep 1 (setting upt he VCN) at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-analytics-cloud.htm
+The first part of these steps is the same for Analytics AND Direct DB access from a compute instance
+
+export IOT_DB_ACCESS_VCN_OCID=<your vcn's ocid>
+
+#  $IOT_DOMAIN_GROUP_OCID  is set when you follow the process in instructions.txt
+# connect the domain group to the vcn, wait for it to complete
+oci iot domain-group configure-data-access --db-allow-listed-vcn-ids "[\"$IOT_DB_ACCESS_VCN_OCID\"]" --iot-domain-group-id  $IOT_DOMAIN_GROUP_OCID    --wait-for-state SUCCEEDED --wait-for-state FAILED
+
+## The following are the the compute oinstance instructions
+Basically go on from step 3 at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-database.htm
+
+
+
+## The following are the anlytics instructions
+
+export IOT_DOMAIN_GROUP_INFO=`oci iot domain-group get --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID`
+export IOT_DB_CONNECTION_STRING=`echo $IOT_DOMAIN_GROUP_INFO | jq -r '.data."db-connection-string"'`
+export IOT_DB_TOKEN_SCOPE=`echo $IOT_DOMAIN_GROUP_INFO | jq -r '.data."db-token-scope"'`
+
+# get the tenancy OCID
+# set the idcs name and the idcs group name you're using, use Default if you're using the system wide idcs
+export IDCS_DOMAIN_NAME=<the name of your IDCS instance, e.g. iotdomain or Default>
+export IDCS_IOT_GROUP_NAME=<the name of the IDCS group you created, this could be the same one you used for ORDS if you've set that up>
+export OCI_TENANCY_OCID=`oci iam compartment list --query 'data[?contains("compartment-id", \`.tenancy\`)]."compartment-id" | [0]' --raw-output`
+
+export OCI_TENANCY_OCID=`oci iam compartment list --query 'data[?contains("compartment-id", \`.tenancy\`)]."compartment-id" | [0]' --raw-output`
+
+
+oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names '["'$OCI_TENANCY_OCID':'$IDCS_DOMAIN_NAME'/'$IDCS_IOT_GROUP_NAME'", "'$OCI_TENANCY_OCID':OracleIdentityCloudService/Domain_Specialists"]'  --wait-for-state SUCCEEDED --wait-for-state FAILED
+
+
+# make sure it worked, look in the domain details
+oci iot domain get --iot-domain-id $IOT_DOMAIN_OCID | jq -r '.data."db-allow-listed-identity-group-names"'
+
+you shouold see some contents in the resulting array
+
+follow the instructions in step 6 at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-analytics-cloud.htm to create and setup the Analytics instance and connect it
+
+## The following are the 

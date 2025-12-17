@@ -34,17 +34,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
+package com.oracle.demo.timg.iot.iotordsaccess.testers;
 
-import java.util.concurrent.CompletableFuture;
-
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
+import com.oracle.demo.timg.iot.iotordsaccess.data.HistorizedDataResponseString;
+import com.oracle.demo.timg.iot.iotordsaccess.idcs.IDCSOAuthApplicationTokenRetriever;
+import com.oracle.demo.timg.iot.iotordsaccess.ords.ORDSApiClient;
+import com.oracle.demo.timg.iot.iotordsaccess.ords.ORDSDataRequestFilter;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
@@ -55,36 +53,38 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
-public class ConfigurationUploaderMqtt {
+@Requires(property = "iot.ords.test-historizeddata-retrieval", value = "true", defaultValue = "false")
+public class ORDSTestHistorizedDataRetrieval {
+	private int counter = 0;
 	@Inject
-	private SonnenBatteryClient client;
-	@Inject
-	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
+	private ORDSApiClient ordsApiClient;
 
-	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
+	// This should not be here, but for some reason at the moment it's the only way
+	// Micronaut can handle the request filter needing to inject the token
+	// retriever.
+	// As it fails to retrieve the token retriever properties, I suspect a
+	// dependencies
+	// issue where all of the dependencies are not resolved when going client ->
+	// filter -> token retriever.
+	@Inject
+	private ORDSDataRequestFilter ordsDataRequestFilter;
+	@Inject
+	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRequest;
+
 	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
-		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
-					+ "no data to upload for service " + e.getServiceId());
-			return null;
+	@Scheduled(fixedRate = "10s", initialDelay = "5s")
+	public void testGetHistorizedData() {
+		if (counter++ > 6) {
+			System.exit(0);
 		}
-		log.info("Retrieved configuration from battery : " + conf);
-		try {
-			CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-			publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
-		} catch (Exception e) {
-			log.warning("Problem publishing configuration to mqtt, " + e.getLocalizedMessage());
-		}
-		return conf;
+		HistorizedDataResponseString data = ordsApiClient.getHistorizedDataString(0, 2);
+		log.info("Count " + counter + " retrieved " + data);
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for configuration mqtt uploader");
+		log.info("Startup event received for ORDSApiClient");
+		ordsDataRequestFilter.setIdcsoAuthApplicationTokenRequest(idcsoAuthApplicationTokenRequest);
+		log.info("configured request filter");
 	}
 }

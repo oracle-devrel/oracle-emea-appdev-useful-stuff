@@ -34,17 +34,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
+package com.oracle.demo.timg.iot.iotordsaccess.testers;
 
-import java.util.concurrent.CompletableFuture;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
+import com.oracle.demo.timg.iot.iotordsaccess.idcs.IDCSOAuthApplicationTokenRetriever;
+import com.oracle.demo.timg.iot.iotordsaccess.idcs.IDCSOAuthTokenRetrievalException;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
@@ -55,36 +55,47 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
-public class ConfigurationUploaderMqtt {
+@Requires(property = "iot.idcs.test-token-retrieval", value = "true", defaultValue = "false")
+public class IDCSTestTokenRetrieval {
 	@Inject
-	private SonnenBatteryClient client;
-	@Inject
-	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
+	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRequest;
 
-	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
+	private int counter = 0;
+	@Inject
+	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRetriever;
+
 	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
-		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
-					+ "no data to upload for service " + e.getServiceId());
-			return null;
+	@Scheduled(fixedRate = "10s", initialDelay = "10s")
+	public void testGetToken() {
+		if (counter++ > 12) {
+			System.exit(0);
 		}
-		log.info("Retrieved configuration from battery : " + conf);
+		String token;
 		try {
-			CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-			publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
-		} catch (Exception e) {
-			log.warning("Problem publishing configuration to mqtt, " + e.getLocalizedMessage());
+			token = idcsoAuthApplicationTokenRetriever.getToken();
+		} catch (IDCSOAuthTokenRetrievalException e) {
+			log.warning("Problem getting token, " + e.getLocalizedMessage());
+			return;
 		}
-		return conf;
+		String tokenType = idcsoAuthApplicationTokenRetriever.getTokenType();
+		LocalDateTime ldt = idcsoAuthApplicationTokenRetriever.getCurrentTokenRenewTime();
+		log.info("Loop :" + counter + " expiry=" + ldt.format(DateTimeFormatter.ISO_DATE_TIME) + ", type=" + tokenType
+				+ ", token=" + token);
+		if (counter == 3) {
+			log.info("Forcing complete token data reset");
+			idcsoAuthApplicationTokenRetriever.deleteTokenDetails();
+		}
+		if ((counter == 6) || (counter == 9)) {
+			log.info("Forcing  token timout after next retrieval");
+			idcsoAuthApplicationTokenRetriever.forceTokenRetrievalAfter(Duration.ofSeconds(15));
+			log.info("current time is " + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+					+ ", new expiry time is " + idcsoAuthApplicationTokenRetriever.getCurrentTokenRenewTime()
+							.format(DateTimeFormatter.ISO_DATE_TIME));
+		}
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for configuration mqtt uploader");
+		log.info("Startup event received for IDCSTestTokenRetrieval");
 	}
 }

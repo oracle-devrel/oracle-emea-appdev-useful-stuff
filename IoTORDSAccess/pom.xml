@@ -38,26 +38,24 @@ SOFTWARE. -->
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.oracle.demo.timg.iot</groupId>
-  <artifactId>iotsonnenuploader</artifactId>
-  <version>0.0.1</version>
+  <artifactId>iotordsaccess</artifactId>
+  <version>0.1</version>
   <packaging>${packaging}</packaging>
 
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.10.1</version>
+    <version>4.10.4</version>
   </parent>
   <properties>
     <packaging>jar</packaging>
     <jdk.version>21</jdk.version>
     <release.version>21</release.version>
-    <micronaut.version>4.10.1</micronaut.version>
+    <micronaut.version>4.10.3</micronaut.version>
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
-    <micronaut.aot.packageName>com.oracle.demo.timg.iot.iotsonnenuploader.aot.generated</micronaut.aot.packageName>
-    <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
+    <micronaut.aot.packageName>com.oracle.demo.timg.iot.aot.generated</micronaut.aot.packageName>
     <micronaut.runtime>netty</micronaut.runtime>
-    <exec.mainClass>com.oracle.demo.timg.iot.iotsonnenuploader.Application</exec.mainClass>
-	<lombok.version>1.18.42</lombok.version>
+    <exec.mainClass>com.oracle.demo.timg.iot.iotordsaccess.Application</exec.mainClass>
   </properties>
 
   <repositories>
@@ -79,45 +77,35 @@ SOFTWARE. -->
       <scope>compile</scope>
     </dependency>-->
     <dependency>
-    <groupId>io.micronaut.mqtt</groupId>
-    <artifactId>micronaut-mqtt-hivemq</artifactId>
-</dependency>
-<!-- can't use the Paho client if sending a respoinse from withiin the subscriber as paho seems to block, so need to use hive which seems to handle this (when using the TaskExectors.IO-->
-    <!--<dependency>
-      <groupId>io.micronaut.mqtt</groupId>
-      <artifactId>micronaut-mqttv5</artifactId>
+      <groupId>io.micronaut.jsonschema</groupId>
+      <artifactId>micronaut-json-schema-annotations</artifactId>
       <scope>compile</scope>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>io.micronaut.serde</groupId>
       <artifactId>micronaut-serde-jackson</artifactId>
       <scope>compile</scope>
     </dependency>
-		<dependency>
-			<groupId>io.micronaut.validation</groupId>
-			<artifactId>micronaut-validation</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<scope>runtime</scope>
-		</dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>io.micronaut.testresources</groupId>
-      <artifactId>micronaut-test-resources-client</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>io.micronaut.jsonschema</groupId>
+      <artifactId>micronaut-json-schema-validation</artifactId>
+      <scope>test</scope>
+    </dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<scope>runtime</scope>
+		</dependency>
     <dependency>
       <groupId>io.micronaut.test</groupId>
       <artifactId>micronaut-test-junit5</artifactId>
@@ -133,11 +121,6 @@ SOFTWARE. -->
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<!--<version>${lombok.version}</version>-->
-		</dependency>
   </dependencies>
   <build>
     <plugins>
@@ -145,7 +128,6 @@ SOFTWARE. -->
         <groupId>io.micronaut.maven</groupId>
         <artifactId>micronaut-maven-plugin</artifactId>
         <configuration>
-          <shared>true</shared>
           <configFile>aot-${packaging}.properties</configFile>
         </configuration>
       </plugin>
@@ -160,21 +142,30 @@ SOFTWARE. -->
           <!-- Uncomment to enable incremental compilation -->
           <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
 
-          <annotationProcessorPaths combine.children="append">
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-						<path>
-							<groupId>io.micronaut</groupId>
-							<artifactId>micronaut-inject-java</artifactId>
-							<version>${micronaut.core.version}</version>
-						</path>
+          <annotationProcessorPaths combine.self="override">
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>io.micronaut</groupId>
+              <artifactId>micronaut-inject-java</artifactId>
+              <version>${micronaut.core.version}</version>
+            </path>
+            <path>
+              <groupId>io.micronaut</groupId>
+              <artifactId>micronaut-graal</artifactId>
+              <version>${micronaut.core.version}</version>
+            </path>
             <path>
               <groupId>io.micronaut</groupId>
               <artifactId>micronaut-http-validation</artifactId>
               <version>${micronaut.core.version}</version>
+            </path>
+            <path>
+              <groupId>io.micronaut.jsonschema</groupId>
+              <artifactId>micronaut-json-schema-processor</artifactId>
             </path>
             <path>
               <groupId>io.micronaut.serde</groupId>
@@ -187,21 +178,10 @@ SOFTWARE. -->
                 </exclusion>
               </exclusions>
             </path>
-						<path>
-							<groupId>io.micronaut.validation</groupId>
-							<artifactId>micronaut-validation-processor</artifactId>
-							<version>${micronaut.validation.version}</version>
-							<exclusions>
-								<exclusion>
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject</artifactId>
-								</exclusion>
-							</exclusions>
-						</path>
           </annotationProcessorPaths>
           <compilerArgs>
             <arg>-Amicronaut.processing.group=com.oracle.demo.timg.iot</arg>
-            <arg>-Amicronaut.processing.module=iotsonnenuploader</arg>
+            <arg>-Amicronaut.processing.module=iotordsaccess</arg>
           </compilerArgs>
         </configuration>
       </plugin>

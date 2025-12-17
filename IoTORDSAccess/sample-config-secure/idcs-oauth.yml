@@ -1,0 +1,16 @@
+ords:
+  idcs:
+    idcshostname:
+    username:
+    password:
+  oauth:
+    appid:
+    appsecret:
+iot:
+  region: "uk-london-1"
+  domaingroup:
+    id:
+  domain:
+    id:
+  ordsapi:
+    version: "20250531"

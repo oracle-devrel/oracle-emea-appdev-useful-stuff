@@ -74,8 +74,12 @@ public class StatusUploaderMqtt {
 			return null;
 		}
 		log.info("Retrieved status from battery : " + status);
-		CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenStatus(status);
-		publishResp.thenRun(() -> log.info("Published status to mqtt"));
+		try {
+			CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenStatus(status);
+			publishResp.thenRun(() -> log.info("Published status to mqtt"));
+		} catch (Exception e) {
+			log.warning("Problem publishing status to mqtt, " + e.getLocalizedMessage());
+		}
 		return status;
 	}
 

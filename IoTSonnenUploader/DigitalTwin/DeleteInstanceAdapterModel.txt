@@ -1,0 +1,10 @@
+# this will delete the twin instance, model and adaptor
+
+oci iot digital-twin-instance delete --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID --force --wait-for-state DELETED
+oci iot digital-twin-adapter delete --digital-twin-adapter-id $DIGITAL_TWIN_ADAPTER_OCID --force --wait-for-state DELETED
+oci iot digital-twin-model delete --digital-twin-model-id $DIGTAL_TWIN_MODEL_ID --force --wait-for-state DELETED
+
+unset DIGTAL_TWIN_MODEL_ID
+unset DIGITAL_TWIN_ADAPTER_OCID
+unset DIGITAL_TWIN_INSTANCE_OCID
+unset DEVICE_EXTERNAL_KEY

@@ -34,57 +34,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
-
-import java.util.concurrent.CompletableFuture;
-
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
+package com.oracle.demo.timg.iot.iotordsaccess.idcs;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.client.exceptions.HttpClientException;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
-import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
+@ClientFilter(patterns = { "/oauth2/v1/token" })
+@Requires(property = IDCSApplicationCredentials.PREFIX + ".appid")
+@Requires(property = IDCSApplicationCredentials.PREFIX + ".appsecret")
 @Log
-@Singleton
-@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
-public class ConfigurationUploaderMqtt {
-	@Inject
-	private SonnenBatteryClient client;
-	@Inject
-	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
+public class IDCSOAuthTokenRequestFilter {
+	private final String appid;
+	private final String appsecret;
 
-	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
-	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
-		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
-					+ "no data to upload for service " + e.getServiceId());
-			return null;
-		}
-		log.info("Retrieved configuration from battery : " + conf);
-		try {
-			CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-			publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
-		} catch (Exception e) {
-			log.warning("Problem publishing configuration to mqtt, " + e.getLocalizedMessage());
-		}
-		return conf;
+	@Inject
+	public IDCSOAuthTokenRequestFilter(IDCSApplicationCredentials applicationCredentials) {
+		this.appid = applicationCredentials.getAppid();
+		this.appsecret = applicationCredentials.getAppsecret();
+	}
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		request.basicAuth(this.appid, this.appsecret);
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for configuration mqtt uploader");
+		log.info("Startup event received for IDCSOAuthTokenRequestFilter appid=" + this.appid);
 	}
 }

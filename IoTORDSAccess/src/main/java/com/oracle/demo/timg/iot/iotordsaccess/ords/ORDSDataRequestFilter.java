@@ -34,57 +34,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.uploadermqtt;
+package com.oracle.demo.timg.iot.iotordsaccess.ords;
 
-import java.util.concurrent.CompletableFuture;
+import com.oracle.demo.timg.iot.iotordsaccess.idcs.IDCSOAuthApplicationTokenRetriever;
+import com.oracle.demo.timg.iot.iotordsaccess.idcs.IDCSOAuthTokenRetrievalException;
 
-import com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata.SonnenConfiguration;
-import com.oracle.demo.timg.iot.iotsonnenuploader.mqtt.MqttSonnenBatteryPublisher;
-import com.oracle.demo.timg.iot.iotsonnenuploader.sonnenbatteryhttpclient.SonnenBatteryClient;
-
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
-import io.micronaut.scheduling.annotation.Scheduled;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
+@ClientFilter(patterns = { "/ords/**" })
 @Log
 @Singleton
-@Requires(property = "mqtt.configurationupload.enabled", value = "true", defaultValue = "false")
-public class ConfigurationUploaderMqtt {
-	@Inject
-	private SonnenBatteryClient client;
-	@Inject
-	private MqttSonnenBatteryPublisher mqttSonnenBatteryPublisher;
+public class ORDSDataRequestFilter {
+	// @Inject
+	// @Getter
+	@Setter
+	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRequest;
 
-	@Scheduled(fixedRate = "${mqtt.configurationupload.frequency:120s}", initialDelay = "${mqtt.configurationupload.initialdelay:5s}")
-	@ExecuteOn(TaskExecutors.IO)
-	public SonnenConfiguration processConfiguration() {
-		SonnenConfiguration conf;
+//	@Inject
+//	public ORDSDataRequestFilter(IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRequest) {
+//		this.idcsoAuthApplicationTokenRequest = idcsoAuthApplicationTokenRequest;
+//		log.info("ORDSDataFiloter - set idcsoAuthApplicationTokenRequest");
+//	}
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.info("Adding bearer auth header to path " + request.getPath());
 		try {
-			conf = client.fetchConfiguration();
-		} catch (HttpClientException e) {
-			log.warning("HttpClientException getting configuration from sonnen, " + e.getLocalizedMessage()
-					+ "no data to upload for service " + e.getServiceId());
-			return null;
+			request.bearerAuth(idcsoAuthApplicationTokenRequest.getToken());
+		} catch (IDCSOAuthTokenRetrievalException e) {
+			log.warning("Exception getting token, request won't send");
+			throw new HttpClientException("Can't get outh token", e);
 		}
-		log.info("Retrieved configuration from battery : " + conf);
-		try {
-			CompletableFuture<Void> publishResp = mqttSonnenBatteryPublisher.publishSonnenConfiguration(conf);
-			publishResp.thenRun(() -> log.info("Published configuration to mqtt"));
-		} catch (Exception e) {
-			log.warning("Problem publishing configuration to mqtt, " + e.getLocalizedMessage());
-		}
-		return conf;
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for configuration mqtt uploader");
+		log.info("Startup event received for ORDSDataRequestFilter");
 	}
 }

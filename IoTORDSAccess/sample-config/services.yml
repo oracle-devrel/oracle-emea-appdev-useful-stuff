@@ -1,0 +1,7 @@
+micronaut:
+  http:
+    services:
+      idcsoauthtoken:
+        url: "https://${ords.idcs.hostname}.identity.oraclecloud.com:443"
+      ordsapi:
+        url: "https://${iot.domaingroup.id}.data.iot.${iot.region}.oci.oraclecloud.com:443"

@@ -141,4 +141,11 @@ public class SonnenStatus {
 
 	private int solarProductionWattsPointInTime;
 
+	@JsonProperty("Pac_total_W")
+	public void setInverterPowerWattsPointInTimeFromSonnen(int inverterPowerWattsPointInTime) {
+		this.inverterPowerWattsPointInTime = inverterPowerWattsPointInTime;
+	}
+
+	private int inverterPowerWattsPointInTime;
+
 }
