@@ -1,0 +1,64 @@
+# this follows the steps to get the various OCID's and so on. 
+# it is basically all of the steps in the instructions.txt but 
+# with none of the create or modify steps
+# Each step should work if the one before it suceeds PROVIDED
+# that the object at that step exists. I.e. if the adaptor has
+# not been created (or has been destriyed) then you probaly don't
+# have an instance so can't retrieve the instance OCID 
+# note that in some cases you may need to set some environment
+# variables as they use things like names to work.
+# 
+# Things you may need to change are here
+#
+export IOT_COMPARTMENT_OCID=<compartment ocid>
+export DEVICE_VAULT_SECRET_OCID=<the secret ocid>
+
+# change these names as required
+export IOT_DOMAIN_GROUP_NAME=iot-domain-group-timg
+export IOT_DOMAIN_NAME=iot-domain-timg
+export DEVICE_ID=timssonnen
+# note that this is set for homebattery (the generic model), but it might well be sonnenbattery for the sonnen specific model
+export DIGITAL_TWIN_MODEL_NAME=homebattery
+# DIGITAL_TWIN_MODEL_FILE_NAME should be the name of the file containing the model for example HomeBatteryDTMI.json for the generic home battery, SonnenSpecificDTMI.json for the sonnen specific version
+export DIGITAL_TWIN_MODEL_FILE_NAME=HomeBatteryDTMI.json
+# this will be one of sonnen-direct-mapping, sonnen-single-route or sonnen-multiple-routes
+export DIGITAL_TWIN_ADAPTER_NAME=sonnen-multiple-routes
+# get the domain group info
+# get the domain group ocid (only run this once it has been created)
+export IOT_DOMAIN_GROUP_OCID=`oci iot domain-group list --display-name $IOT_DOMAIN_GROUP_NAME --compartment-id $IOT_COMPARTMENT_OCID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+
+# get the data host
+export IOT_DOMAIN_GROUP_DATA_HOST=`oci iot domain-group get --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID | jq -r '.data."data-host"'`
+export IOT_DOMAIN_GROUP_SHORT_ID=`echo $IOT_DOMAIN_GROUP_DATA_HOST| tr '.' ' ' | awk '{print $1}'`
+# Now get the domain stuff
+export IOT_DOMAIN_OCID=`oci iot domain list --display-name $IOT_DOMAIN_NAME --compartment-id $IOT_COMPARTMENT_OCID --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+export IOT_DOMAIN_HOST=`oci iot domain get --iot-domain-id $IOT_DOMAIN_OCID | jq -r '.data."device-host"'`
+export IOT_DOMAIN_SHORT_ID=`echo $IOT_DOMAIN_HOST| tr '.' ' ' | awk '{print $1}'`
+
+# these are only relevant if you have setup the digital twin model
+# the DIGITAL_TWIN_MODEL_NAME should relate to the model you are creating, e.g. homebattery for the generic model, sonnenbattery for the sonnen specific one
+export DIGITAL_TWIN_MODEL_ID=`oci iot digital-twin-model list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_MODEL_NAME | jq  -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+
+# these are only relevant if you have setup a digital twin adaptor
+# DIGITAL_TWIN_MODEL_FILE_NAME should be the name of the file containing the model for example HomeBatteryDTMI.json for the generic home battery, SonnenSpecificDTMI.json for the sonnen specific version
+export DIGITAL_TWIN_MODEL_IDENTIFIER=`cat $DIGITAL_TWIN_MODEL_FILE_NAME | jq -r '.["@id"]'`
+export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domain-id $IOT_DOMAIN_OCID  --display-name $DIGITAL_TWIN_ADAPTER_NAME | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+
+# the digital twin instance itself
+# this can work if there is not a model or adaptor configured
+# get the OCID of the digital twin
+export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+# and the external key
+export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance get --digital-twin-instance-id  $DIGITAL_TWIN_INSTANCE_OCID | jq -r  '.data."external-key"'`
+echo Device external key $DEVICE_EXTERNAL_KEY
+# needed to setup the client code
+export DEVICE_SECRET_BASE64=`oci secrets secret-bundle get --secret-id $DEVICE_VAULT_SECRET_OCID --stage CURRENT | jq -r '.data."secret-bundle-content".content'`
+export DEVICE_SECRET=`echo $DEVICE_SECRET_BASE64 | base64 --decode`
+ 
+# this is for APEX, only relevant if APEX has been setup
+#Get the apex URL 
+echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex/"
+#get the user id and workspace
+echo APEX_Workspace  "$IOT_DOMAIN_SHORT_ID"__WKSP
+echo APEX_User  "$IOT_DOMAIN_SHORT_ID"__WKSP
+echo APEX_Schema  "$IOT_DOMAIN_SHORT_ID"__IOT

@@ -53,7 +53,7 @@ SOFTWARE. -->
     <release.version>21</release.version>
     <micronaut.version>4.10.1</micronaut.version>
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
-    <micronaut.aot.packageName>com.oracle.demo.timg.iot.aot.generated</micronaut.aot.packageName>
+    <micronaut.aot.packageName>com.oracle.demo.timg.iot.iotsonnenuploader.aot.generated</micronaut.aot.packageName>
     <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
     <micronaut.runtime>netty</micronaut.runtime>
     <exec.mainClass>com.oracle.demo.timg.iot.iotsonnenuploader.Application</exec.mainClass>

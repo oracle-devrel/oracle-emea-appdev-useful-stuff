@@ -125,6 +125,17 @@
 		},
 		{
 			"@type": [
+				"Telemetry",
+				"Historized",
+				"EnergyRate"
+			],
+			"displayName": "Inverter power intake",
+			"name": "inverterPowerWattsPointInTime",
+			"schema": "integer",
+			"unit": "watt"
+		},
+		{
+			"@type": [
 				"Telemetry"
 			],
 			"displayName": "Software Version",

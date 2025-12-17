@@ -17,7 +17,8 @@
 				"time": 1763981430279,
 				"timestamp": "2025-11-24T10:50:30.279369Z[Europe/London]",
 				"batteryCharging": false,
-				"batteryDischarging": true
+				"batteryDischarging": true,
+				"inverterPowerWattsPointInTime": 42
 			}
 		},
 		"payload-mapping": {
@@ -31,7 +32,8 @@
 			"$.CapacityRemaining": "$.remainingBatteryCapacityWattHours",
 			"$.ReservedChargePercentage": "$.reservedBatteryCapacityPercentage",
 			"$.SolarGeneration": "$.solarProductionWattsPointInTime",
-			"$.StatusTimestamp": "$.timestamp"
+			"$.StatusTimestamp": "$.timestamp",
+			"$.InverterPowerWattsPointInTime": "$.inverterPowerWattsPointInTime" 
 		}
 	},
 	{

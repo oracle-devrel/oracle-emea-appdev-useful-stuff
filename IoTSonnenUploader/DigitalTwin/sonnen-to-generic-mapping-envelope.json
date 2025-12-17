@@ -13,6 +13,7 @@
            "reservedBatteryCapacityPercentage": 0,
            "solarProductionWattsPointInTime": 0,
 		   "time": 123456,
+		   "inverterPowerWattsPointInTime": 42,
            "timestamp": "2025-11-18T16:23:52.081763412Z"
          },
          "data-format": "JSON"
