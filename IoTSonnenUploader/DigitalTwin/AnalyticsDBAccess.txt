@@ -25,7 +25,6 @@ export IDCS_DOMAIN_NAME=<the name of your IDCS instance, e.g. iotdomain or Defau
 export IDCS_IOT_GROUP_NAME=<the name of the IDCS group you created, this could be the same one you used for ORDS if you've set that up>
 export OCI_TENANCY_OCID=`oci iam compartment list --query 'data[?contains("compartment-id", \`.tenancy\`)]."compartment-id" | [0]' --raw-output`
 
-export OCI_TENANCY_OCID=`oci iam compartment list --query 'data[?contains("compartment-id", \`.tenancy\`)]."compartment-id" | [0]' --raw-output`
 
 
 oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names '["'$OCI_TENANCY_OCID':'$IDCS_DOMAIN_NAME'/'$IDCS_IOT_GROUP_NAME'", "'$OCI_TENANCY_OCID':OracleIdentityCloudService/Domain_Specialists"]'  --wait-for-state SUCCEEDED --wait-for-state FAILED

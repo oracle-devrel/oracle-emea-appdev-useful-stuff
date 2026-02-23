@@ -54,6 +54,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 @Requires(property = "mqtt.client.user-name")
 @Requires(property = "mqtt.client.password")
 @Requires(property = "mqtt.client.server-uri")
+@Requires(property = "mqtt.enabled", value = "true", defaultValue = "true")
 public interface MqttSonnenBatteryPublisher {
 	@Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
 	@ExecuteOn(TaskExecutors.IO)
