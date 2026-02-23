@@ -13,6 +13,9 @@ export IOT_ORDS_OAUTH_ID=<Client id from OAUTH Integrated application config pag
 export IOT_ORDS_OAUTH_SECRET=<Client secret from OAUTH Integrated application config page - shown at step 18/19>
 export IOT_IDENTITY_DOMAIN_HOST=<From the identity details at step 31>
 
+#assuming the above all worked then you can configure the IoT to use the IDCS
+oci iot domain configure-ords-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allowed-identity-domain-host $IOT_IDENTITY_DOMAIN_HOST   --wait-for-state SUCCEEDED --wait-for-state FAILED
+
 # this uses the above to get the token and so on
 export IOT_IDENTITY_DOMAIN_HOST_SHORT=`echo $IOT_IDENTITY_DOMAIN_HOST | tr '.' ' ' | awk '{print $1}'`
 export IOT_IDENTITY_DOMAIN_URL=https://$IOT_IDENTITY_DOMAIN_HOST:443/oauth2/v1/token

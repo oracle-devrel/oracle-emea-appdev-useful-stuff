@@ -48,6 +48,7 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
 @MqttPublisher
+@Requires(property = "mqtt.enabled", value = "true", defaultValue = "true")
 @Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.client.client-id")
 @Requires(property = "mqtt.client.user-name")

@@ -138,6 +138,11 @@ SOFTWARE. -->
 			<artifactId>lombok</artifactId>
 			<!--<version>${lombok.version}</version>-->
 		</dependency>
+		<dependency>
+			<groupId>com.oracle.demos.experiential.addons</groupId>
+			<artifactId>gamevideouriuploader</artifactId>
+			<version>0.2.4</version>
+		</dependency>
   </dependencies>
   <build>
     <plugins>
