@@ -38,7 +38,7 @@ package com.oracle.demo.timg.iot.iotsonnenuploader.sonnendatacapture;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import io.micronaut.context.ApplicationContext;
@@ -61,7 +61,7 @@ import lombok.extern.java.Log;
 @Requires(property = "datacapture.captureduration")
 public class CaptureTimerController {
 	@Property(name = "datacapture.starttimestamp")
-	private LocalDateTime startTimestamp;
+	private ZonedDateTime startTimestamp;
 	@Property(name = "datacapture.captureduration")
 	private Duration captureDuration;
 
@@ -78,21 +78,21 @@ public class CaptureTimerController {
 	private ObjectMapper mapper;
 
 	private boolean waitingToStartDataCapture = true;
-	private LocalDateTime endTimestamp;
+	private ZonedDateTime endTimestamp;
 
 	@Scheduled(fixedRate = "${datacapture.timer.frequency:60s}", initialDelay = "${datacapture.timer.initialdelay:1s}")
 	@ExecuteOn(TaskExecutors.IO)
 	public synchronized void checkTimer() {
 		if (waitingToStartDataCapture) {
-			if (LocalDateTime.now().isAfter(startTimestamp)) {
-				DataCaptureConfig dataCaptureConfig = DataCaptureConfig.builder().starttime(startTimestamp)
-						.duration(captureDuration).build();
+			if (ZonedDateTime.now().isAfter(startTimestamp)) {
+				DataCaptureConfig dataCaptureConfig = DataCaptureConfig.builder()
+						.starttime(ZonedDateTime.from(startTimestamp)).duration(captureDuration).build();
 				String dataCaptureConfigString;
 				try {
 					dataCaptureConfigString = mapper.writeValueAsString(dataCaptureConfig);
 				} catch (IOException e) {
 					log.severe(
-							"Major problem, can't serialize the data capture config, will try again but this coudl be an issue");
+							"Major problem, can't serialize the data capture config, will try again but this could be an issue");
 					return;
 				}
 
@@ -110,7 +110,7 @@ public class CaptureTimerController {
 				log.info("Not yet reached start time");
 			}
 		} else {
-			if (endTimestamp.isBefore(LocalDateTime.now())) {
+			if (endTimestamp.isBefore(ZonedDateTime.now())) {
 				// force an entry to be generated
 				configurationDataCapture.processConfiguration();
 				statusDataCapture.processStatus();

@@ -37,6 +37,7 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotsonnenuploader.sonnendatacapture;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -76,6 +77,8 @@ public class ConfigurationDataCapture {
 	private SonnenBatteryClient sonnenClient;
 	@Property(name = "datacapture.configurationsave.filename", defaultValue = "./saveddata/configuration.json")
 	private String configurationFileName;
+	@Property(name = "datacapture.configurationsave.overwrite", defaultValue = "false")
+	private boolean overwrite;
 
 	@Inject
 	private ObjectMapper mapper;
@@ -139,7 +142,13 @@ public class ConfigurationDataCapture {
 	public void onStartup(StartupEvent event) {
 		log.info("Startup event received for configuration https uploader, output file=" + configurationFileName);
 		try {
-			writer = new BufferedWriter(new FileWriter(configurationFileName));
+			if (new File(configurationFileName).exists() && (!overwrite)) {
+				log.info("output file " + configurationFileName
+						+ " exists and ovewrwrite is false, nowhere to write data");
+			} else {
+				writer = new BufferedWriter(new FileWriter(configurationFileName));
+				log.info("Created writer");
+			}
 		} catch (IOException e) {
 			log.warning("Unable to open writer to file " + configurationFileName + " due to " + e.getLocalizedMessage()
 					+ "\nNo configuration data will be saved.");
