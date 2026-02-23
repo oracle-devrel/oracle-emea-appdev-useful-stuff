@@ -47,6 +47,7 @@ import lombok.extern.java.Log;
 
 @Log
 @MqttSubscriber
+@Requires(property = "mqtt.enabled", value = "true", defaultValue = "true")
 @Requires(property = DeviceSettings.PREFIX + ".id")
 @Requires(property = "mqtt.monitorreference.enabled", value = "true", defaultValue = "false")
 @Requires(property = "mqtt.client.client-id")
