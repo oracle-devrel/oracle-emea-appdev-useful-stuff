@@ -1,0 +1,70 @@
+gateway:
+  oci:
+    config:
+      sectionname: "DEFAULT"
+  # uploaddata: true
+  multithreaduploads: true 
+  eventqueue:
+    type: "IN_MEMORY"
+    inmemory:
+      size: 1024
+  eventdatapending:
+    type: "IN_MEMORY"
+  instance:
+    oninstancecreationgeterrorresubmit: true
+    secret:
+      # one off REUSE_SECRET or GENERATE_UNIQUE_SECRET, REUSE_SECRET means that the same secret contents will be used for all 
+      # digital twin instances, GENERATE_UNIQUE_SECRET means that a new secret will be generated for each instance
+      # if both cases gateway.instance.secret.compartment must be set and contain the "path" of the
+      # compartment holding the vault, key & secret, gateway.instance.secret.vault must be set to the name of the vault
+      # if REUSE_SECRET then gateway.instance.secret.reuse.secret must be the name of the secret to reuse (in the vault & compartment)
+      # if GENERATE_UNIQUE_SECRET then gateway.instance.secret.generate.key must contain the name of the master encryption key
+      # (in the vault & compartment) to use to encrypt the secret, gateway.instance.secret.generate.secretprefix is optional and 
+      # is used as a prefix for the vault key name (the remainder is randomly generated) it defaults to iot
+      # gateway.instance.secret.generate.secretlength is how long a generated password key should be (14 - 32 characters)
+      newinstancesecretmode: "GENERATE_UNIQUE_SECRET"
+      vault: 
+        name: "iotvault"
+        compartment: "/domain-specialists/tim.graves/iot"
+      reuse:
+        secret: "iot-instance-secret"
+      generate:
+        key: "iot-instance-key"
+        secretprefix: "iot-gateway-generated-secret"
+        secretlength: 32
+    # the transformers to use to convert the key, for example by removing bad characters, the order is used to chose the order 
+    # they will be applied with the lower numbers being run first (some might be order dependent, e.g. if converting snake case to
+    # camel you probabaly want to lower case the snake case before you do the camel case case)
+    keytransformer:
+      passthrough:
+        enabled: false
+        order: 10
+      tolowercase:
+        enabled: true
+        order: 20
+      snakecasetocamelcase:
+        enabled: true
+        order: 30
+  eventdatatransformer:
+    passthrough:
+      enabled: false
+      order: 10
+    xmlinputtojsonoutput:
+      enabled: false
+      order: 20
+  iotservice:
+    uploadmechanism: "HTTPS"
+    domaingroup:
+      name: "iot-domain-group-timg"
+      compartment: "/domain-specialists/tim.graves/iot"
+    domain:
+      name: "iot-domain-timg"
+    digitaltwinmodel:
+      name: "testmodel"
+    digitaltwinadapter:
+      name: "testadapter"
+      pathprefix: "/home/sonnen"
+
+micronaut:
+  server:
+    port: 8123		

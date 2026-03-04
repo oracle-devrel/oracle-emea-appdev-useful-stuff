@@ -1,0 +1,7 @@
+IoT policy - apply in the tim.graves compartment, you will need to get the vault OCID and substitute it
+Allow group OracleIdentityCloudService/Domain_Specialists to manage iot-family in compartment tim.graves
+Allow any-user to {SECRET_BUNDLE_READ, SECRET_READ} in compartment tim.graves where ALL {request.principal.type = 'iotdomain', target.vault.id = '<VAULT OCID>'}
+Allow any-user to {CERTIFICATE_BUNDLE_READ, CERTIFICATE_READ} in compartment tim.graves where request.principal.type = 'iotdomain'
+Allow any-user to {CERTIFICATE_AUTHORITY_BUNDLE_READ, CERTIFICATE_AUTHORITY_READ} in compartment tim.graves where request.principal.type = 'iotdomain'
+Allow any-user to {CABUNDLE_READ} in compartment tim.graves where request.principal.type = 'iotdomain'
+Allow any-user to {VCN_READ} in compartment tim.graves where request.principal.type = 'iotdomain'

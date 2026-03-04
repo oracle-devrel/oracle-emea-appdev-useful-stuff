@@ -1,0 +1,15 @@
+iotgateway:
+  host: "localhost"
+  port: 8123
+
+oci:
+  iot:
+    compartmentname: "/domain-specialists/tim.graves/iot"
+    iotdomaingroupname: "iot-domain-group-timg"
+    iotdomainname: "iot-domain-timg"
+
+micronaut:
+  http:
+    services:
+      iotgatewayserver:
+        url: "http://${iotgateway.host}:${iotgateway.port}"
