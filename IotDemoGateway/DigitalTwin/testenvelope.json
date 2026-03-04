@@ -1,0 +1,17 @@
+{
+  "reference-endpoint": "house/sonnen/status",
+  "reference-payload": {
+         "data": {
+           "currentBatteryCapacityPercentage": 0, 
+           "operatingMode": 0,
+           "reservedBatteryCapacityPercentage": 0,
+           "time": 123456,
+           "comment": "Your random comment",
+           "timestamp": "2025-11-18T16:23:52.081763412Z" 
+         },
+         "data-format": "JSON"
+  },
+  "envelope-mapping": {
+    "timeObserved": "$.time"
+  }
+}

@@ -1,0 +1,24 @@
+[
+	{
+		"condition": "*",
+		"description": "Default condition",
+		"payload-mapping": {
+			"$.CurrentChargePercentage": "$.currentBatteryCapacityPercentage", 
+			"$.OperatingMode": "${if (.operatingMode == 1)  then \"Manual\" elif (.operatingMode == 2) then \"Automatic - Self-Consumption\" elif (.operatingMode == 6) then \"Battery-Module-Extension (30%)\" elif (.operatingMode == 10) then \"Time-Of-Use\" else \"Unknown Mode\" end}",
+			"$.ReservedChargePercentage": "$.reservedBatteryCapacityPercentage", 
+			"$.comment": "$.comment", 
+            "$.StatusTimestamp": "$.timestamp" 
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"currentBatteryCapacityPercentage": 59,
+				"operatingMode": 2,
+				"reservedBatteryCapacityPercentage": 5,
+                "comment": "Your comment on the update",
+                "time": 1763981430279,
+				"timestamp": "2025-11-24T10:50:30.279369Z"
+			}
+		}
+	}
+]

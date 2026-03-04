@@ -1,0 +1,63 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:testmodel;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Status Data timestamp",
+			"name": "StatusTimestamp",
+			"schema": "dateTime"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Operating Mode",
+			"name": "OperatingMode",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Current Battery Charge Percentage",
+			"name": "CurrentChargePercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Validated"
+			],
+			"displayName": "Reserved Battery Charge Percentage",
+			"name": "ReservedChargePercentage",
+			"schema": "integer",
+			"minimum": 0,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Update comment",
+			"name": "comment",
+			"schema": "string"
+		}
+	]
+}
