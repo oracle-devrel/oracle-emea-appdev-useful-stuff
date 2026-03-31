@@ -1,0 +1,11 @@
+This will get the instance id, instance displayname and model display name for all instances where the model displayname is 'homebattery'
+
+SELECT
+  JSON_VALUE(dti.data, '$._id' ) AS instance_id,
+  JSON_VALUE(dti.data, '$.displayName' ) AS instance_displayname,
+  JSON_VALUE(dtm.data, '$.displayName' ) AS model_displayname
+FROM digital_twin_instances dti
+INNER JOIN digital_twin_models dtm
+  ON JSON_VALUE(dti.data, '$.digitalTwinModelId' )
+   = JSON_VALUE(dtm.data, '$._id' )
+where  JSON_VALUE(dtm.data, '$.displayName' ) = 'homebattery'
