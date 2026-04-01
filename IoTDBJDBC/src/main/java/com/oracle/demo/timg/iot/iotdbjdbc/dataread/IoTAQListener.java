@@ -8,13 +8,13 @@ import jakarta.inject.Singleton;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
-import jakarta.jms.Queue;
-import jakarta.jms.QueueConnection;
-import jakarta.jms.QueueConnectionFactory;
-import jakarta.jms.QueueReceiver;
-import jakarta.jms.QueueSession;
 import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
+import jakarta.jms.Topic;
+import jakarta.jms.TopicConnection;
+import jakarta.jms.TopicConnectionFactory;
+import jakarta.jms.TopicSession;
+import jakarta.jms.TopicSubscriber;
 import lombok.extern.java.Log;
 import oracle.jakarta.jms.AQjmsFactory;
 import oracle.jdbc.pool.OracleDataSource;
@@ -81,23 +81,23 @@ public class IoTAQListener implements MessageListener {
 		}
 	}
 
-	private QueueConnectionFactory qcf;
-	private QueueConnection conn;
-	private QueueSession session;
-	private Queue queue;
-	private QueueReceiver receiver;
+	private TopicConnectionFactory qcf;
+	private TopicConnection conn;
+	private TopicSession session;
+	private Topic topic;
+	private TopicSubscriber subscriber;
 
 	public void connectToAQ() throws JMSException {
-		qcf = AQjmsFactory.getQueueConnectionFactory(dataSource);
-		conn = qcf.createQueueConnection();
-		session = conn.createQueueSession(false, Session.CLIENT_ACKNOWLEDGE);
-		queue = session.createQueue(schemaName + "." + aqname);
-		receiver = session.createReceiver(queue);
-		receiver.setMessageListener(this);
+		qcf = AQjmsFactory.getTopicConnectionFactory(dataSource);
+		conn = qcf.createTopicConnection();
+		session = conn.createTopicSession(false, Session.CLIENT_ACKNOWLEDGE);
+		topic = session.createTopic(schemaName + "." + aqname);
+		subscriber = session.createSubscriber(topic);
+		subscriber.setMessageListener(this);
 	}
 
 	public void disconnectFromAQ() throws JMSException {
-		receiver.close();
+		subscriber.close();
 		session.close();
 		conn.close();
 	}
