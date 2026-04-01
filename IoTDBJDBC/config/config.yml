@@ -3,3 +3,6 @@ datasources:
     url: "jdbc:oracle:thin:@tcps:adb.${iotdatacache.ociregion}.oraclecloud.com:1521/${iotdatacache.connectionname}.adb.oraclecloud.com?TOKEN_AUTH=OCI_TOKEN"
     username: ""
     password: ""
+
+iotdatacache:
+  aqname: "normalized_data"

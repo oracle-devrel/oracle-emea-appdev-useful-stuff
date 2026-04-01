@@ -63,6 +63,7 @@ public class IoTAQListener implements MessageListener {
 
 	@Override
 	public void onMessage(Message message) {
+		log.info("Processing incoming message");
 		try {
 			// Handle common payload types
 			if (message instanceof TextMessage tm) {
@@ -88,18 +89,22 @@ public class IoTAQListener implements MessageListener {
 	private TopicSubscriber subscriber;
 
 	public void connectToAQ() throws JMSException {
+		log.info("Setting up AQ configuration");
 		qcf = AQjmsFactory.getTopicConnectionFactory(dataSource);
 		conn = qcf.createTopicConnection();
 		session = conn.createTopicSession(false, Session.CLIENT_ACKNOWLEDGE);
 		topic = session.createTopic(schemaName + "." + aqname);
 		subscriber = session.createSubscriber(topic);
 		subscriber.setMessageListener(this);
+		log.info("Completed stting up AQ configuration");
 	}
 
 	public void disconnectFromAQ() throws JMSException {
+		log.info("Disconnecting AQ");
 		subscriber.close();
 		session.close();
 		conn.close();
+		log.info("Disconnected AQ");
 	}
 
 }

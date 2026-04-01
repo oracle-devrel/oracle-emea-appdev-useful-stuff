@@ -76,9 +76,11 @@ public class JDBCRunner implements Runnable {
 
 	@Override
 	public void run() {
+		log.info("Starting AQ processing");
 		try {
 			ioTAQListener.connectToAQ();
 			if (aqRuntime > 0) {
+				log.info("Entering run wait for AQ");
 				Thread.sleep(aqRuntime * 1000);
 				ioTAQListener.disconnectFromAQ();
 			}
@@ -88,5 +90,6 @@ public class JDBCRunner implements Runnable {
 		} catch (InterruptedException e) {
 			log.warning("Opps, got interruped whiel waiting for the AQ time out, " + e.getLocalizedMessage());
 		}
+		log.info("Completed AQ processing");
 	}
 }
