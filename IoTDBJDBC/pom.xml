@@ -87,11 +87,11 @@ SOFTWARE. -->
       <scope>compile</scope>
     </dependency>-->
 
-		<dependency>
+		<!--<dependency>
 			<groupId>io.micronaut.data</groupId>
 			<artifactId>micronaut-data-jdbc</artifactId>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>io.micronaut.serde</groupId>
@@ -99,11 +99,11 @@ SOFTWARE. -->
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>io.micronaut.sql</groupId>
 			<artifactId>micronaut-jdbc-hikari</artifactId>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -154,11 +154,11 @@ SOFTWARE. -->
 			<version>${version.ojdbc}</version>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>io.micronaut</groupId>
 			<artifactId>micronaut-http-client</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>io.micronaut.test</groupId>
@@ -226,17 +226,6 @@ SOFTWARE. -->
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-inject-java</artifactId>
 							<version>${micronaut.core.version}</version>
-						</path>
-						<path>
-							<groupId>io.micronaut.data</groupId>
-							<artifactId>micronaut-data-processor</artifactId>
-							<version>${micronaut.data.version}</version>
-							<exclusions>
-								<exclusion>
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject</artifactId>
-								</exclusion>
-							</exclusions>
 						</path>
 						<path>
 							<groupId>io.micronaut</groupId>

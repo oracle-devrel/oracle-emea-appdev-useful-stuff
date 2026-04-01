@@ -1,10 +1,10 @@
-package com.oracle.demo.timg.iot.iotjdbc.dbschema;
+package com.oracle.demo.timg.iot.iotdbjdbc.dbschema;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.data.annotation.Embeddable;
-import io.micronaut.data.annotation.MappedProperty;
+//import io.micronaut.data.annotation.Embeddable;
+//import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,16 +18,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @Serdeable
 @Introspected
-@Embeddable
+//@Embeddable
 
 public class RawDataId {
-	@MappedProperty(value = "DIGITAL_TWIN_INSTANCE_ID")
+	// @MappedProperty(value = "DIGITAL_TWIN_INSTANCE_ID")
 	@NotNull
 	private String digitalTwinInstanceId;
-	@MappedProperty(value = "ENDPOINT")
+	// @MappedProperty(value = "ENDPOINT")
 	@NotNull
 	private String endpoint;
-	@MappedProperty(value = "TIME_RECEIVED")
+	// @MappedProperty(value = "TIME_RECEIVED")
 	@NotNull
-	private ZonedDateTime timeReceived;
+	private Date timeReceived;
 }

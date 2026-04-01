@@ -34,13 +34,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotjdbc.dbschema;
+package com.oracle.demo.timg.iot.iotdbjdbc.dbschema;
 
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.data.annotation.EmbeddedId;
-import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.MappedProperty;
-import io.micronaut.data.model.naming.NamingStrategies;
+//import io.micronaut.data.annotation.EmbeddedId;
+//import io.micronaut.data.annotation.MappedEntity;
+//import io.micronaut.data.annotation.MappedProperty;
+//import io.micronaut.data.model.naming.NamingStrategies;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -48,7 +48,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@MappedEntity(value = "RAW_DATA", namingStrategy = NamingStrategies.UnderScoreSeparatedUpperCase.class)
+//@MappedEntity(value = "RAW_DATA", namingStrategy = NamingStrategies.UnderScoreSeparatedUpperCase.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -56,13 +56,13 @@ import lombok.NoArgsConstructor;
 @Serdeable
 @Introspected
 public class RawData {
-	@EmbeddedId
+	// @EmbeddedId
 	private RawDataId id;
 
 	@NotNull
-	@MappedProperty(value = "CONTENT_TYPE")
+	// @MappedProperty(value = "CONTENT_TYPE")
 	public @NotNull String contentType;
 	@NotNull
-	@MappedProperty(value = "CONTENT")
+	// @MappedProperty(value = "CONTENT")
 	public @NotNull String content;
 }

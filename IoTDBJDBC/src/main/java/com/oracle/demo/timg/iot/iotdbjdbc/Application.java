@@ -1,4 +1,4 @@
-package com.oracle.demo.timg.iot.iotjdbc;
+package com.oracle.demo.timg.iot.iotdbjdbc;
 
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import io.micronaut.runtime.Micronaut;

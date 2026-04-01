@@ -1,6 +1,8 @@
-package com.oracle.demo.timg.iot.iotjdbc.runner;
+package com.oracle.demo.timg.iot.iotdbjdbc.runner;
 
-import com.oracle.demo.timg.iot.iotjdbc.dataread.IoTJDBCReader;
+import java.sql.SQLException;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTJDBCReader;
 
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Property;
@@ -34,12 +36,14 @@ public class JDBCRunner {
 	// for example altering the default schema
 	private IoTJDBCReader ioTJDBCReader;
 
-	public JDBCRunner(@Property(name = "iotdatacache.schemaname") String schemaName) {
+	public JDBCRunner(@Property(name = "datasources.default.url") String url,
+			@Property(name = "iotdatacache.schemaname") String schemaName) {
+		log.info("Using URL " + url);
 		log.info("Will eventually use IOT Schama named " + schemaName);
 	}
 
 	@EventListener
-	public void onStartup(StartupEvent event) {
+	public void onStartup(StartupEvent event) throws SQLException {
 		log.info("Startup event received, getting data");
 		log.info("Raw data entries are :\n" + ioTJDBCReader.getRawData());
 	}
