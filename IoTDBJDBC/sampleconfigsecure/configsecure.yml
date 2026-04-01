@@ -1,0 +1,4 @@
+iotdatacache:
+  schemaname: "<IOT DOmain Shortid>__iot"
+  ociregion: "uk-london-1"
+  connectionname: "<The name of the adb low connection e.g. abc123_xyz789.low - see the iot domain group page for the details>"
