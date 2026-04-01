@@ -22,6 +22,9 @@ import oracle.jdbc.pool.OracleDataSource;
  * this class does business logic stuff needed to retrieve the data from the IOT
  * instance
  * 
+ * it sits on the data source which uses the file system based db token. it
+ * really needs to be updated to handle a dynamic token refresh, but that can be
+ * done later
  */
 public class IoTJDBCReader {
 	private OracleDataSource dataSource;
@@ -50,16 +53,6 @@ public class IoTJDBCReader {
 		}
 	}
 
-//	private RawDataRepository rawDataRepository;
-//
-//	@Inject
-//	public IoTJDBCReader(RawDataRepository rawDataRepository) {
-//		this.rawDataRepository = rawDataRepository;
-//	}
-//
-//	public List<RawData> getRawData() {
-//		return rawDataRepository.findAll();
-//	}
 	public List<RawData> getRawData() throws SQLException {
 		List<RawData> results = new LinkedList<>();
 
