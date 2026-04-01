@@ -41,8 +41,13 @@ public class IoTJDBCReader {
 		this.password = password;
 		dataSource = new OracleDataSource();
 		dataSource.setURL(url);
-		dataSource.setUser(username);
-		dataSource.setPassword(password);
+		if (username.length() > 0) {
+			dataSource.setUser(username);
+		}
+
+		if (password.length() > 0) {
+			dataSource.setPassword(password);
+		}
 	}
 
 //	private RawDataRepository rawDataRepository;
@@ -58,16 +63,18 @@ public class IoTJDBCReader {
 	public List<RawData> getRawData() throws SQLException {
 		List<RawData> results = new LinkedList<>();
 
-		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT,  TIME_RECEIVED FROM "
-				+ schemaName + ".raw_data";
+		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT,  TIME_RECEIVED FROM raw_data";
 		try (Connection conn = dataSource.getConnection();
 				Statement st = conn.createStatement();
+				// for efficiency this should only be done when we get a new connection that has
+				// not had it's current scheme altered, but for not this is a simple approach
+				ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + schemaName);
 				ResultSet rs = st.executeQuery(queryString)) {
 			int i = 1;
 			if (rs.next()) {
 				RawDataId id = new RawDataId(rs.getString("DIGITAL_TWIN_INSTANCE_ID"), rs.getString("ENDPOINT"),
 						rs.getDate("TIME_RECEIVED"));
-				RawData rawData = new RawData(id, rs.getString("CONTENT_TYPE"), rs.getString("CONTENT"));
+				RawData rawData = new RawData(id, rs.getString("CONTENT_TYPE"), rs.getBlob("CONTENT").toString());
 				results.add(rawData);
 				System.out.println("Result set row " + i + " = " + rawData);
 			}
