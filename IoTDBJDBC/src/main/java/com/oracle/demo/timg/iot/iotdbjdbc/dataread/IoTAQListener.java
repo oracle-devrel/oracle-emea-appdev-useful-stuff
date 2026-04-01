@@ -50,10 +50,12 @@ public class IoTAQListener implements MessageListener {
 		dataSource = new OracleDataSource();
 		dataSource.setURL(url);
 		if (username.length() > 0) {
+			log.info("Setting username");
 			dataSource.setUser(username);
 		}
 
 		if (password.length() > 0) {
+			log.info("Setting password");
 			dataSource.setPassword(password);
 		}
 

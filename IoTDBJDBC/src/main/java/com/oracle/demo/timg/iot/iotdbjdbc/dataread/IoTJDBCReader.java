@@ -13,6 +13,7 @@ import com.oracle.demo.timg.iot.iotdbjdbc.dbschema.RawDataId;
 import io.micronaut.context.annotation.Property;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 //import com.oracle.demo.timg.iot.iotdbjdbc.dbschema.RawDataRepository;
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -26,6 +27,7 @@ import oracle.jdbc.pool.OracleDataSource;
  * really needs to be updated to handle a dynamic token refresh, but that can be
  * done later
  */
+@Log
 public class IoTJDBCReader {
 	private OracleDataSource dataSource;
 	private String url;
@@ -45,10 +47,12 @@ public class IoTJDBCReader {
 		dataSource = new OracleDataSource();
 		dataSource.setURL(url);
 		if (username.length() > 0) {
+			log.info("Setting username");
 			dataSource.setUser(username);
 		}
 
 		if (password.length() > 0) {
+			log.info("Setting password");
 			dataSource.setPassword(password);
 		}
 	}
