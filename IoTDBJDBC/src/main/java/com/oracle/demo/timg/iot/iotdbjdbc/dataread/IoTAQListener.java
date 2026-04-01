@@ -96,11 +96,13 @@ public class IoTAQListener implements MessageListener {
 		topic = session.createTopic(schemaName + "." + aqname);
 		subscriber = session.createSubscriber(topic);
 		subscriber.setMessageListener(this);
+		conn.start();
 		log.info("Completed stting up AQ configuration");
 	}
 
 	public void disconnectFromAQ() throws JMSException {
 		log.info("Disconnecting AQ");
+		conn.stop();
 		subscriber.close();
 		session.close();
 		conn.close();
