@@ -27,6 +27,7 @@ echo "Located IOT Domain $IOT_DOMAIN_NAME"
 export IOT_DOMAIN_GROUP_DATA_HOST=`oci iot domain-group get --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID | jq -r '.data."data-host"'`
 export IOT_DOMAIN_GROUP_SHORT_ID=`echo $IOT_DOMAIN_GROUP_DATA_HOST| tr '.' ' ' | awk '{print $1}'`
 export IOT_DOMAIN_HOST=`oci iot domain get --iot-domain-id $IOT_DOMAIN_OCID | jq -r '.data."device-host"'`
+export IOT_DOMAIN_SHORT_ID=`echo $IOT_DOMAIN_HOST| tr '.' ' ' | awk '{print $1}'`
 
 
 export VAULT_OCID=`oci kms management vault list   --compartment-id $IOT_COMPARTMENT_OCID --all | jq -r ".data[] |  select (.\"display-name\" == \"$VAULT_NAME\") | select (.\"lifecycle-state\" == \"ACTIVE\") | .id"`
@@ -51,12 +52,8 @@ echo "Got secret $APEX_PASSWORD_SECRET_NAME contents"
 echo "Configuring APEX access to domain"
 oci iot domain configure-apex-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-workspace-admin-initial-password $IOT_APEX_INITIAL_PASSWORD  --wait-for-state SUCCEEDED --wait-for-state FAILED
 
-#Get the apex URL 
-echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex"
-#get the user id and workspace
-echo APEX_Workspace  "$IOT_DOMAIN_SHORT_ID"__WKSP
-echo APEX_User  "$IOT_DOMAIN_SHORT_ID"__WKSP
-echo APEX_Schema  "$IOT_DOMAIN_SHORT_ID"__IOT
+
+
 #  usefull commands
 echo "To access data uploaded using the SQL workbench this command can get the most recent 10 raw data rows"
 echo 'select TIME_RECEIVED, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) from RAW_DATA order by TIME_RECEIVED FETCH FIRST 10 ROWS ONLY'
