@@ -29,6 +29,7 @@ import oracle.jdbc.pool.OracleDataSource;
  */
 @Log
 public class IoTJDBCReader {
+	public final static String DRIVER_URL_SEP = "@";
 	private OracleDataSource dataSource;
 	private String url;
 	private String schemaName;
@@ -37,6 +38,7 @@ public class IoTJDBCReader {
 
 	@Inject
 	public IoTJDBCReader(@Property(name = "datasources.default.url") String url,
+			@Property(name = "datasources.default.driver", defaultValue = "jdbc:oracle:thin:") String driver,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "datasources.default.username", defaultValue = "") String username,
 			@Property(name = "datasources.default.password", defaultValue = "") String password) throws SQLException {
@@ -45,7 +47,7 @@ public class IoTJDBCReader {
 		this.username = username;
 		this.password = password;
 		dataSource = new OracleDataSource();
-		dataSource.setURL(url);
+		dataSource.setURL(driver + DRIVER_URL_SEP + url);
 		if (username.length() > 0) {
 			log.info("Setting username");
 			dataSource.setUser(username);
@@ -64,7 +66,7 @@ public class IoTJDBCReader {
 		try (Connection conn = dataSource.getConnection();
 				Statement st = conn.createStatement();
 				// for efficiency this should only be done when we get a new connection that has
-				// not had it's current scheme altered, but for not this is a simple approach
+				// not had it's current schema altered, but for now this is a simple approach
 				ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + schemaName);
 				ResultSet rs = st.executeQuery(queryString)) {
 			int i = 1;
@@ -75,6 +77,8 @@ public class IoTJDBCReader {
 				results.add(rawData);
 				System.out.println("Result set row " + i + " = " + rawData);
 			}
+		} catch (Exception e) {
+			log.severe("Problem connecting to DB " + e.getLocalizedMessage());
 		}
 		return results;
 	}

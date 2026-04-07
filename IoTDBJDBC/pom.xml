@@ -147,6 +147,12 @@ SOFTWARE. -->
 			<artifactId>oci-java-sdk-identity</artifactId>
 			<version>${version.ocisdk}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.oracle.oci.sdk</groupId>
+			<artifactId>oci-java-sdk-identitydataplane</artifactId>
+			<version>${version.ocisdk}</version>
+		</dependency>
+
 		<!-- Oracle JDBC driver (JDBC 4.3+; recommended for Java 11/17/21+) -->
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
@@ -187,11 +193,11 @@ SOFTWARE. -->
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>io.micronaut.validation</groupId>
 			<artifactId>micronaut-validation</artifactId>
@@ -214,7 +220,8 @@ SOFTWARE. -->
 				</configuration>
 			</plugin>
 
-			<!-- this is probabaly important, but I don;t have the time to work out why the checksnake scae is failing right now
+			<!-- this is probabaly important, but I don;t have the time to work
+			out why the checksnake scae is failing right now
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>

@@ -2,7 +2,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.runner;
 
 import java.sql.SQLException;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQListener;
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTJDBCReader;
 
 import io.micronaut.context.annotation.Context;
@@ -11,7 +10,6 @@ import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.jms.JMSException;
 import lombok.extern.java.Log;
 
 @Singleton
@@ -37,8 +35,8 @@ public class JDBCRunner implements Runnable {
 	// constructor is called, this will let us use the constrictor to play around
 	// for example altering the default schema
 	private IoTJDBCReader ioTJDBCReader;
-	@Inject
-	private IoTAQListener ioTAQListener;
+//	@Inject
+//	private IoTAQJMSListener ioTAQJMSListener;
 
 	private final int aqRuntime;
 	private final boolean listenToAq;
@@ -66,30 +64,32 @@ public class JDBCRunner implements Runnable {
 		log.info("Startup event received, getting data");
 		log.info("Raw data entries are :\n" + ioTJDBCReader.getRawData());
 
-		if (listenToAq) {
-			// yes this should use executors and the like, but this is a basic
-			// demo, not a production setup
-			Thread t = new Thread(this);
-			t.start();
-		}
+//		if (listenToAq) {
+//			// yes this should use executors and the like, but this is a basic
+//			// demo, not a production setup
+//			Thread t = new Thread(this);
+//			t.start();
+//		}
 	}
 
 	@Override
 	public void run() {
-		log.info("Starting AQ processing");
-		try {
-			ioTAQListener.connectToAQ();
-			if (aqRuntime > 0) {
-				log.info("Entering run wait for AQ");
-				Thread.sleep(aqRuntime * 1000);
-				ioTAQListener.disconnectFromAQ();
-			}
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			log.warning("Opps, got interruped whiel waiting for the AQ time out, " + e.getLocalizedMessage());
-		}
-		log.info("Completed AQ processing");
+//		log.info("Starting AQ processing");
+//		try {
+//			ioTAQJMSListener.connectToAQ(ioTAQJMSListener);
+//			if (aqRuntime > 0) {
+//				log.info("Entering run wait for AQ");
+//				Thread.sleep(aqRuntime * 1000);
+//				ioTAQJMSListener.disconnectFromAQ();
+//			}
+//		} catch (JMSException e) {
+//			// TODO Auto-generated catch block
+//			log.warning("JMW Exception setting up queue " + e.getLocalizedMessage());
+//		} catch (InterruptedException e) {
+//			log.warning("Opps, got interruped while waiting for the AQ time out, " + e.getLocalizedMessage());
+//		} catch (Exception e) {
+//			log.warning("Some unexpected exception occured, " + e.getLocalizedMessage());
+//		}
+//		log.info("Completed AQ processing");
 	}
 }
