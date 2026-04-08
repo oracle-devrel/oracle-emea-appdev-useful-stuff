@@ -73,6 +73,7 @@ public class DBTokenRetriever {
 
 	@Inject
 	public DBTokenRetriever(OCIAuthProvider ociAuthProvider, @Property(name = "oci.dbtoken.scope") String scope) {
+		log.info("Auth provider will return type " + ociAuthProvider.getAuthProviderType());
 		this.authProvider = ociAuthProvider.getAuthProvider();
 		this.scope = scope;
 		if (!(authProvider instanceof RegionProvider regionProvider)) {

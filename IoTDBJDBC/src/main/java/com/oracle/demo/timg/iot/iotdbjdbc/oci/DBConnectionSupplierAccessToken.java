@@ -73,14 +73,14 @@ public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
 		OracleConnectionBuilder builder = dataSource.createConnectionBuilder();
 		builder.accessToken(accessToken);
 		OracleConnection connection = builder.build();
+		log.info("Created connection, turning off auto commit as this will be for reads");
 		connection.setAutoCommit(false);
-		log.info("Connection created");
+		log.info("Auth commit disabled");
 
 		if (switchToSchema != null) {
-
 			log.info("Switching connection current schema to " + switchToSchema);
-			try (Connection conn = dataSource.getConnection();
-					Statement st = conn.createStatement();
+			try (// Connection conn = dataSource.getConnection();
+					Statement st = connection.createStatement();
 					// for efficiency this should only be done when we get a new connection that has
 					// not had it's current schema altered, but for now this is a simple approach
 					ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + switchToSchema)) {

@@ -45,7 +45,7 @@ import jakarta.inject.Singleton;
 
 @Singleton
 // don't use a default value here to ensure error if it's not been set
-@Requires(property = "oci.auth.type", value = "InstanceProvider")
+@Requires(property = "oci.auth.type", value = "InstancePrinciple")
 public class OCIInstancePrincipleAuthProvider implements OCIAuthProvider {
 	private final BasicAuthenticationDetailsProvider basicAuthenticationDetailsProvider;
 
@@ -57,6 +57,11 @@ public class OCIInstancePrincipleAuthProvider implements OCIAuthProvider {
 	@Override
 	public BasicAuthenticationDetailsProvider getAuthProvider() {
 		return basicAuthenticationDetailsProvider;
+	}
+
+	@Override
+	public String getAuthProviderType() {
+		return "InstancePrinciple auth provider";
 	}
 
 }

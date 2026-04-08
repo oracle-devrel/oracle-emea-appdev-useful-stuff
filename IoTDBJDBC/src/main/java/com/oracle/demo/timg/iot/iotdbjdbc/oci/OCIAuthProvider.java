@@ -41,4 +41,6 @@ import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider;
 public interface OCIAuthProvider {
 	public BasicAuthenticationDetailsProvider getAuthProvider();
 
+	public String getAuthProviderType();
+
 }

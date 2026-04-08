@@ -64,4 +64,9 @@ public class OCIConfigFileAuthProvider implements OCIAuthProvider {
 		return basicAuthenticationDetailsProvider;
 	}
 
+	@Override
+	public String getAuthProviderType() {
+		return "ConfigFile auth provider";
+	}
+
 }
