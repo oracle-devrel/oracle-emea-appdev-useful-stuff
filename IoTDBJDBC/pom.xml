@@ -219,13 +219,10 @@ SOFTWARE. -->
 					<configFile>aot-${packaging}.properties</configFile>
 				</configuration>
 			</plugin>
-
-			<!-- this is probabaly important, but I don;t have the time to work
-			out why the checksnake scae is failing right now
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-			</plugin>-->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
