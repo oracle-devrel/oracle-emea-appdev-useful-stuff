@@ -1,6 +1,6 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.dbschema;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,5 +25,5 @@ public class RawDataId {
 	private String endpoint;
 	// @MappedProperty(value = "TIME_RECEIVED")
 	@NotNull
-	private Date timeReceived;
+	private Timestamp timeReceived;
 }

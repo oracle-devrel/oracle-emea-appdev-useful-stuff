@@ -56,7 +56,7 @@ public class IoTJDBCReader {
 			int i = 1;
 			if (rs.next()) {
 				RawDataId id = new RawDataId(rs.getString("DIGITAL_TWIN_INSTANCE_ID"), rs.getString("ENDPOINT"),
-						rs.getDate("TIME_RECEIVED"));
+						rs.getTimestamp("TIME_RECEIVED"));
 				RawData rawData = new RawData(id, rs.getString("CONTENT_TYPE"), rs.getBlob("CONTENT").toString());
 				results.add(rawData);
 				System.out.println("Result set row " + i + " = " + rawData);
