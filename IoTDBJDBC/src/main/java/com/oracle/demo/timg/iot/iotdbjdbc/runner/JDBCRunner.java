@@ -3,6 +3,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.runner;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
+import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQNormalizedDataReader;
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTJDBCReader;
 
 import io.micronaut.context.annotation.Context;
@@ -36,8 +37,8 @@ public class JDBCRunner implements Runnable {
 	// constructor is called, this will let us use the constrictor to play around
 	// for example altering the default schema
 	private IoTJDBCReader ioTJDBCReader;
-//	@Inject
-//	private IoTAQJMSListener ioTAQJMSListener;
+	@Inject
+	private IoTAQNormalizedDataReader ioTAQNormalizedDataReader;
 
 	private final int aqRuntime;
 	private final boolean listenToAq;
@@ -66,32 +67,22 @@ public class JDBCRunner implements Runnable {
 		String entries = ioTJDBCReader.getRawData().stream().map(rd -> rd.toString()).collect(Collectors.joining("\n"));
 		log.info("Raw data entries are :\n" + entries);
 
-//		if (listenToAq) {
-//			// yes this should use executors and the like, but this is a basic
-//			// demo, not a production setup
-//			Thread t = new Thread(this);
-//			t.start();
-//		}
+		if (listenToAq) {
+			// yes this should use executors and the like, but this is a basic
+			// demo, not a production setup
+			Thread t = new Thread(this);
+			t.start();
+		}
 	}
 
 	@Override
 	public void run() {
-//		log.info("Starting AQ processing");
-//		try {
-//			ioTAQJMSListener.connectToAQ(ioTAQJMSListener);
-//			if (aqRuntime > 0) {
-//				log.info("Entering run wait for AQ");
-//				Thread.sleep(aqRuntime * 1000);
-//				ioTAQJMSListener.disconnectFromAQ();
-//			}
-//		} catch (JMSException e) {
-//			// TODO Auto-generated catch block
-//			log.warning("JMW Exception setting up queue " + e.getLocalizedMessage());
-//		} catch (InterruptedException e) {
-//			log.warning("Opps, got interruped while waiting for the AQ time out, " + e.getLocalizedMessage());
-//		} catch (Exception e) {
-//			log.warning("Some unexpected exception occured, " + e.getLocalizedMessage());
-//		}
-//		log.info("Completed AQ processing");
+		log.info("Starting AQ processing");
+		// we should do something to pick up on stopping this
+		try {
+			ioTAQNormalizedDataReader.readAQMessages();
+		} catch (SQLException e) {
+			log.severe("SQLException reading the AQ, " + e.getLocalizedMessage());
+		}
 	}
 }
