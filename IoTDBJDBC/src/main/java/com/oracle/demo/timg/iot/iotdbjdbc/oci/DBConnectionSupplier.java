@@ -3,6 +3,8 @@ package com.oracle.demo.timg.iot.iotdbjdbc.oci;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import oracle.jdbc.OracleConnection;
+
 /**
  * This class is based on the DatabaseConnector by Philippe Vanhaesendonck but
  * using micronaut dependency injection
@@ -28,5 +30,5 @@ public interface DBConnectionSupplier {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	public Connection getNewConnection(String switchToSchema) throws SQLException, Exception;
+	public OracleConnection getNewConnection(String switchToSchema) throws SQLException, Exception;
 }

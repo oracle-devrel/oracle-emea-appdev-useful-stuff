@@ -1,6 +1,5 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.oci;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -66,7 +65,7 @@ public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
 	 * the connection to use switchToSchema as the default schema
 	 */
 	@Override
-	public Connection getNewConnection(String switchToSchema) throws SQLException, Exception {
+	public OracleConnection getNewConnection(String switchToSchema) throws SQLException, Exception {
 		log.info("Getting access token");
 		AccessToken accessToken = dbTokenRetriever.generateAccessToken();
 		log.info("Creating connection");
