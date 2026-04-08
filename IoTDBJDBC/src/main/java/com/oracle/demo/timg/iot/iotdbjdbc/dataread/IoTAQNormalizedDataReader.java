@@ -76,9 +76,11 @@ public class IoTAQNormalizedDataReader implements Runnable {
 	}
 
 	public void stopReading() {
+		log.info("Stopping reading");
 		this.stopped = true;
 		// interrupt the thread if it's not null
 		if (currentThread != null) {
+			log.info("Interrupting thread");
 			currentThread.interrupt();
 		}
 	}
