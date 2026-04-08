@@ -51,15 +51,16 @@ public class IoTJDBCReader {
 		}
 		// note that we are assuming here that the current scheme for the connection has
 		// been set.
-		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT,  TIME_RECEIVED FROM raw_data";
+		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT, TIME_RECEIVED FROM raw_data ORDER BY TIME_RECEIVED DESC FETCH FIRST 5 ROWS ONLY";
 		try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(queryString)) {
 			int i = 1;
-			if (rs.next()) {
+			while (rs.next()) {
 				RawDataId id = new RawDataId(rs.getString("DIGITAL_TWIN_INSTANCE_ID"), rs.getString("ENDPOINT"),
 						rs.getTimestamp("TIME_RECEIVED"));
 				RawData rawData = new RawData(id, rs.getString("CONTENT_TYPE"), rs.getBlob("CONTENT").toString());
 				results.add(rawData);
 				System.out.println("Result set row " + i + " = " + rawData);
+				i++;
 			}
 		} catch (Exception e) {
 			log.severe("Problem connecting to DB " + e.getLocalizedMessage());
