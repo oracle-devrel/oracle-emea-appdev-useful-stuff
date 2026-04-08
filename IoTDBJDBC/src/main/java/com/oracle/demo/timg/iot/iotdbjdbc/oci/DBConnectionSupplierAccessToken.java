@@ -79,10 +79,7 @@ public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
 
 		if (switchToSchema != null) {
 			log.info("Switching connection current schema to " + switchToSchema);
-			try (// Connection conn = dataSource.getConnection();
-					Statement st = connection.createStatement();
-					// for efficiency this should only be done when we get a new connection that has
-					// not had it's current schema altered, but for now this is a simple approach
+			try (Statement st = connection.createStatement();
 					ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + switchToSchema)) {
 			} catch (SQLException e) {
 				log.severe("Problem connecting to DB " + e.getLocalizedMessage());
