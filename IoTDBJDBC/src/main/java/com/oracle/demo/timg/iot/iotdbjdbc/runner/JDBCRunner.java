@@ -1,6 +1,7 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.runner;
 
 import java.sql.SQLException;
+import java.util.stream.Collectors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTJDBCReader;
 
@@ -62,7 +63,8 @@ public class JDBCRunner implements Runnable {
 	@EventListener
 	public void onStartup(StartupEvent event) throws SQLException, Exception {
 		log.info("Startup event received, getting data");
-		log.info("Raw data entries are :\n" + ioTJDBCReader.getRawData());
+		String entries = ioTJDBCReader.getRawData().stream().map(rd -> rd.toString()).collect(Collectors.joining("\n"));
+		log.info("Raw data entries are :\n" + entries);
 
 //		if (listenToAq) {
 //			// yes this should use executors and the like, but this is a basic

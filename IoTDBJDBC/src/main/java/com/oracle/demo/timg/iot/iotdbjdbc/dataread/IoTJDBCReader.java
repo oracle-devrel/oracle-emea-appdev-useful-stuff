@@ -59,7 +59,7 @@ public class IoTJDBCReader {
 						rs.getTimestamp("TIME_RECEIVED"));
 				RawData rawData = new RawData(id, rs.getString("CONTENT_TYPE"), rs.getBlob("CONTENT").toString());
 				results.add(rawData);
-				System.out.println("Result set row " + i + " = " + rawData);
+				log.info("Result set row " + i + " = " + rawData);
 				i++;
 			}
 		} catch (Exception e) {
