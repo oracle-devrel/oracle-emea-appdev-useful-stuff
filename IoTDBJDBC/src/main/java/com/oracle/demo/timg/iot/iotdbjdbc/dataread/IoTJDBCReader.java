@@ -9,13 +9,12 @@ import java.util.List;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.dbschema.RawData;
 import com.oracle.demo.timg.iot.iotdbjdbc.dbschema.RawDataId;
+import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
-//import com.oracle.demo.timg.iot.iotdbjdbc.dbschema.RawDataRepository;
-import oracle.jdbc.pool.OracleDataSource;
 
 @Singleton
 
@@ -29,46 +28,31 @@ import oracle.jdbc.pool.OracleDataSource;
  */
 @Log
 public class IoTJDBCReader {
-	public final static String DRIVER_URL_SEP = "@";
-	private OracleDataSource dataSource;
-	private String url;
-	private String schemaName;
-	private String username;
-	private String password;
+	private final DBConnectionSupplier dbConnectionSupplier;
+	private final String schemaName;
+	private final int jdbcValidationTimeout;
+	private Connection conn;
 
 	@Inject
-	public IoTJDBCReader(@Property(name = "datasources.default.url") String url,
-			@Property(name = "datasources.default.driver", defaultValue = "jdbc:oracle:thin:") String driver,
+	public IoTJDBCReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "datasources.default.username", defaultValue = "") String username,
-			@Property(name = "datasources.default.password", defaultValue = "") String password) throws SQLException {
-		this.url = url;
+			@Property(name = "iotdatacache.valudationtimeout", defaultValue = "5") int jdbcValidationTimeout)
+			throws SQLException, Exception {
+		this.dbConnectionSupplier = dbConnectionSupplier;
 		this.schemaName = schemaName;
-		this.username = username;
-		this.password = password;
-		dataSource = new OracleDataSource();
-		dataSource.setURL(driver + DRIVER_URL_SEP + url);
-		if (username.length() > 0) {
-			log.info("Setting username");
-			dataSource.setUser(username);
-		}
-
-		if (password.length() > 0) {
-			log.info("Setting password");
-			dataSource.setPassword(password);
-		}
+		this.jdbcValidationTimeout = jdbcValidationTimeout;
+		conn = dbConnectionSupplier.getNewConnection(schemaName);
 	}
 
-	public List<RawData> getRawData() throws SQLException {
+	public List<RawData> getRawData() throws SQLException, Exception {
 		List<RawData> results = new LinkedList<>();
-
+		if (!conn.isValid(jdbcValidationTimeout)) {
+			conn = dbConnectionSupplier.getNewConnection(schemaName);
+		}
+		// note that we are assuming here that the current scheme for the connection has
+		// been set.
 		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT,  TIME_RECEIVED FROM raw_data";
-		try (Connection conn = dataSource.getConnection();
-				Statement st = conn.createStatement();
-				// for efficiency this should only be done when we get a new connection that has
-				// not had it's current schema altered, but for now this is a simple approach
-				ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + schemaName);
-				ResultSet rs = st.executeQuery(queryString)) {
+		try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(queryString)) {
 			int i = 1;
 			if (rs.next()) {
 				RawDataId id = new RawDataId(rs.getString("DIGITAL_TWIN_INSTANCE_ID"), rs.getString("ENDPOINT"),
