@@ -60,7 +60,7 @@ public class JDBCRunner implements Runnable {
 	}
 
 	@EventListener
-	public void onStartup(StartupEvent event) throws SQLException {
+	public void onStartup(StartupEvent event) throws SQLException, Exception {
 		log.info("Startup event received, getting data");
 		log.info("Raw data entries are :\n" + ioTJDBCReader.getRawData());
 

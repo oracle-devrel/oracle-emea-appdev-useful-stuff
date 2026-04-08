@@ -53,11 +53,11 @@ SOFTWARE. -->
 		<packaging>jar</packaging>
 		<jdk.version>21</jdk.version>
 		<release.version>17</release.version>
-		<version.ocisdk>3.80.1</version.ocisdk>
+		<version.ocisdk>3.74.2</version.ocisdk>
 		<version.lombok>1.18.42</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
 		<!-- Oracle JDBC 23ai line (set to the latest approved version) -->
-		<version.ojdbc>23.26.1.0.0</version.ojdbc>
+		<version.ojdbc>23.8.0.25.04</version.ojdbc>
 		<micronaut.version>4.10.10</micronaut.version>
 		<micronaut.runtime>netty</micronaut.runtime>
 		<micronaut.aot.enabled>false</micronaut.aot.enabled>
@@ -75,11 +75,11 @@ SOFTWARE. -->
 
 
 	<dependencies>
-		<dependency>
+		<!--<dependency>
 			<groupId>io.micronaut.oraclecloud</groupId>
 			<artifactId>micronaut-oraclecloud-sdk</artifactId>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 
 		<!--<dependency>
       <groupId>io.micronaut</groupId>
@@ -133,20 +133,28 @@ SOFTWARE. -->
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>${version.slf4j}</version>
+			<scope>compile</scope>
 		</dependency>
 		<!-- OCI SDK: common utilities (HTTP client, auth plumbing, etc.) -->
 		<dependency>
 			<groupId>com.oracle.oci.sdk</groupId>
 			<artifactId>oci-java-sdk-common</artifactId>
 			<version>${version.ocisdk}</version>
+			<scope>compile</scope>
 		</dependency>
 
-		<!-- OCI SDK: IAM / Identity service client -->
 		<dependency>
+			<groupId>com.oracle.oci.sdk</groupId>
+			<artifactId>oci-java-sdk-common-httpclient-jersey3</artifactId>
+			<version>${version.ocisdk}</version>
+		</dependency>
+		<!-- OCI SDK: IAM / Identity service client -->
+		<!--<dependency>
 			<groupId>com.oracle.oci.sdk</groupId>
 			<artifactId>oci-java-sdk-identity</artifactId>
 			<version>${version.ocisdk}</version>
-		</dependency>
+			<scope>compile</scope>
+		</dependency>-->
 		<dependency>
 			<groupId>com.oracle.oci.sdk</groupId>
 			<artifactId>oci-java-sdk-identitydataplane</artifactId>
@@ -159,22 +167,22 @@ SOFTWARE. -->
 			<artifactId>ojdbc11</artifactId>
 			<version>${version.ojdbc}</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>com.oracle.database.messaging</groupId>
 			<artifactId>aqapi-jakarta</artifactId>
 			<version>23.8.0.0</version>
-		</dependency>
-		<dependency>
+		</dependency>-->
+		<!--<dependency>
 			<groupId>jakarta.jms</groupId>
 			<artifactId>jakarta.jms-api</artifactId>
 			<version>3.1.0</version>
-		</dependency>
+		</dependency>-->
 
-		<!--<dependency>
+		<dependency>
 			<groupId>io.micronaut</groupId>
 			<artifactId>micronaut-http-client</artifactId>
-			<scope>test</scope>
-		</dependency>-->
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>io.micronaut.test</groupId>
@@ -247,11 +255,11 @@ SOFTWARE. -->
 							<artifactId>micronaut-graal</artifactId>
 							<version>${micronaut.core.version}</version>
 						</path>
-						<path>
+						<!--<path>
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-http-validation</artifactId>
 							<version>${micronaut.core.version}</version>
-						</path>
+						</path>-->
 						<path>
 							<groupId>io.micronaut.serde</groupId>
 							<artifactId>micronaut-serde-processor</artifactId>
@@ -263,7 +271,7 @@ SOFTWARE. -->
 								</exclusion>
 							</exclusions>
 						</path>
-						<path>
+						<!--<path>
 							<groupId>io.micronaut.validation</groupId>
 							<artifactId>micronaut-validation-processor</artifactId>
 							<version>${micronaut.validation.version}</version>
@@ -273,7 +281,7 @@ SOFTWARE. -->
 									<artifactId>micronaut-inject</artifactId>
 								</exclusion>
 							</exclusions>
-						</path>
+						</path>-->
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<arg>

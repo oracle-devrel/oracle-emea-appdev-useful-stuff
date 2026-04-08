@@ -1,4 +1,4 @@
-/*Copyright (c) 2024 Oracle and/or its affiliates.
+/*Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,29 +34,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.dbschema;
+package com.oracle.demo.timg.iot.iotdbjdbc.oci;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.IOException;
 
-//@MappedEntity(value = "RAW_DATA", namingStrategy = NamingStrategies.UnderScoreSeparatedUpperCase.class)
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-//@Serdeable
-//@Introspected
-public class RawData {
-	// @EmbeddedId
-	private RawDataId id;
+import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider;
+import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider;
 
-	@NotNull
-	// @MappedProperty(value = "CONTENT_TYPE")
-	public @NotNull String contentType;
-	@NotNull
-	// @MappedProperty(value = "CONTENT")
-	public @NotNull String content;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Singleton;
+
+@Singleton
+// don't use a default value here to ensure error if it's not been set
+@Requires(property = "oci.auth.type", value = "ConfigFile")
+public class OCIConfigFileAuthProvider implements OCIAuthProvider {
+	private final BasicAuthenticationDetailsProvider basicAuthenticationDetailsProvider;
+
+	public OCIConfigFileAuthProvider(
+			@Property(name = "oci.auth.config.section", defaultValue = "DEFAULT") String configSectionName)
+			throws IOException {
+		ConfigFileAuthenticationDetailsProvider configFileProvider = new ConfigFileAuthenticationDetailsProvider(
+				configSectionName);
+		this.basicAuthenticationDetailsProvider = configFileProvider;
+	}
+
+	@Override
+	public BasicAuthenticationDetailsProvider getAuthProvider() {
+		return basicAuthenticationDetailsProvider;
+	}
+
 }

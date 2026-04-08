@@ -66,22 +66,29 @@ public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
 	 * the connection to use switchToSchema as the default schema
 	 */
 	@Override
-	public Connection getNewConnection(String switchToSchema) throws SQLException {
+	public Connection getNewConnection(String switchToSchema) throws SQLException, Exception {
+		log.info("Getting access token");
 		AccessToken accessToken = dbTokenRetriever.generateAccessToken();
+		log.info("Creating connection");
 		OracleConnectionBuilder builder = dataSource.createConnectionBuilder();
 		builder.accessToken(accessToken);
 		OracleConnection connection = builder.build();
 		connection.setAutoCommit(false);
+		log.info("Connection created");
 
 		if (switchToSchema != null) {
+
+			log.info("Switching connection current schema to " + switchToSchema);
 			try (Connection conn = dataSource.getConnection();
 					Statement st = conn.createStatement();
 					// for efficiency this should only be done when we get a new connection that has
 					// not had it's current schema altered, but for now this is a simple approach
 					ResultSet rsSchema = st.executeQuery("alter session set current_schema=" + switchToSchema)) {
-			} catch (Exception e) {
+			} catch (SQLException e) {
 				log.severe("Problem connecting to DB " + e.getLocalizedMessage());
+				throw e;
 			}
+			log.info("Connection current schema set to " + switchToSchema);
 		}
 		return connection;
 	}

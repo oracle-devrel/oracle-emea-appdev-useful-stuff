@@ -16,7 +16,7 @@ public interface DBConnectionSupplier {
 	 * @return
 	 * @throws SQLException
 	 */
-	public default Connection getNewConnection() throws SQLException {
+	public default Connection getNewConnection() throws SQLException, Exception {
 		return getNewConnection(null);
 	}
 
@@ -26,6 +26,7 @@ public interface DBConnectionSupplier {
 	 * 
 	 * @return
 	 * @throws SQLException
+	 * @throws Exception
 	 */
-	public Connection getNewConnection(String switchToSchema) throws SQLException;
+	public Connection getNewConnection(String switchToSchema) throws SQLException, Exception;
 }

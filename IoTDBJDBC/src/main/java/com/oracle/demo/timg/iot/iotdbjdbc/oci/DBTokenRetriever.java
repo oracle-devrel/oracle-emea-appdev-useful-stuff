@@ -51,10 +51,10 @@ import com.oracle.bmc.identitydataplane.requests.GenerateScopedAccessTokenReques
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import oracle.jdbc.AccessToken;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
+import oracle.jdbc.AccessToken;
 
 @Singleton
 @Log
@@ -67,10 +67,14 @@ public class DBTokenRetriever {
 
 	private final BasicAuthenticationDetailsProvider authProvider;
 	private final String scope;
-	private final Region region ;
+	private final Region region;
+
+	private final DataplaneClient dataplaneClient;
 
 	@Inject
 	public DBTokenRetriever(OCIAuthProvider ociAuthProvider, @Property(name = "oci.dbtoken.scope") String scope) {
+		this.authProvider = ociAuthProvider.getAuthProvider();
+		this.scope = scope;
 		if (!(authProvider instanceof RegionProvider regionProvider)) {
 			throw new IllegalArgumentException("OCI auth provider must implement RegionProvider");
 		}
@@ -79,26 +83,28 @@ public class DBTokenRetriever {
 		if (region == null) {
 			throw new IllegalArgumentException("OCI auth provider does not expose a region");
 		}
-		this.authProvider=ociAuthProvider.getAuthProvider();
-		this.scope=scope;
+		this.dataplaneClient = DataplaneClient.builder().build(authProvider);
+		dataplaneClient.setRegion(region);
 	}
-	
-	public AccessToken generateAccessToken() {
-		 KeyPair keyPair = generateKeyPair();
-	        String publicKeyPem = toPublicKeyPem(keyPair);
 
-	        try (DataplaneClient dataplaneClient = DataplaneClient.builder().build(authProvider)) {
-	            dataplaneClient.setRegion(region);
-	            GenerateScopedAccessTokenRequest request = GenerateScopedAccessTokenRequest.builder()
-	                    .generateScopedAccessTokenDetails(
-	                            GenerateScopedAccessTokenDetails.builder()
-	                                    .scope(scope)
-	                                    .publicKey(publicKeyPem)
-	                                    .build())
-	                    .build();
-	            String token = dataplaneClient.generateScopedAccessToken(request).getSecurityToken().getToken();
-	            return AccessToken.createJsonWebToken(token.toCharArray(), keyPair.getPrivate());
-	        }
+	public AccessToken generateAccessToken() throws Exception {
+		log.info("generating key pair");
+		KeyPair keyPair = generateKeyPair();
+		String publicKeyPem = toPublicKeyPem(keyPair);
+		log.info("Creating request");
+		GenerateScopedAccessTokenRequest request = GenerateScopedAccessTokenRequest.builder()
+				.generateScopedAccessTokenDetails(
+						GenerateScopedAccessTokenDetails.builder().scope(scope).publicKey(publicKeyPem).build())
+				.build();
+		try {
+			String token = dataplaneClient.generateScopedAccessToken(request).getSecurityToken().getToken();
+			log.info("Request generated, returning new token");
+			return AccessToken.createJsonWebToken(token.toCharArray(), keyPair.getPrivate());
+		} catch (Exception e) {
+			// problem, throw an error
+			log.warning("Problem getting a token, " + e.getLocalizedMessage());
+			throw new Exception("Problem getting a token, " + e.getLocalizedMessage(), e);
+		}
 	}
 
 	private KeyPair generateKeyPair() {
@@ -116,11 +122,7 @@ public class DBTokenRetriever {
 	}
 
 	static String toPem(String label, byte[] encoded) {
-	        Base64.Encoder encoder = Base64.getMimeEncoder(64, new byte[]{'\n'});
-	        return "-----BEGIN " + label + "-----\n"
-	                + encoder.encodeToString(encoded)
-	                + "\n-----END " + label + "-----";
-	    }
-}
-
+		Base64.Encoder encoder = Base64.getMimeEncoder(64, new byte[] { '\n' });
+		return "-----BEGIN " + label + "-----\n" + encoder.encodeToString(encoded) + "\n-----END " + label + "-----";
+	}
 }

@@ -2,10 +2,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.dbschema;
 
 import java.util.Date;
 
-import io.micronaut.core.annotation.Introspected;
-//import io.micronaut.data.annotation.Embeddable;
-//import io.micronaut.data.annotation.MappedProperty;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Serdeable
-@Introspected
+//@Serdeable
+//@Introspected
 //@Embeddable
 
 public class RawDataId {

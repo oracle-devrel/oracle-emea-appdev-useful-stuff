@@ -40,16 +40,23 @@ import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider;
 import com.oracle.bmc.auth.InstancePrincipalsAuthenticationDetailsProvider;
 
 import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
 // don't use a default value here to ensure error if it's not been set
-@Requires(property = "oci.authtype", value = "InstanceProvider")
+@Requires(property = "oci.auth.type", value = "InstanceProvider")
 public class OCIInstancePrincipleAuthProvider implements OCIAuthProvider {
+	private final BasicAuthenticationDetailsProvider basicAuthenticationDetailsProvider;
+
+	@Inject
+	public OCIInstancePrincipleAuthProvider() {
+		basicAuthenticationDetailsProvider = InstancePrincipalsAuthenticationDetailsProvider.builder().build();
+	}
 
 	@Override
 	public BasicAuthenticationDetailsProvider getAuthProvider() {
-		return InstancePrincipalsAuthenticationDetailsProvider.builder().build();
+		return basicAuthenticationDetailsProvider;
 	}
 
 }
