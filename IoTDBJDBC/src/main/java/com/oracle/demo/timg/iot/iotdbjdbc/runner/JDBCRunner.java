@@ -1,6 +1,9 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.runner;
 
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQNormalizedDataReader;
@@ -31,7 +34,8 @@ import lombok.extern.java.Log;
  * it's going to be started
  */
 @Context
-public class JDBCRunner implements Runnable {
+public class JDBCRunner {
+	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
 	@Inject
 	// as this is a field injection it will happen after the
 	// constructor is called, this will let us use the constrictor to play around
@@ -68,21 +72,11 @@ public class JDBCRunner implements Runnable {
 		log.info("Raw data entries are :\n" + entries);
 
 		if (listenToAq) {
-			// yes this should use executors and the like, but this is a basic
-			// demo, not a production setup
-			Thread t = new Thread(this);
-			t.start();
+			executorService.execute(ioTAQNormalizedDataReader);
 		}
-	}
-
-	@Override
-	public void run() {
-		log.info("Starting AQ processing");
-		// we should do something to pick up on stopping this
-		try {
-			ioTAQNormalizedDataReader.readAQMessages();
-		} catch (SQLException e) {
-			log.severe("SQLException reading the AQ, " + e.getLocalizedMessage());
+		if (aqRuntime > 0) {
+			// schedule the shutdown
+			executorService.schedule(() -> ioTAQNormalizedDataReader.stopReading(), aqRuntime, TimeUnit.SECONDS);
 		}
 	}
 }

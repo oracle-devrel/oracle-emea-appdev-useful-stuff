@@ -1,6 +1,9 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.dataread;
 
+import java.sql.CallableStatement;
 import java.sql.SQLException;
+import java.sql.Struct;
+import java.sql.Types;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
@@ -19,7 +22,7 @@ import oracle.sql.json.OracleJsonValue;
 
 @Singleton
 @Log
-public class IoTAQNormalizedDataReader {
+public class IoTAQNormalizedDataReader implements Runnable {
 	public final static String SCHEMA_SUFFIX = "__IOT";
 	private final DBConnectionSupplier dbConnectionSupplier;
 	@Inject
@@ -32,6 +35,7 @@ public class IoTAQNormalizedDataReader {
 	private OracleConnection connection;
 
 	private boolean stopped = false;
+	private Thread currentThread;
 
 	@Inject
 	public IoTAQNormalizedDataReader(DBConnectionSupplier dbConnectionSupplier,
@@ -67,10 +71,16 @@ public class IoTAQNormalizedDataReader {
 			log.info("Recieved " + normalizedData);
 			connection.commit();
 		}
+		// tidy things up nicely
+		removeSubscriber();
 	}
 
-	public void stop() {
+	public void stopReading() {
 		this.stopped = true;
+		// interrupt the thread if it's not null
+		if (currentThread != null) {
+			currentThread.interrupt();
+		}
 	}
 
 	private static NormalizedData convertToNormalizedData(OracleJsonDatum payloadDatum) throws SQLException {
@@ -84,4 +94,59 @@ public class IoTAQNormalizedDataReader {
 		return new NormalizedData(ocid, contentPath, timeObserved, value);
 	}
 
+	private void addSubscriber(String rule) throws SQLException {
+		try (CallableStatement statement = connection.prepareCall("begin dbms_aqadm.add_subscriber("
+				+ "queue_name => ?, " + "subscriber => ?, " + "rule => ?, " + "transformation => null, "
+				+ "queue_to_queue => false, " + "delivery_mode => dbms_aqadm.persistent_or_buffered); end;")) {
+			statement.setString(1, normalisedQueueName);
+			statement.setObject(2, createSubscriberStruct());
+			if (rule == null) {
+				statement.setNull(3, Types.VARCHAR);
+			} else {
+				statement.setString(3, rule);
+			}
+			statement.execute();
+		}
+	}
+
+	private void removeSubscriber() throws SQLException {
+		try (CallableStatement statement = connection
+				.prepareCall("begin dbms_aqadm.remove_subscriber(queue_name => ?, subscriber => ?); end;")) {
+			statement.setString(1, normalisedQueueName);
+			statement.setObject(2, createSubscriberStruct());
+			statement.execute();
+		}
+	}
+
+	private Struct createSubscriberStruct() throws SQLException {
+		return connection.createStruct("SYS.AQ$_AGENT", new Object[] { aqsubscribername, null, 0 });
+	}
+
+	@Override
+	public void run() {
+		// save the thread we're running in so we can interrupt it later
+		currentThread = Thread.currentThread();
+		try {
+			log.info("Setting up subscriber");
+			addSubscriber(null);
+		} catch (SQLException e) {
+			log.severe("SQLException while setting up subscriber, " + e.getLocalizedMessage());
+			return;
+		}
+
+		try {
+			log.info("Starting read loop");
+			readAQMessages();
+		} catch (SQLException e) {
+			log.severe("SQLException in read loop will attempt to remove subsciber, " + e.getLocalizedMessage());
+		}
+
+		try {
+			log.info("Attempting to remove subscriber");
+			removeSubscriber();
+		} catch (SQLException e) {
+			log.severe("SQLException removing subsciber, " + e.getLocalizedMessage());
+			return;
+		}
+	}
 }
