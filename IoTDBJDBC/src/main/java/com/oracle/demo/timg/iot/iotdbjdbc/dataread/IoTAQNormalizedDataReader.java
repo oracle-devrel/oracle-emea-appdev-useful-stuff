@@ -23,6 +23,7 @@ import oracle.sql.json.OracleJsonValue;
 @Singleton
 @Log
 public class IoTAQNormalizedDataReader implements Runnable {
+	private final static int ORACLE_AQ_ALREADY_SUBSCRIBED_ERROR_CODE = 24034;
 	public final static String SCHEMA_SUFFIX = "__IOT";
 	private final DBConnectionSupplier dbConnectionSupplier;
 	@Inject
@@ -71,8 +72,6 @@ public class IoTAQNormalizedDataReader implements Runnable {
 			log.info("Recieved " + normalizedData);
 			connection.commit();
 		}
-		// tidy things up nicely
-		removeSubscriber();
 	}
 
 	public void stopReading() {
@@ -107,7 +106,19 @@ public class IoTAQNormalizedDataReader implements Runnable {
 			} else {
 				statement.setString(3, rule);
 			}
-			statement.execute();
+			try {
+				statement.execute();
+			} catch (SQLException e) {
+				if (e.getErrorCode() == ORACLE_AQ_ALREADY_SUBSCRIBED_ERROR_CODE) {
+					log.info("Subscriber " + aqsubscribername + " is already subscribed to queue " + normalisedQueueName
+							+ ", continuing");
+				} else {
+					// was another error code
+					log.severe("SQLException subscribing " + aqsubscribername + " to queue " + normalisedQueueName
+							+ ", " + e.getLocalizedMessage());
+					throw e;
+				}
+			}
 		}
 	}
 
