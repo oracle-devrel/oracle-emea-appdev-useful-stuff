@@ -75,8 +75,12 @@ public class JDBCRunner {
 			executorService.execute(ioTAQNormalizedDataReader);
 		}
 		if (aqRuntime > 0) {
-			// schedule the shutdown
-			executorService.schedule(() -> ioTAQNormalizedDataReader.stopReading(), aqRuntime, TimeUnit.SECONDS);
+			// schedule the reader shutdown, then request the executor shutdown once the
+			// tasks are finished
+			executorService.schedule(() -> {
+				ioTAQNormalizedDataReader.stopAQAccess();
+				executorService.shutdown();
+			}, aqRuntime, TimeUnit.SECONDS);
 		}
 	}
 }
