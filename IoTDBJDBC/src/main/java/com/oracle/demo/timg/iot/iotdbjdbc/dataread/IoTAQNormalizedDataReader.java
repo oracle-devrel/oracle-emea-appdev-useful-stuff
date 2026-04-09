@@ -78,10 +78,10 @@ public class IoTAQNormalizedDataReader implements Runnable {
 		log.info("Stopping reading");
 		this.stopped = true;
 		// interrupt the thread if it's not null
-		if (currentThread != null) {
-			log.info("Interrupting thread");
-			currentThread.interrupt();
-		}
+//		if (currentThread != null) {
+//			log.info("Interrupting thread");
+//			currentThread.interrupt();
+//		}
 	}
 
 	private static NormalizedData convertToNormalizedData(OracleJsonDatum payloadDatum) throws SQLException {
