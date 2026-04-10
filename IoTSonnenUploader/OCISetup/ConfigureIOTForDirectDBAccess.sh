@@ -36,6 +36,10 @@ then
   exit -1
 fi
 
+export IOT_DOMAIN_HOST=`oci iot domain get --iot-domain-id $IOT_DOMAIN_OCID | jq -r '.data."device-host"'`
+export IOT_DOMAIN_SHORT_ID=`echo $IOT_DOMAIN_HOST| tr '.' ' ' | awk '{print $1}'`
+
+
 VCN_ID=$(oci network vcn list --compartment-id "$IOT_COMPARTMENT_OCID" --display-name "$VCN_NAME" --query "data[0].id" --raw-output)
 if [[ -z "$VCN_ID" ]]
 then
@@ -43,6 +47,21 @@ then
   exit -1
 fi
 
-oci iot domain-group configure-data-access --db-allow-listed-vcn-ids "[\"$VCN_ID\"]" --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID  --wait-for-state SUCCEEDED --wait-for-state FAILED
+oci iot domain-group configure-data-access --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID  --db-allow-listed-vcn-ids "[\"$VCN_ID\"]" --wait-for-state SUCCEEDED --wait-for-state FAILED
 
-oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names "[\"$TENANCY_OCID:$IDCS_NAME/<identity-group-name>\"]"
+oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names "[\"$TENANCY_OCID:$IDCS_NAME/$IOT_CLIENT_VM_DYNAMIC_GROUP_NAME\"]"   --wait-for-state SUCCEEDED --wait-for-state FAILED
+
+
+export DB_TOKEN_SCOPE=`oci iot domain-group  get --iot-domain-group-id  $IOT_DOMAIN_GROUP_OCID | jq -r '.data."db-token-scope"'`
+export DB_CONNECTION_STRING=`oci iot domain-group  get --iot-domain-group-id  $IOT_DOMAIN_GROUP_OCID | jq -r '.data."db-connection-string"'`
+echo "OCI Command to get the DB token (on the VM only)"
+echo oci iam db-token get --scope \"$DB_TOKEN_SCOPE\" --auth instance_principal
+
+echo "SQL CLI command (on vm) to access database"
+echo sql /@\"jdbc:oracle:thin:@$DB_CONNECTION_STRING\&TOKEN_AUTH=OCI_TOKEN\"
+
+echo "SQL (on VM) to set the current scheme to the IOT schema"
+echo alter session set current_schema="$IOT_DOMAIN_SHORT_ID"__iot \;
+
+echo "Java command to run the test jar file (once mvn clean package is completed)"
+echo java -Dmicronaut.config.files=configsecure/configsecure.properties,config/config.properties -jar target/IoTDBJDBC-\*.jar
