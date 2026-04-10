@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQNormalizedDataListener;
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQNormalizedDataReader;
 import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTJDBCReader;
 
@@ -43,8 +44,11 @@ public class JDBCRunner {
 	private IoTJDBCReader ioTJDBCReader;
 	@Inject
 	private IoTAQNormalizedDataReader ioTAQNormalizedDataReader;
+	@Inject
+	private IoTAQNormalizedDataListener ioTAQNormalizedDataListener;
 
 	private final int aqRuntime;
+	private final boolean readFromAq;
 	private final boolean listenToAq;
 
 	public JDBCRunner(@Property(name = "datasources.default.url") String url,
@@ -52,7 +56,8 @@ public class JDBCRunner {
 			@Property(name = "datasources.default.username", defaultValue = "") String username,
 			@Property(name = "datasources.default.password", defaultValue = "") String password,
 			@Property(name = "iotdatacache.aqname", defaultValue = "raw_data_in") String aqname,
-			@Property(name = "iotdatacache.listentoaq", defaultValue = "true") boolean listenToAq,
+			@Property(name = "iotdatacache.readfromaq", defaultValue = "false") boolean readFromAq,
+			@Property(name = "iotdatacache.listentoaq", defaultValue = "false") boolean listenToAq,
 			@Property(name = "iotdatacache.aqruntime", defaultValue = "120") int aqRuntime) {
 		log.info("Using URL " + url);
 		log.info("Will eventually use IOT Schama named " + schemaName);
@@ -61,26 +66,48 @@ public class JDBCRunner {
 		log.info("aqname is :" + aqname + ":");
 		log.info("listenToAq is :" + listenToAq + ":");
 		log.info("aqRuntime is :" + aqRuntime + ":");
+
+		this.readFromAq = readFromAq;
 		this.listenToAq = listenToAq;
 		this.aqRuntime = aqRuntime;
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) throws SQLException, Exception {
-		log.info("Startup event received, getting data");
+		log.info("Startup event received, getting data using JDBC");
 		String entries = ioTJDBCReader.getRawData().stream().map(rd -> rd.toString()).collect(Collectors.joining("\n"));
 		log.info("Raw data entries are :\n" + entries);
 
-		if (listenToAq) {
+		if (readFromAq) {
+			log.info("Starting read loop");
 			executorService.execute(ioTAQNormalizedDataReader);
+			if (aqRuntime > 0) {
+				// schedule the reader shutdown, then request the executor shutdown once the
+				// tasks are finished
+				executorService.schedule(() -> {
+					ioTAQNormalizedDataReader.stopAQAccess();
+					executorService.shutdown();
+				}, aqRuntime, TimeUnit.SECONDS);
+
+				log.info("Read loop shutdown set");
+			}
 		}
-		if (aqRuntime > 0) {
-			// schedule the reader shutdown, then request the executor shutdown once the
-			// tasks are finished
-			executorService.schedule(() -> {
-				ioTAQNormalizedDataReader.stopAQAccess();
-				executorService.shutdown();
-			}, aqRuntime, TimeUnit.SECONDS);
+		if (listenToAq) {
+			log.info("Starting notification listener");
+			if (!ioTAQNormalizedDataListener.startListening()) {
+				// some form of problem setting things up, just quit
+				return;
+			}
+			log.info("Notification listener configured");
+			if (aqRuntime > 0) {
+				// schedule the reader shutdown, then request the executor shutdown once the
+				// tasks are finished
+				executorService.schedule(() -> {
+					ioTAQNormalizedDataListener.stopListening();
+					executorService.shutdown();
+				}, aqRuntime, TimeUnit.SECONDS);
+				log.info("Notification shutdown set");
+			}
 		}
 	}
 }
