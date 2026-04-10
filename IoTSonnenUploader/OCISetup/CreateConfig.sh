@@ -114,6 +114,6 @@ echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/house/sonnenconfiguration/$DIGITAL_TWIN_INSTANCE_DEVICE_NAME\" -H \'Content-Type: application/json\' -d \"{\\\"softwareVersion\\\": \\\"1.18.4\\\",\\\"time\\\": \$CURRENT_TS}\"
 echo "To send text data for the status"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
-calen
+echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/house/sonnenstatus/$DIGITAL_TWIN_INSTANCE_DEVICE_NAME\" -H \'Content-Type: application/json\' -d \"{\\\"batteryCharging\\\": false,\\\"consumptionAvgWattsLastMinute\\\": 339,\\\"currentBatteryCapacityPercentage\\\": 59,\\\"operatingMode\\\": 2,\\\"reservedBatteryCapacityPercentage\\\": 5,\\\"solarProductionWattsPointInTime\\\": 131,\\\"time\\\": \$CURRENT_TS}\"
 
  
