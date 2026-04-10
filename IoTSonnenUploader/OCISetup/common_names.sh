@@ -45,14 +45,23 @@ export DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE=file://sonnen-to-generic-mapping
 export DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-envelope.json
 export DIGITAL_TWIN_ADAPTER_NAME=sonnen-multiple-routes
 
-# this is the id of the digital twin iinstance, it will be created if needed, but you can setup your own of course
+# this is the id of the digital twin instance, it will be created if needed, but you can setup your own of course
 export DIGITAL_TWIN_INSTANCE_DEVICE_NAME=timssonnen
 
 #these are for the  DB direct connection VCN and VM
 export SSH_PUBLIC_KEY_PATH="$HOME/.ssh/id_rsa.pub" 
-export VCN_NAME="IoT_DBDirectConnect_VCN"
+export VCN_NAME="iotdemosvcn"
 export VCN_CIDR="10.0.0.0/16"
 export SUBNET_CIDR="10.0.1.0/24"
 
-# vm details
-export VM_NAME="IotDBVM"
+# the dynamic group name identifying potential users
+export IOT_CLIENT_VM_DYNAMIC_GROUP_NAME=TGIoTDBAccessDG
+
+# Virtual machine access to the IOT Instance
+export VM_NAME="iotdbaccess"
+export VM_USER_NAME="opc"
+
+# allows us to connect to it
+export BASTION_NAME=IoTDBAccessBastion
+export BASTION_PRIV_KEY_PATH="$HOME/.ssh/id_rsa"
+export BASTION_PUB_KEY_PATH="$BASTION_PRIV_KEY_PATH"".pub"
