@@ -47,10 +47,13 @@ then
   exit -1
 fi
 
+echo "Configuring iot domain group to connect to VCN [\"$VCN_ID\"]"
 oci iot domain-group configure-data-access --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID  --db-allow-listed-vcn-ids "[\"$VCN_ID\"]" --wait-for-state SUCCEEDED --wait-for-state FAILED
+echo "Completed iot domain group vcn setup"
 
-oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names "[\"$TENANCY_OCID:$IDCS_NAME/$IOT_CLIENT_VM_DYNAMIC_GROUP_NAME\"]"   --wait-for-state SUCCEEDED --wait-for-state FAILED
-
+echo "Configuring iot domain with identity group name [\"$TENANCY_OCID:$IOT_CLIENT_VM_DYNAMIC_GROUP_IDCS_NAME/$IOT_CLIENT_VM_DYNAMIC_GROUP_NAME\"]"
+oci iot domain configure-direct-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-allow-listed-identity-group-names "[\"$TENANCY_OCID:$IOT_CLIENT_VM_DYNAMIC_GROUP_IDCS_NAME/$IOT_CLIENT_VM_DYNAMIC_GROUP_NAME\"]"   --wait-for-state SUCCEEDED --wait-for-state FAILED
+echo "Completed iot domain identity group setup"
 
 export DB_TOKEN_SCOPE=`oci iot domain-group  get --iot-domain-group-id  $IOT_DOMAIN_GROUP_OCID | jq -r '.data."db-token-scope"'`
 export DB_CONNECTION_STRING=`oci iot domain-group  get --iot-domain-group-id  $IOT_DOMAIN_GROUP_OCID | jq -r '.data."db-connection-string"'`
@@ -63,5 +66,20 @@ echo sql /@\"jdbc:oracle:thin:@$DB_CONNECTION_STRING\&TOKEN_AUTH=OCI_TOKEN\"
 echo "SQL (on VM) to set the current scheme to the IOT schema"
 echo alter session set current_schema="$IOT_DOMAIN_SHORT_ID"__iot \;
 
-echo "Java command to run the test jar file (once mvn clean package is completed)"
+echo "Java command to run the test jar file in the IOTDB project folder (once mvn clean package is completed)"
 echo java -Dmicronaut.config.files=configsecure/configsecure.properties,config/config.properties -jar target/IoTDBJDBC-\*.jar
+
+OCI_CONFIG_REGION=$(awk -F= -v profile="$OCI_CLI_PROFILE" '
+  $0 ~ "\\["profile"\\]" {found=1; next}
+  /^\[/ {found=0}
+  found && $1 ~ /region/ {print $2; exit}
+' ~/.oci/config | xargs)
+
+DB_CONNECTION_NAME=`echo $DB_CONNECTION_STRING | awk -F '/' '{print $2}' | awk -F '.' '{print $1}'`
+DB_COMPARTMENT_NAME=`echo $DB_TOKEN_SCOPE | awk -F ':' '{print $7}'`
+echo "Config settings for the IoTDBJDBC"
+echo iotdatacache.schemaname="$IOT_DOMAIN_SHORT_ID"__iot
+echo iotdatacache.ociregion=$OCI_CONFIG_REGION
+echo iotdatacache.connectionname=$DB_CONNECTION_NAME
+echo oci.dbtoken.compartment=$DB_COMPARTMENT_NAME
+echo oci.auth.type=InstancePrinciple

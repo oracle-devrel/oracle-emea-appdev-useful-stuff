@@ -18,8 +18,7 @@ export IDCS_ORDS_DB_ACCESS_APPLICATION_NAME=IOTORDSApp
 export IDCS_ORDS_APP_USER='tim.graves@oracle.com'
 # this is the users group within the IDCS
 export IDCS_ORDS_APP_USERS_GROUP=IOTORDSUsers
-# The Dynamic group for the compute instances in the IDCS instance
-export IDCS_DYNAMIC_GROUP_NAME=TGIoTDBAccessDG
+# this is the IDCS instance that holds the dynamic group that can access the domain
 
 # change these names as required
 export IOT_DOMAIN_GROUP_NAME=iot-domain-group-timg
@@ -54,7 +53,9 @@ export VCN_NAME="iotdemosvcn"
 export VCN_CIDR="10.0.0.0/16"
 export SUBNET_CIDR="10.0.1.0/24"
 
-# the dynamic group name identifying potential users
+# the name of the IDCS instance for the dynamic group of the compute VMs - can differ from the ORDS OAUTH IDCS instance name
+export IOT_CLIENT_VM_DYNAMIC_GROUP_IDCS_NAME=OracleIdentityCloudService
+# the name of the dynamic group that represents the VM Direct DB clients  in the IOT_CLIENT_VM_DYNAMIC_GROUP_IDCS_NAME idcs instance
 export IOT_CLIENT_VM_DYNAMIC_GROUP_NAME=TGIoTDBAccessDG
 
 # Virtual machine access to the IOT Instance
