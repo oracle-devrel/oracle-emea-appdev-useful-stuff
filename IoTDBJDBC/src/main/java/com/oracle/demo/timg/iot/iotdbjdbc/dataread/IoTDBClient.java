@@ -1,6 +1,6 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.dataread;
 
-public interface IoTDBClient {
+public interface IoTDBClient extends Comparable<IoTDBClient> {
 	/**
 	 * do any one off preparation to connect to the DB, for example registering the
 	 * client, note that any client registration must ensure they use a name that is
@@ -81,5 +81,20 @@ public interface IoTDBClient {
 	 */
 	public default String getConfig() {
 		return "No config details";
+	}
+
+	/**
+	 * returns the order to use when starting the client
+	 * 
+	 * @return
+	 */
+	public int getOrder();
+
+	@Override
+	public default int compareTo(IoTDBClient otherIoTDBClient) {
+		if (otherIoTDBClient == null) {
+			throw new NullPointerException("otherIoTDBClient must not be null");
+		}
+		return Integer.compare(this.getOrder(), otherIoTDBClient.getOrder());
 	}
 }

@@ -46,7 +46,6 @@ public class JDBCRunner {
 			@Property(name = "iotdatacache.aq.uselistener", defaultValue = "false") boolean listenToAq,
 			@Property(name = "iotdatacache.jdbc.doconnectiontestread", defaultValue = "false") boolean doJDBCConnectionTestRead,
 			@Property(name = "iotdatacache.aqruntime", defaultValue = "120") int aqRuntime) {
-		this.ioTDBClients = ioTDBClients;
 		log.info("Using URL " + url);
 		log.info("Will use IOT Schema named " + schemaName);
 		log.info("username is :" + username + ":");
@@ -57,6 +56,7 @@ public class JDBCRunner {
 		log.info("aqRuntime is :" + aqRuntime + ":");
 
 		this.aqRuntime = aqRuntime;
+		this.ioTDBClients = ioTDBClients.stream().sorted().toList();
 		String iotDBClientDetails = ioTDBClients.stream()
 				.map(client -> client.getName() + "(" + client.getConfig() + ")").collect(Collectors.joining(", "));
 		log.info("There are " + ioTDBClients.size() + " IoTDBClients configured - " + iotDBClientDetails);
