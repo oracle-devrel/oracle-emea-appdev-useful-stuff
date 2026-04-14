@@ -71,6 +71,10 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 			try {
 				messages = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
 			} catch (SQLException e) {
+				if (e.getErrorCode() == 25228) {
+					log.info("Timeout reading messages");
+					continue;
+				}
 				log.info("SQLException getting messages, " + e.getLocalizedMessage());
 				continue;
 			}
@@ -80,6 +84,7 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 				log.info("Received a null message");
 				continue;
 			}
+			log.info("Queue returned " + messages.length + " out of a max read size of " + aqBatchSize);
 			// ultimately this could be a stream, but we want to track the number when
 			// processing so let's use a loop.
 			for (int i = 0; i < messages.length; i++) {
