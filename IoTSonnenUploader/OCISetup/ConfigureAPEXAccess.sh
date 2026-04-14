@@ -45,8 +45,8 @@ then
 fi
 echo "Located secret $APEX_PASSWORD_SECRET_NAME getting it's contents"
 IOT_APEX_INITIAL_PASSWORD_BASE64=`oci secrets secret-bundle get --secret-id $APEX_PASSWORD_SECRET_OCID --stage CURRENT | jq -r '.data."secret-bundle-content".content'`
-export IOT_APEX_INITIAL_PASSWORD=`echo $DIGITAL_TWIN_INSTANCE_SECRET_BASE64 | base64 --decode`
-echo "Got secret $APEX_PASSWORD_SECRET_NAME contents"
+export IOT_APEX_INITIAL_PASSWORD=`echo $IOT_APEX_INITIAL_PASSWORD_BASE64 | base64 --decode`
+echo "Got secret $APEX_PASSWORD_SECRET_NAME base 64 contents $IOT_APEX_INITIAL_PASSWORD_BASE64 as text $IOT_APEX_INITIAL_PASSWORD"
 
 # There does not seem to be a way to determine if this is already configured, so go for it anyway, worst case it will fail
 echo "Configuring APEX access to domain"
