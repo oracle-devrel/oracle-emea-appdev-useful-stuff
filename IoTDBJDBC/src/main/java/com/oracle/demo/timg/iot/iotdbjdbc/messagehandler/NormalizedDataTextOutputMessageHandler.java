@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
+@Requires(property = "normalizeddata.handler.textoutput.enabled", value = "true", defaultValue = "false")
 @Requires(property = "normalizeddata.handler.textoutput.order")
 @Log
 public class NormalizedDataTextOutputMessageHandler implements NormalizedDataMessageHandler {
