@@ -1,58 +1,102 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.dataread;
 
-import static com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTAQNormalizedDataCore.convertToNormalizedData;
-
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandlerService;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.constraints.Min;
 import lombok.extern.java.Log;
 import oracle.jdbc.aq.AQDequeueOptions;
 import oracle.jdbc.aq.AQMessage;
 
 @Singleton
 @Log
-public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implements Runnable {
+@Requires(property = "iotdatacache.aq.usereader", value = "true", defaultValue = "false")
+public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
+	public final static String QUEUE_SUFFIX = "reader";
 	private boolean stopped = false;
+	private final AQDequeueOptions dequeueOptions;
+	private final int aqReadTimeout;
+	private final int aqBatchSize;
 	private Thread currentThread;
+	private ExecutorService executor;
+
+	@Inject
+	private NormalizedDataMessageHandlerService normalizedDataMessageHandlerService;
 
 	@Inject
 	public IoTAQNormalizedDataReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "iotdatacache.valudationtimeout", defaultValue = "5") int jdbcValidationTimeout,
-			@Property(name = "iotdatacache.aqsubscribername", defaultValue = "aqreader") String aqsubscribername)
+			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") @Min(value = 1) int jdbcValidationTimeout,
+			@Property(name = "iotdatacache.aq.subscribername", defaultValue = "aqclient") String aqsubscribername,
+			@Property(name = "iotdatacache.aq.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
+			@Property(name = "iotdatacache.aq.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize)
 			throws SQLException, Exception {
-		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername);
-	}
-
-	public void readAQMessages() throws SQLException {
-		log.info("Setting up AQ reader");
-		AQDequeueOptions dequeueOptions = new AQDequeueOptions();
+		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUFFIX);
+		this.aqReadTimeout = aqReadTimeout;
+		this.aqBatchSize = aqBatchSize;
+		dequeueOptions = new AQDequeueOptions();
 		dequeueOptions.setDequeueMode(AQDequeueOptions.DequeueMode.REMOVE);
-		dequeueOptions.setWait(10);
+		dequeueOptions.setWait(aqReadTimeout);
 		dequeueOptions.setNavigation(AQDequeueOptions.NavigationOption.FIRST_MESSAGE);
 		dequeueOptions.setConsumerName(aqsubscribername);
+	}
+
+	@Override
+	public void configureDBClient(String filteringRule) throws Exception {
+		executor = Executors.newCachedThreadPool();
+		// the aq options have been set in the constructor, but we need to tell the
+		// database about us
+		super.addSubscriber(filteringRule);
+	}
+
+	private void readAQMessages() throws SQLException {
+		log.info("Starting to read AQ messages");
+		int readCounter = 0;
 		while (!stopped) {
 			// read a value
-			AQMessage message = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON");
+			AQMessage messages[] = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
 			// I guess if we have a timeout while waiting for a message to be available to
 			// dequeue there will be a null message
-			if (message == null) {
+			if (messages == null) {
 				log.info("Received a null message");
 				continue;
 			}
-			NormalizedData normalizedData = convertToNormalizedData(message.getJSONPayload());
-			log.info("Received " + normalizedData);
+			// ultimately this could be a stream, but we want to track the number when
+			// processing so let's use a loop.
+			for (int i = 0; i < messages.length; i++) {
+				try {
+					NormalizedData normalizedData = convertToNormalizedData(messages[i].getJSONPayload());
+					log.info("Received message block " + readCounter + ", message no " + i + ", " + normalizedData);
+					normalizedDataMessageHandlerService.handle(normalizedData);
+				} catch (SQLException e) {
+					log.info("SQLException processing message block " + readCounter + ", message" + i);
+				}
+				i++;
+			}
+			readCounter++;
 			connection.commit();
 		}
+		log.info("Finished to reading AQ messages");
 	}
 
-	public void stopAQAccess() {
+	@Override
+	public void startDBProcessing() throws Exception {
+		// start this in a separate loop
+		executor.execute(() -> this.run());
+	}
+
+	@Override
+	public void stopDBProcessing() throws Exception {
 		log.info("Stopping reading");
 		this.stopped = true;
 		// interrupt the thread if it's not null
@@ -63,32 +107,23 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 	}
 
 	@Override
+	public void unconfigureDBClient() throws Exception {
+		// stop the executors from accepting new tasks
+		executor.shutdown();
+		// unconfigure the queue
+		removeSubscriber();
+	}
+
+	@Override
 	public void run() {
 		// save the thread we're running in so we can interrupt it later
 		currentThread = Thread.currentThread();
 		try {
-			log.info("Setting up subscriber");
-			addSubscriber(null);
-		} catch (SQLException e) {
-			log.severe("SQLException while setting up subscriber, " + e.getLocalizedMessage());
-			return;
-		}
-
-		try {
 			log.info("Starting read loop");
 			readAQMessages();
 		} catch (SQLException e) {
-			log.severe("SQLException in read loop will attempt to remove subsciber, " + e.getLocalizedMessage());
+			log.severe("SQLException in read loop, " + e.getLocalizedMessage());
 		}
-
-		try {
-			log.info("Attempting to remove subscriber");
-			removeSubscriber();
-		} catch (SQLException e) {
-			log.severe("SQLException removing subsciber, " + e.getLocalizedMessage());
-			return;
-		}
-
-		log.info("Completed");
+		log.info("Completed read thread");
 	}
 }

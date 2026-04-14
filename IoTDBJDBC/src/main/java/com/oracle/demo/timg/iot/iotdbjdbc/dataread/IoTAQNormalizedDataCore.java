@@ -5,15 +5,28 @@ import java.sql.SQLException;
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
+import lombok.extern.java.Log;
+import oracle.jdbc.aq.AQMessage;
 import oracle.sql.json.OracleJsonDatum;
 import oracle.sql.json.OracleJsonObject;
 import oracle.sql.json.OracleJsonValue;
 
+@Log
 public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
+	public static final String SQL_QUEUE_NAME = "normalized_data";
 
 	public IoTAQNormalizedDataCore(DBConnectionSupplier dbConnectionSupplier, String schemaName,
 			int jdbcValidationTimeout, String aqsubscribername) throws SQLException, Exception {
-		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername);
+		super(dbConnectionSupplier, schemaName, SQL_QUEUE_NAME, jdbcValidationTimeout, aqsubscribername);
+	}
+
+	/**
+	 * @param message
+	 * @throws SQLException
+	 */
+	protected void processAQMessage(AQMessage message) throws SQLException {
+		NormalizedData normalizedData = convertToNormalizedData(message.getJSONPayload());
+		log.info("Received " + normalizedData);
 	}
 
 	protected static NormalizedData convertToNormalizedData(OracleJsonDatum payloadDatum) throws SQLException {

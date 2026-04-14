@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Struct;
 import java.sql.Types;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import lombok.extern.java.Log;
@@ -24,17 +23,18 @@ public abstract class IoTAQCore {
 	protected final String normalisedQueueName;
 	protected OracleConnection connection;
 
-	public IoTAQCore(DBConnectionSupplier dbConnectionSupplier, String schemaName, int jdbcValidationTimeout,
-			String aqsubscribername) throws SQLException, Exception {
+	public IoTAQCore(DBConnectionSupplier dbConnectionSupplier, String schemaName, String queueName,
+			int jdbcValidationTimeout, String aqsubscribername) throws SQLException, Exception {
 		this.dbConnectionSupplier = dbConnectionSupplier;
 		this.schemaName = schemaName + SCHEMA_SUFFIX;
-		this.normalisedQueueName = (schemaName + "." + NormalizedData.SQL_QUEUE_NAME).toUpperCase();
+		this.normalisedQueueName = (schemaName + "." + queueName).toUpperCase();
 		this.jdbcValidationTimeout = jdbcValidationTimeout;
 		this.aqsubscribername = aqsubscribername;
 		connection = dbConnectionSupplier.getNewConnection(schemaName);
 	}
 
 	protected void addSubscriber(String rule) throws SQLException {
+		log.info("Adding subscriber " + aqsubscribername);
 		try (CallableStatement statement = connection.prepareCall("begin dbms_aqadm.add_subscriber("
 				+ "queue_name => ?, " + "subscriber => ?, " + "rule => ?, " + "transformation => null, "
 				+ "queue_to_queue => false, " + "delivery_mode => dbms_aqadm.persistent_or_buffered); end;")) {
@@ -59,15 +59,18 @@ public abstract class IoTAQCore {
 				}
 			}
 		}
+		log.info("Added subscriber " + aqsubscribername);
 	}
 
 	protected void removeSubscriber() throws SQLException {
+		log.info("Removing Subscriber " + aqsubscribername);
 		try (CallableStatement statement = connection
 				.prepareCall("begin dbms_aqadm.remove_subscriber(queue_name => ?, subscriber => ?); end;")) {
 			statement.setString(1, normalisedQueueName);
 			statement.setObject(2, createSubscriberStruct());
 			statement.execute();
 		}
+		log.info("Removed subscriber " + aqsubscribername);
 	}
 
 	private Struct createSubscriberStruct() throws SQLException {

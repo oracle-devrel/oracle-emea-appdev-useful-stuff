@@ -15,5 +15,4 @@ public class NormalizedData {
 	private String timeObserved;
 	private String contentType;
 	private String content;
-	public static final String SQL_QUEUE_NAME = "normalized_data";
 }

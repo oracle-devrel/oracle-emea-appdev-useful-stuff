@@ -5,10 +5,10 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -21,9 +21,11 @@ import oracle.jdbc.aq.AQNotificationRegistration;
 
 @Singleton
 @Log
-public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore implements AQNotificationListener {
-
-	private ExecutorService executor = Executors.newCachedThreadPool();
+@Requires(property = "iotdatacache.aq.uselistener", value = "true", defaultValue = "false")
+public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
+		implements AQNotificationListener, IoTDBClient {
+	public final static String QUEUE_SUFFIX = "listener";
+	private ExecutorService executor;
 	private final AQDequeueOptions dequeueOptions;
 
 	private AQNotificationRegistration aqNotificationRegistration;
@@ -31,23 +33,28 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore impleme
 	@Inject
 	public IoTAQNormalizedDataListener(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-
-			@Property(name = "iotdatacache.valudationtimeout", defaultValue = "5") int jdbcValidationTimeout,
+			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") int jdbcValidationTimeout,
 			@Property(name = "iotdatacache.aqsubscribername", defaultValue = "aqreader") String aqsubscribername)
 			throws SQLException, Exception {
-		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername);
-		// setup the dequeue details as they can be reused
+		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUFFIX);
+		// setup the dequeue details as they can be reused each time we get a message
 		dequeueOptions = new AQDequeueOptions();
 		dequeueOptions.setDequeueMode(AQDequeueOptions.DequeueMode.REMOVE);
 		dequeueOptions.setWait(10);
 		dequeueOptions.setNavigation(AQDequeueOptions.NavigationOption.FIRST_MESSAGE);
-		dequeueOptions.setConsumerName(aqsubscribername);
+		dequeueOptions.setConsumerName(aqsubscribername + QUEUE_SUFFIX);
 	}
 
-	private void registerForAQNotifications() throws SQLException, Exception {
-		if (executor.isShutdown()) {
-			throw new Exception("System has been shutdown");
-		}
+	@Override
+	public void configureDBClient(String filteringRule) throws Exception {
+		executor = Executors.newCachedThreadPool();
+		// the aq options have been set in the constructor, but we need to tell the
+		// database about us
+		super.addSubscriber(filteringRule);
+	}
+
+	@Override
+	public void startDBProcessing() throws Exception {
 		log.info("Setting up AQ registration");
 		Properties globalOptions = new Properties();
 		String[] queueNameArr = new String[1];
@@ -62,13 +69,14 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore impleme
 		log.info("AQ Notification listened added");
 	}
 
-	/**
-	 * note that this is a persistent call, once made you can't restart things
-	 * 
-	 * @throws SQLException
-	 */
-	private void stopAQNotifications() throws SQLException {
+	@Override
+	public void stopDBProcessing() throws Exception {
 		aqNotificationRegistration.removeListener(this);
+	}
+
+	@Override
+	public void unconfigureDBClient() throws Exception {
+		super.removeSubscriber();
 		executor.shutdown();
 	}
 
@@ -89,55 +97,10 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore impleme
 				log.info("Received a null message");
 				return;
 			}
-			NormalizedData normalizedData = convertToNormalizedData(message.getJSONPayload());
-			log.info("Received " + normalizedData);
+			processAQMessage(message);
 			connection.commit();
 		} catch (SQLException e) {
 			log.warning("SQL Exception while getting message from AQ");
 		}
-	}
-
-	public boolean startListening() throws Exception {
-		try {
-			log.info("Setting up subscriber");
-			addSubscriber(null);
-		} catch (SQLException e) {
-			log.severe("SQLException while setting up subscriber, " + e.getLocalizedMessage());
-			return false;
-		}
-
-		try {
-			log.info("Register for notifications");
-			registerForAQNotifications();
-		} catch (SQLException e) {
-			log.severe("SQLException registering for notificaions, " + e.getLocalizedMessage());
-			log.info("Attempting to remove subscriber");
-			try {
-				removeSubscriber();
-				return false;
-			} catch (SQLException e1) {
-				log.severe("SQLException unregistering");
-				return false;
-			}
-		}
-		log.info("Setup subscription and registered for notifications");
-		return true;
-	}
-
-	public void stopListening() {
-		try {
-			stopAQNotifications();
-		} catch (SQLException e) {
-			log.severe("SQLException stopping the notifications, " + e.getLocalizedMessage());
-		}
-		try {
-			log.info("Attempting to remove subscriber");
-			removeSubscriber();
-		} catch (SQLException e) {
-			log.severe("SQLException removing subsciber, " + e.getLocalizedMessage());
-			return;
-		}
-
-		log.info("Completed");
 	}
 }
