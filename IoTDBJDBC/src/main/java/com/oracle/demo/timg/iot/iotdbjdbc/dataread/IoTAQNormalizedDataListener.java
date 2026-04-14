@@ -21,12 +21,14 @@ import oracle.jdbc.aq.AQNotificationRegistration;
 
 @Singleton
 @Log
-@Requires(property = "iotdatacache.aq.uselistener", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.listener.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.listener.order")
 public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 		implements AQNotificationListener, IoTDBClient {
-	public final static String QUEUE_SUFFIX = "listener";
+	public final static String QUEUE_SUBSCRIBER_SUFFIX = "listener";
 	private ExecutorService executor;
 	private final AQDequeueOptions dequeueOptions;
+	private final int order;
 
 	private AQNotificationRegistration aqNotificationRegistration;
 
@@ -34,15 +36,16 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 	public IoTAQNormalizedDataListener(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") int jdbcValidationTimeout,
-			@Property(name = "iotdatacache.aqsubscribername", defaultValue = "aqreader") String aqsubscribername)
-			throws SQLException, Exception {
-		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUFFIX);
+			@Property(name = "iotdatacache.aqsubscribername", defaultValue = "aqreader") String aqsubscribername,
+			@Property(name = "iotdatacache.aq.listener.order") int order) throws SQLException, Exception {
+		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
+		this.order = order;
 		// setup the dequeue details as they can be reused each time we get a message
 		dequeueOptions = new AQDequeueOptions();
 		dequeueOptions.setDequeueMode(AQDequeueOptions.DequeueMode.REMOVE);
 		dequeueOptions.setWait(10);
 		dequeueOptions.setNavigation(AQDequeueOptions.NavigationOption.FIRST_MESSAGE);
-		dequeueOptions.setConsumerName(aqsubscribername + QUEUE_SUFFIX);
+		dequeueOptions.setConsumerName(aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 	}
 
 	@Override
@@ -102,5 +105,10 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 		} catch (SQLException e) {
 			log.warning("SQL Exception while getting message from AQ");
 		}
+	}
+
+	@Override
+	public int getOrder() {
+		return order;
 	}
 }

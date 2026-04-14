@@ -30,21 +30,24 @@ import lombok.extern.java.Log;
  * done later
  */
 @Log
-@Requires(property = "iotdatacache.jdbc.doconnectiontestread", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.jdbc.doconnectiontestread.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.jdbc.doconnectiontestread.order")
 public class IoTJDBCConnectionTestReader implements IoTDBClient {
 	private final DBConnectionSupplier dbConnectionSupplier;
 	private final String schemaName;
 	private final int jdbcValidationTimeout;
+	private final int order;
 	private Connection conn;
 
 	@Inject
 	public IoTJDBCConnectionTestReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "iotdatacache.valudationtimeout", defaultValue = "5") int jdbcValidationTimeout)
-			throws SQLException, Exception {
+			@Property(name = "iotdatacache.valudationtimeout", defaultValue = "5") int jdbcValidationTimeout,
+			@Property(name = "iotdatacache.jdbc.doconnectiontestread.order") int order) throws SQLException, Exception {
 		this.dbConnectionSupplier = dbConnectionSupplier;
 		this.schemaName = schemaName;
 		this.jdbcValidationTimeout = jdbcValidationTimeout;
+		this.order = order;
 	}
 
 	@Override
@@ -76,7 +79,7 @@ public class IoTJDBCConnectionTestReader implements IoTDBClient {
 		if (!conn.isValid(jdbcValidationTimeout)) {
 			conn = dbConnectionSupplier.getNewConnection(schemaName);
 		}
-		// note that we are assuming here that the current scheme for the connection has
+		// note that we are assuming here that the current schema for the connection has
 		// been set.
 		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT, TIME_RECEIVED FROM raw_data ORDER BY TIME_RECEIVED DESC FETCH FIRST 5 ROWS ONLY";
 		try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(queryString)) {
@@ -93,5 +96,10 @@ public class IoTJDBCConnectionTestReader implements IoTDBClient {
 			log.severe("Problem connecting to DB " + e.getLocalizedMessage());
 		}
 		return results;
+	}
+
+	@Override
+	public int getOrder() {
+		return order;
 	}
 }

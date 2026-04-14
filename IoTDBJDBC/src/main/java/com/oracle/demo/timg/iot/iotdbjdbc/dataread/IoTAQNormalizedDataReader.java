@@ -19,14 +19,16 @@ import oracle.jdbc.aq.AQMessage;
 
 @Singleton
 @Log
-@Requires(property = "iotdatacache.aq.usereader", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.reader.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.reader.order")
 public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
-	public final static String QUEUE_SUFFIX = "reader";
+	public final static String QUEUE_SUBSCRIBER_SUFFIX = "reader";
 	private boolean stopped = false;
 	private final AQDequeueOptions dequeueOptions;
 	private final int aqReadTimeout;
 	private final int aqBatchSize;
+	private final int order;
 	private Thread currentThread;
 	private ExecutorService executor;
 
@@ -39,16 +41,17 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") @Min(value = 1) int jdbcValidationTimeout,
 			@Property(name = "iotdatacache.aq.subscribername", defaultValue = "aqclient") String aqsubscribername,
 			@Property(name = "iotdatacache.aq.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
-			@Property(name = "iotdatacache.aq.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize)
-			throws SQLException, Exception {
-		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUFFIX);
+			@Property(name = "iotdatacache.aq.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize,
+			@Property(name = "iotdatacache.aq.reader.order") @Min(value = 0) int order) throws SQLException, Exception {
+		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 		this.aqReadTimeout = aqReadTimeout;
 		this.aqBatchSize = aqBatchSize;
+		this.order = order;
 		dequeueOptions = new AQDequeueOptions();
 		dequeueOptions.setDequeueMode(AQDequeueOptions.DequeueMode.REMOVE);
 		dequeueOptions.setWait(aqReadTimeout);
 		dequeueOptions.setNavigation(AQDequeueOptions.NavigationOption.FIRST_MESSAGE);
-		dequeueOptions.setConsumerName(aqsubscribername);
+		dequeueOptions.setConsumerName(aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 	}
 
 	@Override
@@ -125,5 +128,10 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 			log.severe("SQLException in read loop, " + e.getLocalizedMessage());
 		}
 		log.info("Completed read thread");
+	}
+
+	@Override
+	public int getOrder() {
+		return order;
 	}
 }
