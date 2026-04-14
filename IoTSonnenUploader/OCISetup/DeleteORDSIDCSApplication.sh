@@ -1,3 +1,4 @@
+
 #!/bin/bash -f
 # run this in the DigitalTwin directory
 source ../OCISetup/common_names.sh
