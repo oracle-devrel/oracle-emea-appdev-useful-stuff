@@ -67,7 +67,13 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 		int readCounter = 0;
 		while (!stopped) {
 			// read a value
-			AQMessage messages[] = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
+			AQMessage messages[];
+			try {
+				messages = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
+			} catch (SQLException e) {
+				log.info("SQLException getting messages, " + e.getLocalizedMessage());
+				continue;
+			}
 			// I guess if we have a timeout while waiting for a message to be available to
 			// dequeue there will be a null message
 			if (messages == null) {
