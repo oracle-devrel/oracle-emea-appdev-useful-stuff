@@ -19,15 +19,14 @@ import oracle.jdbc.aq.AQMessage;
 
 @Singleton
 @Log
-@Requires(property = "iotdatacache.aq.reader.enabled", value = "true", defaultValue = "false")
-@Requires(property = "iotdatacache.aq.reader.order")
-public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
+@Requires(property = "iotdatacache.aq.individualreader.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.individualreader.order")
+public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
 	public final static String QUEUE_SUBSCRIBER_SUFFIX = "reader";
 	private boolean stopped = false;
 	private final AQDequeueOptions dequeueOptions;
 	private final int aqReadTimeout;
-	private final int aqBatchSize;
 	private final int order;
 	private Thread currentThread;
 	private ExecutorService executor;
@@ -36,22 +35,22 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 	private NormalizedDataMessageHandlerService normalizedDataMessageHandlerService;
 
 	@Inject
-	public IoTAQNormalizedDataReader(DBConnectionSupplier dbConnectionSupplier,
+	public IoTAQNormalizedDataIndividualReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") @Min(value = 1) int jdbcValidationTimeout,
 			@Property(name = "iotdatacache.aq.subscribername", defaultValue = "aqclient") String aqsubscribername,
-			@Property(name = "iotdatacache.aq.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
-			@Property(name = "iotdatacache.aq.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize,
-			@Property(name = "iotdatacache.aq.reader.order") @Min(value = 0) int order) throws SQLException, Exception {
+			@Property(name = "iotdatacache.aq.individualreader.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
+			@Property(name = "iotdatacache.aq.individualreader.order") @Min(value = 0) int order)
+			throws SQLException, Exception {
 		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 		this.aqReadTimeout = aqReadTimeout;
-		this.aqBatchSize = aqBatchSize;
 		this.order = order;
 		dequeueOptions = new AQDequeueOptions();
 		dequeueOptions.setDequeueMode(AQDequeueOptions.DequeueMode.REMOVE);
 		dequeueOptions.setWait(aqReadTimeout);
 		dequeueOptions.setNavigation(AQDequeueOptions.NavigationOption.FIRST_MESSAGE);
 		dequeueOptions.setConsumerName(aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
+		log.info("Running with aqTimeout of " + aqReadTimeout);
 	}
 
 	@Override
@@ -67,9 +66,9 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 		int readCounter = 0;
 		while (!stopped) {
 			// read a value
-			AQMessage messages[];
+			AQMessage message;
 			try {
-				messages = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
+				message = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON");
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 25228) {
 					log.info("Timeout reading messages");
@@ -80,21 +79,17 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 			}
 			// I guess if we have a timeout while waiting for a message to be available to
 			// dequeue there will be a null message
-			if (messages == null) {
+			if (message == null) {
 				log.info("Received a null message");
 				continue;
 			}
-			log.info("Queue returned " + messages.length + " out of a max read size of " + aqBatchSize);
 			// ultimately this could be a stream, but we want to track the number when
 			// processing so let's use a loop.
-			for (int i = 0; i < messages.length; i++) {
-				try {
-					NormalizedData normalizedData = convertToNormalizedData(messages[i].getJSONPayload());
-					log.info("Received message block " + readCounter + ", message no " + i + ", " + normalizedData);
-					normalizedDataMessageHandlerService.handle(normalizedData);
-				} catch (SQLException e) {
-					log.info("SQLException processing message block " + readCounter + ", message" + i);
-				}
+			try {
+				NormalizedData normalizedData = convertToNormalizedData(message.getJSONPayload());
+				normalizedDataMessageHandlerService.handle(normalizedData);
+			} catch (SQLException e) {
+				log.info("SQLException processing message block " + readCounter);
 			}
 			readCounter++;
 			connection.commit();
