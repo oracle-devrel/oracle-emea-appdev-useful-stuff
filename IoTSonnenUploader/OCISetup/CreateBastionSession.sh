@@ -7,12 +7,12 @@ echo "Using OCI config profile $OCI_CLI_PROFILE"
 IOT_COMPARTMENT_OCID=`get_oci_compartment_ocid.sh $COMPARTMENT_PATH`
 
 
-BASTION_OCID=`oci bastion bastion list    --compartment-id "$IOT_COMPARTMENT_OCID"    --name "$BASTION_NAME"    --query "data[0].id" --raw-output`
+BASTION_OCID=`oci bastion bastion list --compartment-id "$IOT_COMPARTMENT_OCID" --name "$BASTION_NAME" --all --query "data[0].id" --raw-output`
 
 
 echo "Bastion $BASTION_NAME in compartment $IOT_COMPARTMENT_OCID has $BASTION_OCID ocid"
 # Retrieve Target Instance OCID by Name
-VM_OCID=`oci compute instance list     --compartment-id "$IOT_COMPARTMENT_OCID"     --display-name "$VM_NAME"     --query "data[0].id" --raw-output`
+VM_OCID=`oci compute instance list --compartment-id "$IOT_COMPARTMENT_OCID" --display-name "$VM_NAME" --query "data[0].id" --raw-output`
 
 echo "Compute instance $VM_NAME in compartment $IOT_COMPARTMENT_OCID has $VM_OCID ocid"
 
