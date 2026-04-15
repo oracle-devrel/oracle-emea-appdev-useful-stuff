@@ -60,23 +60,23 @@ public class NormalizedDataMessageHandlerService {
 	@Inject
 	public NormalizedDataMessageHandlerService(List<NormalizedDataMessageHandler> handlers) {
 		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
-		handlersChainDetails = "There are " + this.handlers.size() + " handlers which are " + handlers.stream()
+		handlersChainDetails = "There are " + this.handlers.size() + " handlers which are " + this.handlers.stream()
 				.map(h -> h.getName() + " (config" + h.getConfig() + ")").collect(Collectors.joining(", "));
-		if (handlers.size() == 0) {
+		if (this.handlers.size() == 0) {
 			log.warning("No handlers configured");
-			return;
+		} else {
+			log.info(handlersChainDetails);
 		}
-		log.info(handlersChainDetails);
 	}
 
 	public void handle(@NonNull NormalizedData normalizedData) {
 		log.info("Handling NormalizedData " + normalizedData + " with chain " + handlersChainDetails);
 		if (handlers.size() == 0) {
 			log.warning("No NormalizedDataMessageHandler loaded, cannot process " + normalizedData);
-			return;
+		} else {
+			int handlerIndex = 0;
+			handle(handlerIndex, handlers.get(0), normalizedData);
 		}
-		int handlerIndex = 0;
-		handle(handlerIndex, handlers.get(0), normalizedData);
 	}
 
 	private void handle(int handlerIndex, @NonNull NormalizedDataMessageHandler handler,
