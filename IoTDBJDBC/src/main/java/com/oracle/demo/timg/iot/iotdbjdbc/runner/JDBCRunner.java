@@ -57,7 +57,7 @@ public class JDBCRunner {
 
 		this.aqRuntime = aqRuntime;
 		this.ioTDBClients = ioTDBClients.stream().sorted().toList();
-		String iotDBClientDetails = ioTDBClients.stream()
+		String iotDBClientDetails = this.ioTDBClients.stream()
 				.map(client -> client.getName() + "(" + client.getConfig() + ")").collect(Collectors.joining(", "));
 		log.info("There are " + ioTDBClients.size() + " IoTDBClients configured - " + iotDBClientDetails);
 		// place to put the clients we have started
