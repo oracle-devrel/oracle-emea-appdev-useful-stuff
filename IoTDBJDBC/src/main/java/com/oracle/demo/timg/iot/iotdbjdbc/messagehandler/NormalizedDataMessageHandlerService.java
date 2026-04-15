@@ -38,30 +38,36 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
 @Singleton
 @Log
-@NoArgsConstructor
 public class NormalizedDataMessageHandlerService {
 	// this will inject a list of possible handlers
 	// of course if the transformers are blocked because they are not instantiated
 	// (maybe they require properties not set) they will not be included here
+	private final ArrayList<NormalizedDataMessageHandler> handlers;
 
-	// once the class is constructed this should never be modified
 	@Inject
-	private ArrayList<NormalizedDataMessageHandler> handlers = new ArrayList<>();
+	public NormalizedDataMessageHandlerService(List<NormalizedDataMessageHandler> handlers) {
+		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
+		if (handlers.size() == 0) {
+			log.warning("No handlers configured");
+			return;
+		}
+		log.info(this.toString());
+	}
 
 	public void handle(@NonNull NormalizedData normalizedData) {
+		log.info("Handling NormalizedData " + normalizedData);
 		if (handlers.size() == 0) {
 			log.warning("No NormalizedDataMessageHandler loaded, cannot process " + normalizedData);
 			return;
@@ -75,6 +81,8 @@ public class NormalizedDataMessageHandlerService {
 		// run the handler and get the response
 		NormalizedData handledNormalizedData[];
 		try {
+			log.info("Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+					+ normalizedData);
 			handledNormalizedData = handler.processNormalizedData(normalizedData);
 		} catch (Exception e) {
 			log.warning("Exception in handler " + handler.getName() + " with configuration " + handler.getConfig()
@@ -89,6 +97,8 @@ public class NormalizedDataMessageHandlerService {
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
+			log.info("Resulting data is " + handledNormalizedData.length + " results, calling handler "
+					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
 			Arrays.stream(handledNormalizedData)
 					.forEach(nextNormalizedData -> handle(nextHandlerIndex, nextHandler, nextNormalizedData));
 		}
@@ -101,19 +111,7 @@ public class NormalizedDataMessageHandlerService {
 	}
 
 	public String getName() {
-		return "Core EventDataTransformService itself";
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		// there is no need to add a passthrough default as in practical terms this is
-		// what will happen if no transformers are specified
-		// make sure any transformers are correctly sorted to the order they report (or
-		// more hopefully in the config file)
-		// force this to be an array list so we can index into it easily later. (yes I
-		// could do this using a collector I know)
-		handlers = new ArrayList<>(handlers.stream().sorted().toList());
-		log.info(this.toString());
+		return "Core NormalizedDataMessageHandlerService itself";
 	}
 
 	@Override
