@@ -15,13 +15,10 @@ import lombok.extern.java.Log;
 @Log
 public class NormalizedDataRandomFilterMessageHandler implements NormalizedDataMessageHandler {
 	private final int order;
-	private final boolean passthrough;
 
 	public NormalizedDataRandomFilterMessageHandler(
-			@Property(name = "normalizeddata.handler.randomfilter.order") int order,
-			@Property(name = "normalizeddata.handler.randomfilter.passthrough", defaultValue = "true") boolean passthrough) {
+			@Property(name = "normalizeddata.handler.randomfilter.order") int order) {
 		this.order = order;
-		this.passthrough = passthrough;
 	}
 
 	@Override
