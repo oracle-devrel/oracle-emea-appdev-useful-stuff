@@ -75,7 +75,8 @@ while (( i <= BASTIAN_CHECK_MAX_ITERATIONS )); do
       echo "Bastion plugin is RUNNING."
       break
       ;;
-    STOPPED|FAILED|INVALID)
+    FAILED)
+	#STOPPED|FAILED|INVALID)
       echo "Bastion plugin is in a failure state: $BASTION_AGENT_STATUS" >&2
       exit 1
       ;;
