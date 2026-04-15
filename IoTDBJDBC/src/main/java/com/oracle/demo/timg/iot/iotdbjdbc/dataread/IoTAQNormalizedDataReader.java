@@ -95,7 +95,6 @@ public class IoTAQNormalizedDataReader extends IoTAQNormalizedDataCore implement
 				} catch (SQLException e) {
 					log.info("SQLException processing message block " + readCounter + ", message" + i);
 				}
-				i++;
 			}
 			readCounter++;
 			connection.commit();
