@@ -70,6 +70,6 @@ public interface NormalizedDataMessageHandler extends Comparable<NormalizedDataM
 		if (otherNormalizedDataMessageHandler == null) {
 			throw new NullPointerException("otherNormalizedDataMessageHandler must not be null");
 		}
-		return Integer.compare(this.getOrder(), otherNormalizedDataMessageHandler.getOrder());
+		return Integer.compare(otherNormalizedDataMessageHandler.getOrder(), this.getOrder());
 	}
 }
