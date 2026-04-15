@@ -111,4 +111,9 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 	public int getOrder() {
 		return order;
 	}
+
+	@Override
+	public String getConfig() {
+		return "Order " + getOrder() + " client name " + aqsubscribername;
+	}
 }

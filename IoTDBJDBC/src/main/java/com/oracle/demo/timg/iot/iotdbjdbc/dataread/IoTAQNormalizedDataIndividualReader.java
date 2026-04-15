@@ -23,7 +23,7 @@ import oracle.jdbc.aq.AQMessage;
 @Requires(property = "iotdatacache.aq.individualreader.order")
 public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
-	public final static String QUEUE_SUBSCRIBER_SUFFIX = "reader";
+	public final static String QUEUE_SUBSCRIBER_SUFFIX = "individualreader";
 	private boolean stopped = false;
 	private final AQDequeueOptions dequeueOptions;
 	private final int aqReadTimeout;
@@ -138,5 +138,10 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 	@Override
 	public int getOrder() {
 		return order;
+	}
+
+	@Override
+	public String getConfig() {
+		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " client name " + aqsubscribername;
 	}
 }
