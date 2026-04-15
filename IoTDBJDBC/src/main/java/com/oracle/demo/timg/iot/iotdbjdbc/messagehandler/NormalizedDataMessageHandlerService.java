@@ -55,19 +55,22 @@ public class NormalizedDataMessageHandlerService {
 	// of course if the transformers are blocked because they are not instantiated
 	// (maybe they require properties not set) they will not be included here
 	private final ArrayList<NormalizedDataMessageHandler> handlers;
+	private final String handlersChainDetails;
 
 	@Inject
 	public NormalizedDataMessageHandlerService(List<NormalizedDataMessageHandler> handlers) {
 		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
+		handlersChainDetails = "There are " + handlers.size() + " handlers which are " + handlers.stream()
+				.map(h -> h.getName() + " (config" + h.getConfig() + ")").collect(Collectors.joining(", "));
 		if (handlers.size() == 0) {
 			log.warning("No handlers configured");
 			return;
 		}
-		log.info(this.toString());
+		log.info(handlersChainDetails);
 	}
 
 	public void handle(@NonNull NormalizedData normalizedData) {
-		log.info("Handling NormalizedData " + normalizedData);
+		log.info("Handling NormalizedData " + normalizedData + " with chain " + handlersChainDetails);
 		if (handlers.size() == 0) {
 			log.warning("No NormalizedDataMessageHandler loaded, cannot process " + normalizedData);
 			return;
@@ -109,8 +112,7 @@ public class NormalizedDataMessageHandlerService {
 	}
 
 	public String getConfig() {
-		return "There are " + handlers.size() + " handlers which are " + handlers.stream()
-				.map(h -> h.getName() + " (config" + h.getConfig() + ")").collect(Collectors.joining(", "));
+		return handlersChainDetails;
 	}
 
 	public String getName() {
