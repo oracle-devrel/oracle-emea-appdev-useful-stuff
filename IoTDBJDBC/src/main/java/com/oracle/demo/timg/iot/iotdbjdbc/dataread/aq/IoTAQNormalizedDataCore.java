@@ -1,4 +1,4 @@
-package com.oracle.demo.timg.iot.iotdbjdbc.dataread;
+package com.oracle.demo.timg.iot.iotdbjdbc.dataread.aq;
 
 import java.sql.SQLException;
 

@@ -1,8 +1,9 @@
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.testtools;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;

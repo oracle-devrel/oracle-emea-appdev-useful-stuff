@@ -1,10 +1,11 @@
-package com.oracle.demo.timg.iot.iotdbjdbc.dataread;
+package com.oracle.demo.timg.iot.iotdbjdbc.dataread.aq;
 
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTDBClient;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;

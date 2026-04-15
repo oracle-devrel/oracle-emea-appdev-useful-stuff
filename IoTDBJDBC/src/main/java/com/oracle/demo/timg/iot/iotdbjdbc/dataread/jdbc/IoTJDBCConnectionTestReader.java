@@ -1,4 +1,4 @@
-package com.oracle.demo.timg.iot.iotdbjdbc.tester;
+package com.oracle.demo.timg.iot.iotdbjdbc.dataread.jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
