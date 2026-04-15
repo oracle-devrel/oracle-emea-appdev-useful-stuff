@@ -23,6 +23,7 @@ public class NormalizedDataTextOutputMessageHandler implements NormalizedDataMes
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
+		log.info("NormalizedData is " + input);
 		NormalizedData results[];
 		// are we acting as a terminator or a step in the process ?
 		if (passthrough) {
