@@ -89,6 +89,7 @@ public class NormalizedDataMessageHandlerService {
 					+ " handling normalizedData " + normalizedData);
 			return;
 		}
+		log.info("Handler " + handler.getName() + " returned " + handledNormalizedData.length + " elements");
 		// if there were resulting messages then we should process them provided there
 		// is another handler stage
 		int nextHandlerIndex = handlerIndex + 1;
@@ -97,10 +98,12 @@ public class NormalizedDataMessageHandlerService {
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
-			log.info("Resulting data is " + handledNormalizedData.length + " results, calling handler "
+			log.info("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
 					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
 			Arrays.stream(handledNormalizedData)
 					.forEach(nextNormalizedData -> handle(nextHandlerIndex, nextHandler, nextNormalizedData));
+		} else {
+			log.info("There were no elements returned or there are no subsequent handlers");
 		}
 
 	}
