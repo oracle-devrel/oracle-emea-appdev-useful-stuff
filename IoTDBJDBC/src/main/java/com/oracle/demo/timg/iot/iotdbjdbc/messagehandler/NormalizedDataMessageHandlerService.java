@@ -63,6 +63,7 @@ public class NormalizedDataMessageHandlerService {
 
 	public void handle(@NonNull NormalizedData normalizedData) {
 		if (handlers.size() == 0) {
+			log.warning("No NormalizedDataMessageHandler loaded, cannot process " + normalizedData);
 			return;
 		}
 		int handlerIndex = 0;
@@ -83,9 +84,8 @@ public class NormalizedDataMessageHandlerService {
 		// if there were resulting messages then we should process them provided there
 		// is another handler stage
 		int nextHandlerIndex = handlerIndex + 1;
-		if ((handledNormalizedData.length > 0) && (nextHandlerIndex > handlers.size())) {// this won't have been called
-																							// if there wasn't a handler
-																							// at this index so
+		if ((handledNormalizedData.length > 0) && (nextHandlerIndex > handlers.size())) {
+			// we can't have got here if there wasn't a handler at this index so
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
