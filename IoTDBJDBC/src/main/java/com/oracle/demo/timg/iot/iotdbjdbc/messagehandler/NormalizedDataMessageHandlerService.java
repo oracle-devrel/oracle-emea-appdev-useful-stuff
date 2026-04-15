@@ -96,7 +96,7 @@ public class NormalizedDataMessageHandlerService {
 		// if there were resulting messages then we should process them provided there
 		// is another handler stage
 		int nextHandlerIndex = handlerIndex + 1;
-		if ((handledNormalizedData.length > 0) && (nextHandlerIndex > handlers.size())) {
+		if ((handledNormalizedData.length > 0) && (handlers.size() > nextHandlerIndex)) {
 			// we can't have got here if there wasn't a handler at this index so
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
