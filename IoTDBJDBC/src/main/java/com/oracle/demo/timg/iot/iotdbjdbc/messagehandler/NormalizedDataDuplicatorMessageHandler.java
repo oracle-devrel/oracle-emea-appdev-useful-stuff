@@ -24,14 +24,14 @@ public class NormalizedDataDuplicatorMessageHandler implements NormalizedDataMes
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		log.info("Creating "+count" results from " + input);
+		log.info("Creating " + count + " results from " + input);
 		NormalizedData results[] = new NormalizedData[count];
 		// we're not modifying the input here, so we don't need to create new versions,
 		// this assumes however that anything calling this follows the contract and
 		// won't modify it's inputs. However as this class is really for testing
 		// purposes only I don't see a problem
-		for (int i  = 0 ; i < count ; i ++) {
-			results[i] = input ;
+		for (int i = 0; i < count; i++) {
+			results[i] = input;
 		}
 		return results;
 	}
