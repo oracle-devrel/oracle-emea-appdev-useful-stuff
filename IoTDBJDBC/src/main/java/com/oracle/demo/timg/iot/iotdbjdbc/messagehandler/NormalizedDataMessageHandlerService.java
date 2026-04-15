@@ -37,7 +37,6 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,8 +102,12 @@ public class NormalizedDataMessageHandlerService {
 			// stream
 			log.info("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
 					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
-			Arrays.stream(handledNormalizedData)
-					.forEach(nextNormalizedData -> handle(nextHandlerIndex, nextHandler, nextNormalizedData));
+			// coudl do this in a stream, but that would mean we couldn't do debug with the
+			// output order
+			for (int i = 0; i < handledNormalizedData.length; i++) {
+				log.info("Processing data element " + i + " from previous handler");
+				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
+			}
 		} else {
 			log.info("There were no elements returned or there are no subsequent handlers");
 		}
