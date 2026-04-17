@@ -54,12 +54,14 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 	private final int order;
 	private final String regexpPattern;
 	private final boolean caseInsensitive;
+	private final FindOutcomes findOutcomes;
 	private final Pattern pattern;
 
 	public NormalizedDataContentPathMessageFilter(
 			@Property(name = "normalizeddata.handler.contentpathfilter.order") int order,
 			@Property(name = "normalizeddata.handler.contentpathfilter.regexp") String regexpPattern,
-			@Property(name = "normalizeddata.handler.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive) {
+			@Property(name = "normalizeddata.handler.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive,
+			@Property(name = "normalizeddata.handler.contentpathfilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
 		this.order = order;
 		this.regexpPattern = regexpPattern;
 		this.caseInsensitive = caseInsensitive;
@@ -68,6 +70,7 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 			flags |= Pattern.CASE_INSENSITIVE;
 		}
 		this.pattern = Pattern.compile(regexpPattern, flags);
+		this.findOutcomes = findOutcomes;
 	}
 
 	@Override
@@ -75,12 +78,16 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 		log.info("NormalizedData is " + input);
 		NormalizedData results[];
 		// are we acting as a terminator or a step in the process ?
-		if (pattern.matcher(input.getContentPath()).find()) {
-			log.info("Found pattern " + regexpPattern + "in content path " + input);
+		boolean match = switch (findOutcomes) {
+		case FOUND -> pattern.matcher(input.getContentPath()).find();
+		case NOT_FOUND -> !pattern.matcher(input.getContentPath()).find();
+		};
+		if (match) {
+			log.info(findOutcomes + " is " + match + " for pattern " + regexpPattern + "in content path " + input);
 			results = new NormalizedData[1];
 			results[0] = input;
 		} else {
-			log.info("Did not find pattern " + regexpPattern + "in content path " + input);
+			log.info(findOutcomes + " is " + match + " for pattern " + regexpPattern + "in content path " + input);
 			results = new NormalizedData[0];
 		}
 		return results;

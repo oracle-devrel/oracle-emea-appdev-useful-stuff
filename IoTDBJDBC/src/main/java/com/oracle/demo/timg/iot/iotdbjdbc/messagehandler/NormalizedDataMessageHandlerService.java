@@ -87,7 +87,7 @@ public class NormalizedDataMessageHandlerService {
 		// run the handler and get the response
 		NormalizedData handledNormalizedData[];
 		try {
-			log.finer(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+			log.fine(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
 					+ normalizedData);
 			handledNormalizedData = handler.processNormalizedData(normalizedData);
 		} catch (Exception e) {
@@ -111,14 +111,9 @@ public class NormalizedDataMessageHandlerService {
 				log.finer(() -> "Processing data element " + i + " from previous handler");
 				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
 			});
-//			for (int i = 0; i < handledNormalizedData.length; i++) {
-//				// fake up a constant to let us us a lambda in the log saving String concat
-//				int constantI = i;
-//				log.finer(() -> "Processing data element " + constantI + " from previous handler");
-//				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
-//			}
 		} else {
-			log.info("There were no elements returned or there are no subsequent handlers");
+			log.fine
+			("There were no elements returned or there are no subsequent handlers");
 		}
 
 	}
