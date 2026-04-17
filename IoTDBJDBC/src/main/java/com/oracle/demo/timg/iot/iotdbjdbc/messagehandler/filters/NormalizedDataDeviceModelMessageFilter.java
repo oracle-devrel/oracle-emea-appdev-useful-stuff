@@ -104,10 +104,15 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 		if (modelId == null) {
 			log.warning(() -> "Can't locate modelid for model named " + modelName);
 			throw new Exception("Can't locate the model id for model named " + modelName);
+		} else {
+			log.info("Located model name " + modelName + " with id " + modelId);
 		}
 		// try to pre-load the current instances data if we've been asked to
 		if (preloadExisting) {
+			log.info("Pre-loading existing instances");
 			preloadExistingInstances();
+		} else {
+			log.info("Pre-loading existing instances is disabled, they will be loaded on demand");
 		}
 		// set this up so we can re-use it later if we need to query for an instance we
 		// didn't know about
@@ -188,7 +193,14 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 		}
 		log.info("instance is unknown retrieving its model, " + instanceId);
 		// we don't know about it, using the device ID query the DB to get the model id
-		String instanceModelId = getModelIdFromInstanceId(instanceId);
+		String instanceModelId;
+		try {
+			instanceModelId = getModelIdFromInstanceId(instanceId);
+		} catch (SQLException e) {
+			log.warning("SQLException locating instances model id for model " + instanceId + ", "
+					+ e.getLocalizedMessage());
+			instanceModelId = null;
+		}
 		log.info("instance had model id, " + instanceModelId);
 		if (instanceModelId == null) {
 			// no model id found, this I guess is possible for an instance that is not
