@@ -49,6 +49,10 @@ import oracle.sql.json.OracleJsonValue;
 
 @Log
 public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
+	private static final String VALUE_COLUMN_NAME = "value";
+	private static final String TIME_OBSERVED_COLUMN_NAME = "timeObserved";
+	private static final String CONTENT_PATH_COLUMN_NAME = "contentPath";
+	private static final String DIGITAL_TWIN_INSTANCE_ID_COLUMN_NAME = "digitalTwinInstanceId";
 	public static final String SQL_QUEUE_NAME = "normalized_data";
 
 	public IoTAQNormalizedDataCore(DBConnectionSupplier dbConnectionSupplier, String schemaName,
@@ -68,10 +72,10 @@ public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
 	protected static NormalizedData convertToNormalizedData(OracleJsonDatum payloadDatum) throws SQLException {
 		OracleJsonObject payload = (OracleJsonObject) payloadDatum.toJdbc();
 
-		String ocid = payload.getString("digitalTwinInstanceId", "");
-		String contentPath = payload.getString("contentPath", "");
-		String timeObserved = payload.getString("timeObserved", "");
-		OracleJsonValue valueJson = payload.get("value");
+		String ocid = payload.getString(DIGITAL_TWIN_INSTANCE_ID_COLUMN_NAME, "");
+		String contentPath = payload.getString(CONTENT_PATH_COLUMN_NAME, "");
+		String timeObserved = payload.getString(TIME_OBSERVED_COLUMN_NAME, "");
+		OracleJsonValue valueJson = payload.get(VALUE_COLUMN_NAME);
 		String contentType = valueJson.getOracleJsonType().toString();
 		// use content as that's the column name
 		String content = (valueJson == null ? "" : valueJson.toString());
