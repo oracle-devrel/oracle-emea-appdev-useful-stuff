@@ -65,9 +65,9 @@ import lombok.extern.java.Log;
 public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMessageHandler {
 	private static final String INSTANCE_ID_COLUMN_NAME = "instanceid";
 	private static final String MODEL_ID_COLUMN_NAME = "modelid";
-	public final static String SELECT_MODEL_ID_BY_MODEL_NAME = "SELECT JSON_VALUE(dtm.data, '$._id' ) AS modelid FROM digital_twin_models dtm WHERE JSON_VALUE(dtm.data, '$.displayName' ) = ";
-	public final static String SELECT_MODEL_ID_BY_INSTANCE_ID = "SELECT JSON_VALUE(dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti WHERE JSON_VALUE(dti.data,  '$._id'  ) = ?";
-	public final static String SELECT_MODEL_ID_AND_INSTANCE_ID = "SELECT JSON_VALUE(dti.data, '$._id' ) AS instanceid, (dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti";
+	public final static String SELECT_MODEL_ID_BY_MODEL_NAME = "SELECT JSON_VALUE (dtm.data, '$._id' ) AS modelid FROM digital_twin_models dtm WHERE JSON_VALUE(dtm.data, '$.displayName' ) = ";
+	public final static String SELECT_MODEL_ID_BY_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti WHERE JSON_VALUE(dti.data,  '$._id'  ) = ?";
+	public final static String SELECT_MODEL_ID_AND_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$._id' ) AS instanceid, JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti";
 
 	private final String schemaName;
 	private final int order;
@@ -206,7 +206,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 			// no model id found, this I guess is possible for an instance that is not
 			// connected to a model, but we are dealing with normalized data here, which
 			// should always have a model, add to the non matching for future use
-			nonMatchingInstances.add(instanceModelId);
+			nonMatchingInstances.add(instanceId);
 			log.severe("Error, was handed instance id that does not have a model id, " + instanceId);
 			return new NormalizedData[0];
 		} else if (instanceModelId.equals(modelId)) {

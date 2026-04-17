@@ -91,8 +91,11 @@ public class NormalizedDataMessageHandlerService {
 					+ normalizedData);
 			handledNormalizedData = handler.processNormalizedData(normalizedData);
 		} catch (Exception e) {
+			String fname = e.getStackTrace()[0].getFileName();
+			int lineno = e.getStackTrace()[0].getLineNumber();
 			log.warning("Exception in handler " + handler.getName() + " with configuration " + handler.getConfig()
-					+ " handling normalizedData " + normalizedData);
+					+ " handling normalizedData " + normalizedData + ", " + e.getLocalizedMessage() + " in file "
+					+ fname + " at line " + lineno);
 			return;
 		}
 		log.finer("Handler " + handler.getName() + " returned " + handledNormalizedData.length + " elements");
@@ -112,8 +115,7 @@ public class NormalizedDataMessageHandlerService {
 				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
 			});
 		} else {
-			log.fine
-			("There were no elements returned or there are no subsequent handlers");
+			log.fine("There were no elements returned or there are no subsequent handlers");
 		}
 
 	}
