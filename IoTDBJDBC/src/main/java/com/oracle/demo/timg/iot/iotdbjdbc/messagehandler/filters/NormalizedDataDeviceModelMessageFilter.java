@@ -96,10 +96,10 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 
 	@Override
 	public void configure() throws Exception {
-		log.info("Getting connection");
+		log.fine("Getting connection");
 		connection = dbConnectionSupplier.getNewConnection(schemaName);
 		// get the model ID
-		log.info(() -> "Locating model id for model " + modelName);
+		log.fine(() -> "Locating model id for model " + modelName);
 		modelId = getModelId();
 		if (modelId == null) {
 			log.warning(() -> "Can't locate modelid for model named " + modelName);
@@ -116,9 +116,10 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 		}
 		// set this up so we can re-use it later if we need to query for an instance we
 		// didn't know about
-		log.info("Creating prepared statement");
+		log.fine("Creating prepared statement");
 		selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_BY_INSTANCE_ID);
-		log.info("Prepared statement created");
+		log.fine("Prepared statement created");
+		log.info(getConfig());
 	}
 
 	private String getModelId() throws SQLException {
@@ -182,16 +183,16 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 		String instanceId = input.getDigitalTwinInstanceId();
 		// have we checked and determined it's not a match before ?
 		if (nonMatchingInstances.contains(instanceId)) {
-			log.info("instance is already in the non matching set, " + input.getDigitalTwinInstanceId());
+			log.fine("instance is already in the non matching set, " + input.getDigitalTwinInstanceId());
 			return new NormalizedData[0];
 		}
 		if (matchingInstances.contains(instanceId)) {
-			log.info("instance is already in the matching set, " + input.getDigitalTwinInstanceId());
+			log.fine("instance is already in the matching set, " + input.getDigitalTwinInstanceId());
 			NormalizedData result[] = new NormalizedData[1];
 			result[0] = input;
 			return result;
 		}
-		log.info("instance is unknown retrieving its model, " + instanceId);
+		log.fine("instance is unknown retrieving its model, " + instanceId);
 		// we don't know about it, using the device ID query the DB to get the model id
 		String instanceModelId;
 		try {
@@ -201,7 +202,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 					+ e.getLocalizedMessage());
 			instanceModelId = null;
 		}
-		log.info("instance had model id, " + instanceModelId);
+		log.fine("instance had model id, " + instanceModelId);
 		if (instanceModelId == null) {
 			// no model id found, this I guess is possible for an instance that is not
 			// connected to a model, but we are dealing with normalized data here, which
@@ -211,7 +212,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 			return new NormalizedData[0];
 		} else if (instanceModelId.equals(modelId)) {
 			// it matches, stash the result for later and carry on with it
-			log.info("previously unknown instance " + instanceId + "has model id " + instanceModelId
+			log.fine("previously unknown instance " + instanceId + "has model id " + instanceModelId
 					+ " that matches model id " + modelId);
 			matchingInstances.add(instanceId);
 			NormalizedData result[] = new NormalizedData[1];
@@ -219,7 +220,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 			return result;
 		} else {
 			// no match, remember that
-			log.info("previously unknown instance " + instanceId + "has model id " + instanceModelId
+			log.fine("previously unknown instance " + instanceId + "has model id " + instanceModelId
 					+ " that does not matche model id " + modelId);
 			nonMatchingInstances.add(instanceId);
 			return new NormalizedData[0];
