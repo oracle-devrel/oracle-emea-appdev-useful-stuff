@@ -58,7 +58,7 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 
 	public NormalizedDataContentPathMessageFilter(
 			@Property(name = "normalizeddata.handler.contentpathfilter.order") int order,
-			@Property(name = "normalizeddata.handler.contentpathfilter.passthrough") String regexpPattern,
+			@Property(name = "normalizeddata.handler.contentpathfilter.regexp") String regexpPattern,
 			@Property(name = "normalizeddata.handler.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive) {
 		this.order = order;
 		this.regexpPattern = regexpPattern;
