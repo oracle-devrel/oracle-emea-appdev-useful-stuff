@@ -39,6 +39,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
@@ -86,7 +87,7 @@ public class NormalizedDataMessageHandlerService {
 		// run the handler and get the response
 		NormalizedData handledNormalizedData[];
 		try {
-			log.info("Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+			log.finer(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
 					+ normalizedData);
 			handledNormalizedData = handler.processNormalizedData(normalizedData);
 		} catch (Exception e) {
@@ -94,7 +95,7 @@ public class NormalizedDataMessageHandlerService {
 					+ " handling normalizedData " + normalizedData);
 			return;
 		}
-		log.info("Handler " + handler.getName() + " returned " + handledNormalizedData.length + " elements");
+		log.finer("Handler " + handler.getName() + " returned " + handledNormalizedData.length + " elements");
 		// if there were resulting messages then we should process them provided there
 		// is another handler stage
 		int nextHandlerIndex = handlerIndex + 1;
@@ -103,14 +104,19 @@ public class NormalizedDataMessageHandlerService {
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
-			log.info("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
+			log.finer("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
 					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
-			// coudl do this in a stream, but that would mean we couldn't do debug with the
-			// output order
-			for (int i = 0; i < handledNormalizedData.length; i++) {
-				log.info("Processing data element " + i + " from previous handler");
+			// use a stream for fun
+			IntStream.range(0, handledNormalizedData.length).forEachOrdered((i) -> {
+				log.finer(() -> "Processing data element " + i + " from previous handler");
 				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
-			}
+			});
+//			for (int i = 0; i < handledNormalizedData.length; i++) {
+//				// fake up a constant to let us us a lambda in the log saving String concat
+//				int constantI = i;
+//				log.finer(() -> "Processing data element " + constantI + " from previous handler");
+//				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
+//			}
 		} else {
 			log.info("There were no elements returned or there are no subsequent handlers");
 		}

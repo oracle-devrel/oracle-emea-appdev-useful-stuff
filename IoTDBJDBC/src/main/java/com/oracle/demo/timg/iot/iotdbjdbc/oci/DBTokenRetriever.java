@@ -73,7 +73,7 @@ public class DBTokenRetriever {
 
 	@Inject
 	public DBTokenRetriever(OCIAuthProvider ociAuthProvider, @Property(name = "oci.dbtoken.scope") String scope) {
-		log.info("Auth provider will return type " + ociAuthProvider.getAuthProviderType());
+		log.fine(() -> "Auth provider will return type " + ociAuthProvider.getAuthProviderType());
 		this.authProvider = ociAuthProvider.getAuthProvider();
 		this.scope = scope;
 		if (!(authProvider instanceof RegionProvider regionProvider)) {
@@ -89,10 +89,10 @@ public class DBTokenRetriever {
 	}
 
 	public AccessToken generateAccessToken() throws Exception {
-		log.info("generating key pair");
+		log.fine("generating key pair");
 		KeyPair keyPair = generateKeyPair();
 		String publicKeyPem = toPublicKeyPem(keyPair);
-		log.info("Creating request");
+		log.fine("Creating request");
 		GenerateScopedAccessTokenRequest request = GenerateScopedAccessTokenRequest.builder()
 				.generateScopedAccessTokenDetails(
 						GenerateScopedAccessTokenDetails.builder().scope(scope).publicKey(publicKeyPem).build())
