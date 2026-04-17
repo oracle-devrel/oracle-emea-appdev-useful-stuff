@@ -73,7 +73,7 @@ public class IoTJDBCConnectionTestReader implements IoTDBClient {
 	private final String schemaName;
 	private final int jdbcValidationTimeout;
 	private final int order;
-	private Connection conn;
+	private Connection connection;
 
 	@Inject
 	public IoTJDBCConnectionTestReader(DBConnectionSupplier dbConnectionSupplier,
@@ -88,7 +88,7 @@ public class IoTJDBCConnectionTestReader implements IoTDBClient {
 
 	@Override
 	public void configureDBClient(String filteringRule) throws Exception {
-		conn = dbConnectionSupplier.getNewConnection(schemaName);
+		connection = dbConnectionSupplier.getNewConnection(schemaName);
 	}
 
 	@Override
@@ -107,18 +107,18 @@ public class IoTJDBCConnectionTestReader implements IoTDBClient {
 
 	@Override
 	public void unconfigureDBClient() throws Exception {
-		conn.close();
+		connection.close();
 	}
 
 	public List<RawData> getRawData() throws SQLException, Exception {
 		List<RawData> results = new LinkedList<>();
-		if (!conn.isValid(jdbcValidationTimeout)) {
-			conn = dbConnectionSupplier.getNewConnection(schemaName);
+		if (!connection.isValid(jdbcValidationTimeout)) {
+			connection = dbConnectionSupplier.getNewConnection(schemaName);
 		}
 		// note that we are assuming here that the current schema for the connection has
 		// been set.
 		String queryString = "SELECT DIGITAL_TWIN_INSTANCE_ID, ENDPOINT,CONTENT_TYPE, CONTENT, TIME_RECEIVED FROM raw_data ORDER BY TIME_RECEIVED DESC FETCH FIRST 5 ROWS ONLY";
-		try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(queryString)) {
+		try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(queryString)) {
 			int i = 1;
 			while (rs.next()) {
 				RawDataId id = new RawDataId(rs.getString("DIGITAL_TWIN_INSTANCE_ID"), rs.getString("ENDPOINT"),

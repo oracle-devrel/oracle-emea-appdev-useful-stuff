@@ -104,9 +104,9 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 		opt[0].setProperty(OracleConnection.NTF_AQ_PAYLOAD, "true");
 		AQNotificationRegistration[] regArr = connection.registerAQNotification(queueNameArr, opt, globalOptions);
 		aqNotificationRegistration = regArr[0];
-		log.info("AQ Notification registration completed, adding listener");
+		log.finer("AQ Notification registration completed, adding listener");
 		aqNotificationRegistration.addListener(this, executor);
-		log.info("AQ Notification listened added");
+		log.finer("AQ Notification listened added");
 	}
 
 	@Override

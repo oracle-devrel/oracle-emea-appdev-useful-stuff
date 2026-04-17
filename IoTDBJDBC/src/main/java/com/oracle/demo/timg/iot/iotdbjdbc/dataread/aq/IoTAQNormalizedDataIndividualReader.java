@@ -110,7 +110,7 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 				if (e.getErrorCode() == 25228) {
 					continue;
 				}
-				log.info("SQLException getting messages, " + e.getLocalizedMessage());
+				log.warning("SQLException getting messages, " + e.getLocalizedMessage());
 				continue;
 			}
 			// I guess if we have a timeout while waiting for a message to be available to
