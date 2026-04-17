@@ -136,7 +136,8 @@ if [ "$IS_ACTIVE" = true ]; then
     FINAL_CMD=`echo "$RAW_SSH_CMD" | sed "s|<privateKey>|$BASTION_PRIV_KEY_PATH|g"`
     echo "-------------------------------------------------------"
     echo "SUCCESS: Session is Active."
-    echo "Connect with: $FINAL_CMD"
+    echo "Connect with: "
+    echo "$FINAL_CMD"
     echo "-------------------------------------------------------"
 else
     echo "Timeout: Session did not become active within 5 minutes."
