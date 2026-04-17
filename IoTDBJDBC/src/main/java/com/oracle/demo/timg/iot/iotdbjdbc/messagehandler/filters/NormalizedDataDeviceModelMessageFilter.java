@@ -137,10 +137,11 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 				String modelIdExistingInstance = rs.getString(MODEL_ID_COLUMN_NAME);
 				String instanceIdExistingInstance = rs.getString(INSTANCE_ID_COLUMN_NAME);
 				if (modelIdExistingInstance.equals(modelId)) {
-					log.info("Instance " + instanceIdExistingInstance + " matched model id " + modelIdExistingInstance);
+					log.info("Pre-load instance " + instanceIdExistingInstance + " matched model id "
+							+ modelIdExistingInstance);
 					matchingInstances.add(instanceIdExistingInstance);
 				} else {
-					log.info("Instance " + instanceIdExistingInstance + " did not match model id "
+					log.info("Pre-load instance " + instanceIdExistingInstance + " did not match model id "
 							+ modelIdExistingInstance);
 					nonMatchingInstances.add(instanceIdExistingInstance);
 				}
