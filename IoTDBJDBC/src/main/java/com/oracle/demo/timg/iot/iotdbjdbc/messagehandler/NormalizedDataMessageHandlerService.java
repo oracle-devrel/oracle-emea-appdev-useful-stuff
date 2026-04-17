@@ -42,6 +42,9 @@ import java.util.stream.Collectors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
+import io.micronaut.context.event.ShutdownEvent;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
@@ -125,5 +128,37 @@ public class NormalizedDataMessageHandlerService {
 	@Override
 	public String toString() {
 		return getName() + ", " + getConfig();
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Configuring handlers");
+		handlers.stream().forEach(handler -> {
+			log.info("Configuring handler " + handler.getName());
+			try {
+				handler.configure();
+			} catch (Exception e) {
+				log.severe("Exception configuring handler " + handler.getName() + " which has config "
+						+ handler.getConfig() + ", " + e.getLocalizedMessage());
+				return;
+			}
+			log.info("Configured handler " + handler.getName());
+		});
+	}
+
+	@EventListener
+	public void onShutdown(ShutdownEvent event) {
+		log.info("Unconfiguring handlers");
+		handlers.stream().forEach(handler -> {
+			log.info("Unconfiguring handler " + handler.getName());
+			try {
+				handler.unconfigure();
+			} catch (Exception e) {
+				log.severe("Exception unconfiguring handler " + handler.getName() + " which has config "
+						+ handler.getConfig() + ", " + e.getLocalizedMessage());
+				return;
+			}
+			log.info("Unconfigured handler " + handler.getName());
+		});
 	}
 }

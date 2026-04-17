@@ -1,5 +1,7 @@
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.testtools;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
 
@@ -9,28 +11,26 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.textoutput.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.textoutput.order")
+@Requires(property = "normalizeddata.handler.randomfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "normalizeddata.handler.randomfilter.order")
 @Log
-public class NormalizedDataTextOutputMessageHandler implements NormalizedDataMessageHandler {
+public class NormalizedDataRandomMessageFilter implements NormalizedDataMessageHandler {
 	private final int order;
-	private final boolean passthrough;
 
-	public NormalizedDataTextOutputMessageHandler(@Property(name = "normalizeddata.handler.textoutput.order") int order,
-			@Property(name = "normalizeddata.handler.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
+	public NormalizedDataRandomMessageFilter(
+			@Property(name = "normalizeddata.handler.randomfilter.order") int order) {
 		this.order = order;
-		this.passthrough = passthrough;
 	}
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		log.info("NormalizedData is " + input);
 		NormalizedData results[];
-		// are we acting as a terminator or a step in the process ?
-		if (passthrough) {
+		if (ThreadLocalRandom.current().nextBoolean()) {
+			log.info("Random filter is true, will pass on input " + input);
 			results = new NormalizedData[1];
 			results[0] = input;
 		} else {
+			log.info("Random filter is false, blocking input " + input);
 			results = new NormalizedData[0];
 		}
 		return results;
@@ -43,7 +43,7 @@ public class NormalizedDataTextOutputMessageHandler implements NormalizedDataMes
 
 	@Override
 	public String getName() {
-		return "Text output handler";
+		return "Random filter handler";
 	}
 
 	@Override

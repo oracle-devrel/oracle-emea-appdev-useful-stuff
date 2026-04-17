@@ -12,11 +12,11 @@ import lombok.extern.java.Log;
 @Requires(property = "normalizeddata.handler.duplicator.enabled", value = "true", defaultValue = "false")
 @Requires(property = "normalizeddata.handler.duplicator.order")
 @Log
-public class NormalizedDataDuplicatorMessageHandler implements NormalizedDataMessageHandler {
+public class NormalizedDataDuplicatorMessageProcessor implements NormalizedDataMessageHandler {
 	private final int count;
 	private final int order;
 
-	public NormalizedDataDuplicatorMessageHandler(
+	public NormalizedDataDuplicatorMessageProcessor(
 			@Property(name = "normalizeddata.handler.duplicator.count", defaultValue = "2") int count,
 			@Property(name = "normalizeddata.handler.duplicator.order") int order) {
 		this.count = count;

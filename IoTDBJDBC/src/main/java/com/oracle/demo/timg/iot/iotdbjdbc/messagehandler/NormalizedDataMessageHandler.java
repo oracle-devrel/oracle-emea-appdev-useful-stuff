@@ -19,6 +19,24 @@ import jakarta.inject.Singleton;
 public interface NormalizedDataMessageHandler extends Comparable<NormalizedDataMessageHandler> {
 
 	/**
+	 * do any initial processing that's needed, for example establishing a JDBC
+	 * Connection
+	 * 
+	 * @throws Exception
+	 */
+	public default void configure() throws Exception {
+	}
+
+	/**
+	 * do any processing that's needed to tidy things up, for example closing a JDBC
+	 * Connection
+	 * 
+	 * @throws Exception
+	 */
+	public default void unconfigure() throws Exception {
+	}
+
+	/**
 	 * If transforming the input should not modify the input object, but instead
 	 * create a new version(s), the resulting objects will be passed to the next
 	 * stage in the order they are presented in the response..
