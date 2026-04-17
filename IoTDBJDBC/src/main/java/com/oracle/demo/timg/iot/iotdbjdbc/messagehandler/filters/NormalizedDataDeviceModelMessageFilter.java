@@ -60,6 +60,7 @@ import lombok.extern.java.Log;
 @Requires(property = "normalizeddata.handler.devicemodelfilter.enabled", value = "true", defaultValue = "false")
 @Requires(property = "normalizeddata.handler.devicemodelfilter.order")
 @Requires(property = "normalizeddata.handler.devicemodelfilter.modelname")
+@Requires(property = "iotdatacache.schemaname")
 @Log
 public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMessageHandler {
 	private static final String INSTANCE_ID_COLUMN_NAME = "instanceid";
@@ -68,6 +69,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 	public final static String SELECT_MODEL_ID_BY_INSTANCE_ID = "SELECT JSON_VALUE(dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti WHERE JSON_VALUE(dti.data,  '$._id'  ) = '?'";
 	public final static String SELECT_MODEL_ID_AND_INSTANCE_ID = "SELECT JSON_VALUE(dti.data, '$._id' ) AS instanceid, (dti.data, '$.digitalTwinModelId' ) AS modelid FROM digital_twin_instances dti";
 
+	private final String schemaName;
 	private final int order;
 	private final String modelName;
 	private final Set<String> matchingInstances = new HashSet<>();
@@ -80,10 +82,13 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 
 	@Inject
 	public NormalizedDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
+			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "normalizeddata.handler.devicemodelfilter.order") int order,
 			@Property(name = "normalizeddata.handler.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
 			@Property(name = "normalizeddata.handler.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting) {
 		this.dbConnectionSupplier = dbConnectionSupplier;
+
+		this.schemaName = schemaName;
 		this.order = order;
 		this.modelName = modelName;
 		this.preloadExisting = preloadExisting;
@@ -92,7 +97,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 	@Override
 	public void configure() throws Exception {
 		log.info("Getting connection");
-		connection = dbConnectionSupplier.getNewConnection();
+		connection = dbConnectionSupplier.getNewConnection(schemaName);
 		// get the model ID
 		log.info(() -> "Locating model id for model " + modelName);
 		modelId = getModelId();
