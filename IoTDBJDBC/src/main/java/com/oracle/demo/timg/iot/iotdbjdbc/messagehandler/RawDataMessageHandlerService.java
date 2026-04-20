@@ -1,0 +1,167 @@
+/*Copyright (c) 2026 Oracle and/or its affiliates.
+
+The Universal Permissive License (UPL), Version 1.0
+
+Subject to the condition set forth below, permission is hereby granted to any
+person obtaining a copy of this software, associated documentation and/or data
+(collectively the "Software"), free of charge and under any and all copyright
+rights in the Software, and any and all patent rights owned or freely
+licensable by each licensor hereunder covering either (i) the unmodified
+Software as contributed to or provided by such licensor, or (ii) the Larger
+Works (as defined below), to deal in both
+
+(a) the Software, and
+(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+one is included with the Software (each a "Larger Work" to which the Software
+is contributed by such licensors),
+
+without restriction, including without limitation the rights to copy, create
+derivative works of, display, perform, and distribute the Software and make,
+use, sell, offer for sale, import, export, have made, and have sold the
+Software and the Larger Work(s), and to sublicense the foregoing rights on
+either these or other terms.
+
+This license is subject to the following condition:
+The above copyright notice and either this complete permission notice or at
+a minimum a reference to the UPL must be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
+
+import io.micronaut.context.event.ShutdownEvent;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.NonNull;
+import lombok.extern.java.Log;
+
+@Singleton
+@Log
+public class RawDataMessageHandlerService {
+	// this will inject a list of possible handlers
+	// of course if the transformers are blocked because they are not instantiated
+	// (maybe they require properties not set) they will not be included here
+	private final ArrayList<RawDataMessageHandler> handlers;
+	private final String handlersChainDetails;
+
+	@Inject
+	public RawDataMessageHandlerService(List<RawDataMessageHandler> handlers) {
+		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
+		handlersChainDetails = "There are " + this.handlers.size() + " normalized data handlers which are "
+				+ this.handlers.stream().map(h -> h.getName() + " (config" + h.getConfig() + ")")
+						.collect(Collectors.joining(", "));
+		if (this.handlers.size() == 0) {
+			log.warning("No handlers configured");
+		} else {
+			log.info(handlersChainDetails);
+		}
+	}
+
+	public void handle(@NonNull RawData rawData) {
+		log.info("Handling RawData " + rawData + " with chain " + handlersChainDetails);
+		if (handlers.size() == 0) {
+			log.warning("No rawDataMessageHandler loaded, cannot process " + rawData);
+		} else {
+			int handlerIndex = 0;
+			handle(handlerIndex, handlers.get(0), rawData);
+		}
+	}
+
+	private void handle(int handlerIndex, @NonNull RawDataMessageHandler handler, @NonNull RawData rawData) {
+		// run the handler and get the response
+		RawData handledRawData[];
+		try {
+			log.fine(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+					+ rawData);
+			handledRawData = handler.processNormalizedData(rawData);
+		} catch (Exception e) {
+			String fname = e.getStackTrace()[0].getFileName();
+			int lineno = e.getStackTrace()[0].getLineNumber();
+			log.warning("Exception in handler " + handler.getName() + " with configuration " + handler.getConfig()
+					+ " handling rawData " + rawData + ", " + e.getLocalizedMessage() + " in file " + fname
+					+ " at line " + lineno);
+			return;
+		}
+		log.finer("Handler " + handler.getName() + " returned " + handledRawData.length + " elements");
+		// if there were resulting messages then we should process them provided there
+		// is another handler stage
+		int nextHandlerIndex = handlerIndex + 1;
+		if ((handledRawData.length > 0) && (handlers.size() > nextHandlerIndex)) {
+			// we can't have got here if there wasn't a handler at this index so
+			RawDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
+			// this meets the ordering requirements as arrays.stream returns a sequential
+			// stream
+			log.finer("Resulting data from handler " + handledRawData.length + " results, calling handler "
+					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
+			// use a stream for fun
+			IntStream.range(0, handledRawData.length).forEachOrdered((i) -> {
+				log.finer(() -> "Processing data element " + i + " from previous handler");
+				handle(nextHandlerIndex, nextHandler, handledRawData[i]);
+			});
+		} else {
+			log.fine("There were no elements returned or there are no subsequent handlers");
+		}
+
+	}
+
+	public String getConfig() {
+		return handlersChainDetails;
+	}
+
+	public String getName() {
+		return "Core RawDataMessageHandlerService itself";
+	}
+
+	@Override
+	public String toString() {
+		return getName() + ", " + getConfig();
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Configuring handlers");
+		handlers.stream().forEach(handler -> {
+			log.info("Configuring handler " + handler.getName());
+			try {
+				handler.configure();
+			} catch (Exception e) {
+				log.severe("Exception configuring handler " + handler.getName() + " which has config "
+						+ handler.getConfig() + ", " + e.getLocalizedMessage());
+				return;
+			}
+			log.info("Configured handler " + handler.getName());
+		});
+	}
+
+	@EventListener
+	public void onShutdown(ShutdownEvent event) {
+		log.info("Unconfiguring handlers");
+		handlers.stream().forEach(handler -> {
+			log.info("Unconfiguring handler " + handler.getName());
+			try {
+				handler.unconfigure();
+			} catch (Exception e) {
+				log.severe("Exception unconfiguring handler " + handler.getName() + " which has config "
+						+ handler.getConfig() + ", " + e.getLocalizedMessage());
+				return;
+			}
+			log.info("Unconfigured handler " + handler.getName());
+		});
+	}
+}
