@@ -57,9 +57,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.devicemodelfilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.devicemodelfilter.order")
-@Requires(property = "normalizeddata.handler.devicemodelfilter.modelname")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname")
 @Requires(property = "iotdatacache.schemaname")
 @Log
 public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMessageHandler {
@@ -76,6 +76,7 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 	private final Set<String> nonMatchingInstances = new HashSet<>();
 	private final DBConnectionSupplier dbConnectionSupplier;
 	private final boolean preloadExisting;
+	private final boolean nullModelIdIsError;
 	private Connection connection;
 	private String modelId = "Not yet retrieved";
 	private PreparedStatement selectModelIdByInstanceIdPS;
@@ -83,15 +84,16 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 	@Inject
 	public NormalizedDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "normalizeddata.handler.devicemodelfilter.order") int order,
-			@Property(name = "normalizeddata.handler.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
-			@Property(name = "normalizeddata.handler.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting) {
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError) {
 		this.dbConnectionSupplier = dbConnectionSupplier;
-
 		this.schemaName = schemaName;
 		this.order = order;
 		this.modelName = modelName;
 		this.preloadExisting = preloadExisting;
+		this.nullModelIdIsError = nullModelIdIsError;
 	}
 
 	@Override
@@ -208,7 +210,12 @@ public class NormalizedDataDeviceModelMessageFilter implements NormalizedDataMes
 			// connected to a model, but we are dealing with normalized data here, which
 			// should always have a model, add to the non matching for future use
 			nonMatchingInstances.add(instanceId);
-			log.severe("Error, was handed instance id that does not have a model id, " + instanceId);
+			if (nullModelIdIsError) {
+				log.severe("Error, was handed instance id that does not have a model id, " + instanceId);
+			} else {
+				log.info("Handed instance id that does not have a model id, " + instanceId);
+
+			}
 			return new NormalizedData[0];
 		} else if (instanceModelId.equals(modelId)) {
 			// it matches, stash the result for later and carry on with it

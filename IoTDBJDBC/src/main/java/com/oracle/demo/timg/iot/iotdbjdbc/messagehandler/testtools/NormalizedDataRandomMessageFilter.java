@@ -47,13 +47,14 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.randomfilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.randomfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.randomfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.randomfilter.order")
 @Log
 public class NormalizedDataRandomMessageFilter implements NormalizedDataMessageHandler {
 	private final int order;
 
-	public NormalizedDataRandomMessageFilter(@Property(name = "normalizeddata.handler.randomfilter.order") int order) {
+	public NormalizedDataRandomMessageFilter(
+			@Property(name = "messagehandler.filter.normalizeddata.randomfilter.order") int order) {
 		this.order = order;
 	}
 

@@ -47,8 +47,8 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.contentpathfilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.contentpathfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.contentpathfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.contentpathfilter.order")
 @Log
 public class NormalizedDataContentPathMessageFilter implements NormalizedDataMessageHandler {
 	private final int order;
@@ -58,10 +58,10 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 	private final Pattern pattern;
 
 	public NormalizedDataContentPathMessageFilter(
-			@Property(name = "normalizeddata.handler.contentpathfilter.order") int order,
-			@Property(name = "normalizeddata.handler.contentpathfilter.regexp") String regexpPattern,
-			@Property(name = "normalizeddata.handler.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive,
-			@Property(name = "normalizeddata.handler.contentpathfilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
+			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.regexp") String regexpPattern,
+			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive,
+			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
 		this.order = order;
 		this.regexpPattern = regexpPattern;
 		this.caseInsensitive = caseInsensitive;

@@ -45,16 +45,16 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.duplicator.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.duplicator.order")
+@Requires(property = "messagehandler.processor.normalizeddata.duplicator.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.processor.normalizeddata.duplicator.order")
 @Log
 public class NormalizedDataDuplicatorMessageProcessor implements NormalizedDataMessageHandler {
 	private final int count;
 	private final int order;
 
 	public NormalizedDataDuplicatorMessageProcessor(
-			@Property(name = "normalizeddata.handler.duplicator.count", defaultValue = "2") int count,
-			@Property(name = "normalizeddata.handler.duplicator.order") int order) {
+			@Property(name = "messagehandler.processor.normalizeddata.duplicator.count", defaultValue = "2") int count,
+			@Property(name = "messagehandler.processor.normalizeddata.duplicator.order") int order) {
 		this.count = count;
 		this.order = order;
 	}

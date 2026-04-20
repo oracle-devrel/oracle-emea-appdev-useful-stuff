@@ -45,15 +45,16 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "normalizeddata.handler.textoutput.enabled", value = "true", defaultValue = "false")
-@Requires(property = "normalizeddata.handler.textoutput.order")
+@Requires(property = "messagehandler.output.normalizeddata.textoutput.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.output.normalizeddata.textoutput.order")
 @Log
 public class NormalizedDataTextMessageOutput implements NormalizedDataMessageHandler {
 	private final int order;
 	private final boolean passthrough;
 
-	public NormalizedDataTextMessageOutput(@Property(name = "normalizeddata.handler.textoutput.order") int order,
-			@Property(name = "normalizeddata.handler.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
+	public NormalizedDataTextMessageOutput(
+			@Property(name = "messagehandler.output.normalizeddata.textoutput.order") int order,
+			@Property(name = "messagehandler.output.normalizeddata.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
 		this.order = order;
 		this.passthrough = passthrough;
 	}
