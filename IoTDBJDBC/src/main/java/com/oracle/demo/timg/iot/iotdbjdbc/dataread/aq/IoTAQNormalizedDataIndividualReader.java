@@ -56,8 +56,8 @@ import oracle.jdbc.aq.AQMessage;
 
 @Singleton
 @Log
-@Requires(property = "iotdatacache.aq.individualreader.enabled", value = "true", defaultValue = "false")
-@Requires(property = "iotdatacache.aq.individualreader.order")
+@Requires(property = "iotdatacache.aq.normalizeddata.individualreader.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.normalizeddata.individualreader.order")
 public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
 	public final static String QUEUE_SUBSCRIBER_SUFFIX = "individualreader";
@@ -75,9 +75,9 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 	public IoTAQNormalizedDataIndividualReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") @Min(value = 1) int jdbcValidationTimeout,
-			@Property(name = "iotdatacache.aq.subscribername", defaultValue = "aqclient") String aqsubscribername,
-			@Property(name = "iotdatacache.aq.individualreader.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
-			@Property(name = "iotdatacache.aq.individualreader.order") @Min(value = 0) int order)
+			@Property(name = "iotdatacache.aq.normalizeddata.subscribername", defaultValue = "aqclientnormalized") String aqsubscribername,
+			@Property(name = "iotdatacache.aq.normalizeddata.individualreader.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
+			@Property(name = "iotdatacache.aq.normalizeddata.individualreader.order") @Min(value = 0) int order)
 			throws SQLException, Exception {
 		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 		this.aqReadTimeout = aqReadTimeout;
@@ -105,7 +105,7 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 			// read a value
 			AQMessage message;
 			try {
-				message = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON");
+				message = connection.dequeue(queueName, dequeueOptions, "JSON");
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 25228) {
 					continue;
@@ -178,6 +178,6 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 
 	@Override
 	public String getConfig() {
-		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " client name " + aqsubscribername;
+		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " client name " + getAqsubscribername();
 	}
 }

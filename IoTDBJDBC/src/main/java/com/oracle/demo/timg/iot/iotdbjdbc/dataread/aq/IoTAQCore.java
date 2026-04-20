@@ -45,6 +45,7 @@ import java.util.Locale;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
+import lombok.Getter;
 import lombok.extern.java.Log;
 import oracle.jdbc.OracleConnection;
 
@@ -53,11 +54,12 @@ import oracle.jdbc.OracleConnection;
 public abstract class IoTAQCore {
 	private final static int ORACLE_AQ_ALREADY_SUBSCRIBED_ERROR_CODE = 24034;
 	public final static String SCHEMA_SUFFIX = "__IOT";
-	protected final DBConnectionSupplier dbConnectionSupplier;
-	protected final String schemaName;
-	protected final String aqsubscribername;
-	protected final int jdbcValidationTimeout;
-
+	private final DBConnectionSupplier dbConnectionSupplier;
+	private final String schemaName;
+	@Getter
+	private final String aqsubscribername;
+	private final int jdbcValidationTimeout;
+	@Getter
 	protected final String queueName;
 	protected OracleConnection connection;
 

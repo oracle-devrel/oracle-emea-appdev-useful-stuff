@@ -72,13 +72,14 @@ public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
 	protected static NormalizedData convertToNormalizedData(OracleJsonDatum payloadDatum) throws SQLException {
 		OracleJsonObject payload = (OracleJsonObject) payloadDatum.toJdbc();
 
-		String ocid = payload.getString(DIGITAL_TWIN_INSTANCE_ID_COLUMN_NAME, "");
+		String digitalTwinInstanceId = payload.getString(DIGITAL_TWIN_INSTANCE_ID_COLUMN_NAME, "");
 		String contentPath = payload.getString(CONTENT_PATH_COLUMN_NAME, "");
 		String timeObserved = payload.getString(TIME_OBSERVED_COLUMN_NAME, "");
 		OracleJsonValue valueJson = payload.get(VALUE_COLUMN_NAME);
 		String contentType = valueJson.getOracleJsonType().toString();
 		// use content as that's the column name
 		String content = (valueJson == null ? "" : valueJson.toString());
-		return new NormalizedData(ocid, contentPath, timeObserved, contentType, content);
+		return NormalizedData.builder().digitalTwinInstanceId(digitalTwinInstanceId).contentPath(contentPath)
+				.timeObserved(timeObserved).contentType(contentType).content(content).build();
 	}
 }

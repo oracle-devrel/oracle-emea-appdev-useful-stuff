@@ -37,17 +37,18 @@ SOFTWARE.
 
 package com.oracle.demo.timg.iot.iotdbjdbc.aqdata;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
 
 @Log
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-public class NormalizedData {
-	private String digitalTwinInstanceId;
+public class NormalizedData extends IoTDataCore {
 	private String contentPath;
 	private String timeObserved;
 	private String contentType;

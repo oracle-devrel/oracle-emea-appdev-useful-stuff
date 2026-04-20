@@ -98,7 +98,7 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 		log.info("Setting up AQ registration");
 		Properties globalOptions = new Properties();
 		String[] queueNameArr = new String[1];
-		queueNameArr[0] = normalisedQueueName;
+		queueNameArr[0] = getQueueName();
 		Properties[] opt = new Properties[1];
 		opt[0] = new Properties();
 		opt[0].setProperty(OracleConnection.NTF_AQ_PAYLOAD, "true");
@@ -130,7 +130,7 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 		try {
 			// this will only get a single message, so hopefully there will be a
 			// notifications for each message
-			AQMessage message = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON");
+			AQMessage message = connection.dequeue(getQueueName(), dequeueOptions, "JSON");
 			// I guess if we have a timeout while waiting for a message to be available to
 			// dequeue there will be a null message
 			if (message == null) {
@@ -151,6 +151,6 @@ public class IoTAQNormalizedDataListener extends IoTAQNormalizedDataCore
 
 	@Override
 	public String getConfig() {
-		return "Order " + getOrder() + " client name " + aqsubscribername;
+		return "Order " + getOrder() + " client name " + getAqsubscribername();
 	}
 }

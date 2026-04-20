@@ -58,8 +58,8 @@ import oracle.jdbc.aq.AQMessage;
 
 @Singleton
 @Log
-@Requires(property = "iotdatacache.aq.batchreader.enabled", value = "true", defaultValue = "false")
-@Requires(property = "iotdatacache.aq.batchreader.order")
+@Requires(property = "iotdatacache.aq.normalizeddata.batchreader.enabled", value = "true", defaultValue = "false")
+@Requires(property = "iotdatacache.aq.normalizeddata.batchreader.order")
 public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore implements IoTDBClient, Runnable {
 
 	public final static String QUEUE_SUBSCRIBER_SUFFIX = "batchreader";
@@ -78,10 +78,10 @@ public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore impl
 	public IoTAQNormalizedDataBatchReader(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "iotdatacache.validationtimeout", defaultValue = "5") @Min(value = 1) int jdbcValidationTimeout,
-			@Property(name = "iotdatacache.aq.subscribername", defaultValue = "aqclient") String aqsubscribername,
-			@Property(name = "iotdatacache.aq.batchreader.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
-			@Property(name = "iotdatacache.aq.batchreader.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize,
-			@Property(name = "iotdatacache.aq.batchreader.order") @Min(value = 0) int order)
+			@Property(name = "iotdatacache.aq.normalizeddata.subscribername", defaultValue = "aqclientnormalized") String aqsubscribername,
+			@Property(name = "iotdatacache.aq.normalizeddata.batchreader.readtimeout", defaultValue = "10") @Min(value = 0) int aqReadTimeout,
+			@Property(name = "iotdatacache.aq.normalizeddata.batchreader.batchsize", defaultValue = "10") @Min(value = 1) int aqBatchSize,
+			@Property(name = "iotdatacache.aq.normalizeddata.batchreader.order") @Min(value = 0) int order)
 			throws SQLException, Exception {
 		super(dbConnectionSupplier, schemaName, jdbcValidationTimeout, aqsubscribername + QUEUE_SUBSCRIBER_SUFFIX);
 		this.aqReadTimeout = aqReadTimeout;
@@ -110,7 +110,7 @@ public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore impl
 			// read a value
 			AQMessage messages[];
 			try {
-				messages = connection.dequeue(normalisedQueueName, dequeueOptions, "JSON", aqBatchSize);
+				messages = connection.dequeue(queueName, dequeueOptions, "JSON", aqBatchSize);
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 25228) {
 					log.finest("Timeout reading messages");
@@ -208,6 +208,6 @@ public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore impl
 	@Override
 	public String getConfig() {
 		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " batch size " + aqBatchSize + " client name "
-				+ aqsubscribername;
+				+ getAqsubscribername();
 	}
 }

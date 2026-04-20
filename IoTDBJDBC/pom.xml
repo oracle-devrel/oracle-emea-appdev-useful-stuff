@@ -54,7 +54,7 @@ SOFTWARE. -->
 		<jdk.version>21</jdk.version>
 		<release.version>17</release.version>
 		<version.ocisdk>3.74.2</version.ocisdk>
-		<version.lombok>1.18.42</version.lombok>
+		<version.lombok>1.18.44</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
 		<!-- Oracle JDBC 23ai line (set to the latest approved version) -->
 		<version.ojdbc>23.8.0.25.04</version.ojdbc>
