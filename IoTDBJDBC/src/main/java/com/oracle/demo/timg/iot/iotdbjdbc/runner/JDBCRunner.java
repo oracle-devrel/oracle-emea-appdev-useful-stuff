@@ -78,17 +78,11 @@ public class JDBCRunner {
 			@Property(name = "iotdatacache.schemaname") String schemaName,
 			@Property(name = "datasources.default.username", defaultValue = "") String username,
 			@Property(name = "datasources.default.password", defaultValue = "") String password,
-			@Property(name = "iotdatacache.aq.usereader", defaultValue = "false") boolean readFromAq,
-			@Property(name = "iotdatacache.aq.uselistener", defaultValue = "false") boolean listenToAq,
-			@Property(name = "iotdatacache.jdbc.doconnectiontestread", defaultValue = "false") boolean doJDBCConnectionTestRead,
 			@Property(name = "iotdatacache.aqruntime", defaultValue = "0") int aqRuntime) {
 		log.info("Using URL " + url);
 		log.info("Will use IOT Schema named " + schemaName);
 		log.info("username is :" + username + ":");
 		log.info("password is :" + password + ":");
-		log.info("usereader is :" + listenToAq + ":");
-		log.info("uselistener is :" + listenToAq + ":");
-		log.info("doconnectiontestread is :" + doJDBCConnectionTestRead + ":");
 		log.info("aqRuntime is :" + aqRuntime + ":");
 
 		this.aqRuntime = aqRuntime;
