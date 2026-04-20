@@ -63,8 +63,9 @@ public class NormalizedDataMessageHandlerService {
 	@Inject
 	public NormalizedDataMessageHandlerService(List<NormalizedDataMessageHandler> handlers) {
 		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
-		handlersChainDetails = "There are " + this.handlers.size() + " handlers which are " + this.handlers.stream()
-				.map(h -> h.getName() + " (config" + h.getConfig() + ")").collect(Collectors.joining(", "));
+		handlersChainDetails = "There are " + this.handlers.size() + " normalized data handlers which are "
+				+ this.handlers.stream().map(h -> h.getName() + " (config" + h.getConfig() + ")")
+						.collect(Collectors.joining(", "));
 		if (this.handlers.size() == 0) {
 			log.warning("No handlers configured");
 		} else {
