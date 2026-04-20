@@ -41,6 +41,7 @@ import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Struct;
 import java.sql.Types;
+import java.util.Locale;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
@@ -57,14 +58,14 @@ public abstract class IoTAQCore {
 	protected final String aqsubscribername;
 	protected final int jdbcValidationTimeout;
 
-	protected final String normalisedQueueName;
+	protected final String queueName;
 	protected OracleConnection connection;
 
 	public IoTAQCore(DBConnectionSupplier dbConnectionSupplier, String schemaName, String queueName,
 			int jdbcValidationTimeout, String aqsubscribername) throws SQLException, Exception {
 		this.dbConnectionSupplier = dbConnectionSupplier;
 		this.schemaName = schemaName + SCHEMA_SUFFIX;
-		this.normalisedQueueName = (schemaName + "." + queueName).toUpperCase();
+		this.queueName = (schemaName + "." + queueName).toUpperCase(Locale.ROOT);
 		this.jdbcValidationTimeout = jdbcValidationTimeout;
 		this.aqsubscribername = aqsubscribername;
 		connection = dbConnectionSupplier.getNewConnection(schemaName);
@@ -75,7 +76,7 @@ public abstract class IoTAQCore {
 		try (CallableStatement statement = connection.prepareCall("begin dbms_aqadm.add_subscriber("
 				+ "queue_name => ?, " + "subscriber => ?, " + "rule => ?, " + "transformation => null, "
 				+ "queue_to_queue => false, " + "delivery_mode => dbms_aqadm.persistent_or_buffered); end;")) {
-			statement.setString(1, normalisedQueueName);
+			statement.setString(1, queueName);
 			statement.setObject(2, createSubscriberStruct());
 			if (rule == null) {
 				statement.setNull(3, Types.VARCHAR);
@@ -86,12 +87,12 @@ public abstract class IoTAQCore {
 				statement.execute();
 			} catch (SQLException e) {
 				if (e.getErrorCode() == ORACLE_AQ_ALREADY_SUBSCRIBED_ERROR_CODE) {
-					log.warning(() -> "Subscriber " + aqsubscribername + " is already subscribed to queue "
-							+ normalisedQueueName + ", continuing");
+					log.warning(() -> "Subscriber " + aqsubscribername + " is already subscribed to queue " + queueName
+							+ ", continuing");
 				} else {
 					// was another error code
-					log.severe("SQLException subscribing " + aqsubscribername + " to queue " + normalisedQueueName
-							+ ", " + e.getLocalizedMessage());
+					log.severe("SQLException subscribing " + aqsubscribername + " to queue " + queueName + ", "
+							+ e.getLocalizedMessage());
 					throw e;
 				}
 			}
@@ -103,7 +104,7 @@ public abstract class IoTAQCore {
 		log.info("Removing Subscriber " + aqsubscribername);
 		try (CallableStatement statement = connection
 				.prepareCall("begin dbms_aqadm.remove_subscriber(queue_name => ?, subscriber => ?); end;")) {
-			statement.setString(1, normalisedQueueName);
+			statement.setString(1, queueName);
 			statement.setObject(2, createSubscriberStruct());
 			statement.execute();
 		}
