@@ -36,8 +36,6 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
-
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -52,31 +50,53 @@ import jakarta.inject.Singleton;
  * cause a failure UNLESS isStateless() returns true.
  * 
  */
-public interface NormalizedDataMessageHandler extends MessageHandler {
+public interface MessageHandler extends Comparable<MessageHandler> {
 
 	/**
-	 * If transforming the input should not modify the input object, but instead
-	 * create a new version(s), the resulting objects will be passed to the next
-	 * stage in the order they are presented in the response..
+	 * do any initial processing that's needed, for example establishing a JDBC
+	 * Connection
 	 * 
-	 * This approach allows a transform to split up (or otherwise enrich) the data,
-	 * OR to combine data, for example taking several individual inputs representing
-	 * individual elements and once all elements of a resulting object have been
-	 * provided then generating a single object combining the inputs in some way as
-	 * an output(s).
+	 * @throws Exception
+	 */
+	public default void configure() throws Exception {
+	}
+
+	/**
+	 * do any processing that's needed to tidy things up, for example closing a JDBC
+	 * Connection
 	 * 
-	 * This can be used as a filter by returning only objects that pass the filter
+	 * @throws Exception
+	 */
+	public default void unconfigure() throws Exception {
+	}
+
+	/**
+	 * returns the place the handler sits in the chain, this should be retrieved
+	 * from configuration and must not be static
 	 * 
-	 * For output the result could be all outputs, or perhaps limited to onl'y
-	 * objects that were not uploaded (this is application specific)
-	 * 
-	 * While this can throw an exception (in which case it will be treated as if it
-	 * had returned an empty result set) the best practice is for it to handle
-	 * exceptions and just return an empty array.
-	 * 
-	 * @param input
 	 * @return
 	 */
-	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception;
+	public int getOrder();
 
+	/**
+	 * returns the name of the handler. Useful for diagnostics
+	 * 
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * returns the configuration of the handler. Useful for diagnostics
+	 * 
+	 * @return
+	 */
+	public String getConfig();
+
+	@Override
+	public default int compareTo(MessageHandler otherMessageHandler) {
+		if (otherMessageHandler == null) {
+			throw new NullPointerException("otherMessageHandler must not be null");
+		}
+		return Integer.compare(this.getOrder(), otherMessageHandler.getOrder());
+	}
 }
