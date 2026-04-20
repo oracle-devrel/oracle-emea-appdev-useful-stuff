@@ -80,12 +80,12 @@ public class NormalizedDataTextMessageOutput implements NormalizedDataMessageHan
 
 	@Override
 	public String getName() {
-		return "Text output handler";
+		return "Text output handler (normalized)";
 	}
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder();
+		return getName() + " order " + getOrder() + ", passthrough " + passthrough;
 	}
 
 }
