@@ -60,7 +60,7 @@ public abstract class IoTAQCore {
 	private final String aqsubscribername;
 	private final int jdbcValidationTimeout;
 	@Getter
-	protected final String queueName;
+	private final String queueName;
 	protected OracleConnection connection;
 
 	public IoTAQCore(DBConnectionSupplier dbConnectionSupplier, String schemaName, String queueName,
@@ -98,6 +98,8 @@ public abstract class IoTAQCore {
 					throw e;
 				}
 			}
+			// not sure if this is needed or not, but it probably can't do any harm
+			connection.commit();
 		}
 		log.info("Added subscriber " + aqsubscribername);
 	}
@@ -109,6 +111,8 @@ public abstract class IoTAQCore {
 			statement.setString(1, queueName);
 			statement.setObject(2, createSubscriberStruct());
 			statement.execute();
+			// not sure if this is needed or not, but it probably can't do any harm
+			connection.commit();
 		}
 		log.info("Removed subscriber " + aqsubscribername);
 	}

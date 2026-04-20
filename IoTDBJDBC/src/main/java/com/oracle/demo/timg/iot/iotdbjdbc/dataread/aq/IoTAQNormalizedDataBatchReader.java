@@ -110,7 +110,7 @@ public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore impl
 			// read a value
 			AQMessage messages[];
 			try {
-				messages = connection.dequeue(queueName, dequeueOptions, "JSON", aqBatchSize);
+				messages = connection.dequeue(getQueueName(), dequeueOptions, "JSON", aqBatchSize);
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 25228) {
 					log.finest("Timeout reading messages");

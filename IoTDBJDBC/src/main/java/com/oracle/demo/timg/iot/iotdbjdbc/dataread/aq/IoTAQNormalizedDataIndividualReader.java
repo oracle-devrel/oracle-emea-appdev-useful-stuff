@@ -105,7 +105,7 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 			// read a value
 			AQMessage message;
 			try {
-				message = connection.dequeue(queueName, dequeueOptions, "JSON");
+				message = connection.dequeue(getQueueName(), dequeueOptions, "JSON");
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 25228) {
 					continue;
