@@ -89,7 +89,7 @@ public class RawDataMessageHandlerService {
 		try {
 			log.fine(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
 					+ rawData);
-			handledRawData = handler.processNormalizedData(rawData);
+			handledRawData = handler.processRawData(rawData);
 		} catch (Exception e) {
 			String fname = e.getStackTrace()[0].getFileName();
 			int lineno = e.getStackTrace()[0].getLineNumber();
