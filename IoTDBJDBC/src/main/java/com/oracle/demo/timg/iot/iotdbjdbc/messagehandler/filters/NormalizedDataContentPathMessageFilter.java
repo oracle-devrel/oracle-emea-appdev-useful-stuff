@@ -75,7 +75,7 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		log.finer("NormalizedData is " + input);
+		log.finer(() -> "NormalizedData is " + input);
 		NormalizedData results[];
 		// are we acting as a terminator or a step in the process ?
 		boolean match = switch (findOutcomes) {
@@ -83,12 +83,12 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 		case NOT_FOUND -> !pattern.matcher(input.getContentPath()).find();
 		};
 		if (match) {
-			log.fine(findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
+			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
 					+ caseInsensitive + " in content path " + input);
 			results = new NormalizedData[1];
 			results[0] = input;
 		} else {
-			log.fine(findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
+			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
 					+ caseInsensitive + "in content path " + input);
 			results = new NormalizedData[0];
 		}

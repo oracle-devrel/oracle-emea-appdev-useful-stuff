@@ -95,7 +95,7 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 			log.warning(() -> "Can't locate modelid for model named " + modelName);
 			throw new Exception("Can't locate the model id for model named " + modelName);
 		} else {
-			log.info("Located model name " + modelName + " with id " + modelId);
+			log.info(() -> "Located model name " + modelName + " with id " + modelId);
 		}
 		// try to pre-load the current instances data if we've been asked to
 		if (preloadExisting) {
@@ -138,11 +138,11 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 				String modelIdExistingInstance = rs.getString(MODEL_ID_COLUMN_NAME);
 				String instanceIdExistingInstance = rs.getString(INSTANCE_ID_COLUMN_NAME);
 				if (modelIdExistingInstance.equals(modelId)) {
-					log.info("Pre-load instance " + instanceIdExistingInstance + " matched model id "
+					log.info(() -> "Pre-load instance " + instanceIdExistingInstance + " matched model id "
 							+ modelIdExistingInstance);
 					matchingInstances.add(instanceIdExistingInstance);
 				} else {
-					log.info("Pre-load instance " + instanceIdExistingInstance + " did not match model id "
+					log.info(() -> "Pre-load instance " + instanceIdExistingInstance + " did not match model id "
 							+ modelIdExistingInstance);
 					nonMatchingInstances.add(instanceIdExistingInstance);
 				}
@@ -172,14 +172,14 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 		String instanceId = input.getDigitalTwinInstanceId();
 		// have we checked and determined it's not a match before ?
 		if (nonMatchingInstances.contains(instanceId)) {
-			log.fine("instance is already in the non matching set, " + input.getDigitalTwinInstanceId());
+			log.fine(() -> "instance is already in the non matching set, " + input.getDigitalTwinInstanceId());
 			return false;
 		}
 		if (matchingInstances.contains(instanceId)) {
-			log.fine("instance is already in the matching set, " + input.getDigitalTwinInstanceId());
+			log.fine(() -> "instance is already in the matching set, " + input.getDigitalTwinInstanceId());
 			return true;
 		}
-		log.fine("instance is unknown retrieving its model, " + instanceId);
+		log.fine(() -> "instance is unknown retrieving its model, " + instanceId);
 		// we don't know about it, using the device ID query the DB to get the model id
 		String instanceModelId;
 		try {
@@ -189,6 +189,7 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 					+ e.getLocalizedMessage());
 			instanceModelId = null;
 		}
+		// can't use a lambda here as instanceModelId is
 		log.fine("instance has model id, " + instanceModelId);
 		if (instanceModelId == null) {
 			// no model id found, this I guess is possible for an instance that is not
@@ -196,21 +197,21 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 			// should always have a model, add to the non matching for future use
 			nonMatchingInstances.add(instanceId);
 			if (nullModelIdIsError) {
-				log.severe("Error, was handed instance id that does not have a model id, " + instanceId);
+				log.severe(() -> "Error, was handed instance id that does not have a model id, " + instanceId);
 			} else {
-				log.info("Handed instance id that does not have a model id, " + instanceId);
+				log.info(() -> "Handed instance id that does not have a model id, " + instanceId);
 
 			}
 			return false;
 		} else if (instanceModelId.equals(modelId)) {
 			// it matches, stash the result for later and carry on with it
-			log.fine("previously unknown instance " + instanceId + "has model id " + instanceModelId
+			log.fine(() -> "previously unknown instance " + instanceId + "has model id " + instanceModelId
 					+ " that matches model id " + modelId);
 			matchingInstances.add(instanceId);
 			return true;
 		} else {
 			// no match, remember that
-			log.fine("previously unknown instance " + instanceId + "has model id " + instanceModelId
+			log.fine(() -> "previously unknown instance " + instanceId + "has model id " + instanceModelId
 					+ " that does not matche model id " + modelId);
 			nonMatchingInstances.add(instanceId);
 			return false;

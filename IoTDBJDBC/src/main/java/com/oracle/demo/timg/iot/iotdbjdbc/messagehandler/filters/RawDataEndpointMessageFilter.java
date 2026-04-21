@@ -75,7 +75,7 @@ public class RawDataEndpointMessageFilter implements RawDataMessageHandler {
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
-		log.finer("RawData is " + input);
+		log.finer(() -> "RawData is " + input);
 		RawData results[];
 		// are we acting as a terminator or a step in the process ?
 		boolean match = switch (findOutcomes) {
@@ -83,12 +83,12 @@ public class RawDataEndpointMessageFilter implements RawDataMessageHandler {
 		case NOT_FOUND -> !pattern.matcher(input.getEndpoint()).find();
 		};
 		if (match) {
-			log.fine(findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
+			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
 					+ caseInsensitive + " in content path " + input);
 			results = new RawData[1];
 			results[0] = input;
 		} else {
-			log.fine(findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
+			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
 					+ caseInsensitive + "in content path " + input);
 			results = new RawData[0];
 		}
