@@ -179,7 +179,7 @@ public class IoTAQRawDataIndividualReader extends IoTAQRawDataCore implements Io
 
 	@Override
 	public String getConfig() {
-		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " client name " + getQueueName()
-				+ ", payload type " + getPayloadType();
+		return "Order " + getOrder() + " Read timeout " + aqReadTimeout + " client name " + getQueueName()
+				+ " payload type " + getPayloadType();
 	}
 }

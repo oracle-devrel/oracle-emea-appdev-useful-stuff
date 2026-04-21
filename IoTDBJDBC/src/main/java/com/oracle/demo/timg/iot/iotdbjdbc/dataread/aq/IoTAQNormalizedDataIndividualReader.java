@@ -178,6 +178,6 @@ public class IoTAQNormalizedDataIndividualReader extends IoTAQNormalizedDataCore
 
 	@Override
 	public String getConfig() {
-		return "Order " + getOrder() + "Read timeout " + aqReadTimeout + " client name " + getAqsubscribername();
+		return "Order " + getOrder() + " Read timeout " + aqReadTimeout + " client name " + getAqsubscribername();
 	}
 }
