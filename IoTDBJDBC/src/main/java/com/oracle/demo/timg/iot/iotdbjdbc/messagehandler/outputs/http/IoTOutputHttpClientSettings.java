@@ -34,57 +34,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.testtools;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import io.micronaut.context.annotation.ConfigurationProperties;
+import lombok.Data;
 
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Requires;
-import jakarta.inject.Singleton;
-import lombok.extern.java.Log;
-
-@Singleton
-@Requires(property = "messagehandler.output.rawdata.textoutput.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.textoutput.order")
-@Log
-public class RawDataTextMessageOutput implements RawDataMessageHandler {
-	private final int order;
-	private final boolean passthrough;
-
-	public RawDataTextMessageOutput(@Property(name = "messagehandler.output.rawdata.textoutput.order") int order,
-			@Property(name = "messagehandler.output.rawdata.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
-		this.order = order;
-		this.passthrough = passthrough;
-	}
-
-	@Override
-	public RawData[] processRawData(RawData input) throws Exception {
-		log.info("RawData is " + input + ", content = " + input.getContentString());
-		RawData results[];
-		// are we acting as a terminator or a step in the process ?
-		if (passthrough) {
-			results = new RawData[1];
-			results[0] = input;
-		} else {
-			results = new RawData[0];
-		}
-		return results;
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	@Override
-	public String getName() {
-		return "Text output handler (raw)";
-	}
-
-	@Override
-	public String getConfig() {
-		return getName() + " order " + getOrder() + " passthrough " + passthrough;
-	}
-
+@ConfigurationProperties(IoTOutputHttpClientSettings.PREFIX)
+@Data
+public class IoTOutputHttpClientSettings {
+	public static final String PREFIX = "messagehandler.output.iotoutputhttpclient";
+	// @Property(name = IoTOutputHttpClientSettings.PREFIX + ".username",
+	// defaultValue = "")
+	private String username;
+	// @Property(name = IoTOutputHttpClientSettings.PREFIX + ".password",
+	// defaultValue = "")
+	private String password;
 }

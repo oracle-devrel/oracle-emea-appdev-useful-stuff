@@ -1,4 +1,4 @@
-/*Copyright (c) 2026 Oracle and/or its affiliates.
+/*Copyright (c) 2025 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,57 +34,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.testtools;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import java.util.Base64;
 
-import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import jakarta.inject.Singleton;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
-@Singleton
-@Requires(property = "messagehandler.output.rawdata.textoutput.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.textoutput.order")
+@ClientFilter(patterns = { "${messagehandler.output.iotoutputhttpclient:/api/v1/iotdata}/**"})
 @Log
-public class RawDataTextMessageOutput implements RawDataMessageHandler {
-	private final int order;
-	private final boolean passthrough;
+public class IoTOutputHttiClientRequestFilter {
+	private final String username;
+	private final String password;
 
-	public RawDataTextMessageOutput(@Property(name = "messagehandler.output.rawdata.textoutput.order") int order,
-			@Property(name = "messagehandler.output.rawdata.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
-		this.order = order;
-		this.passthrough = passthrough;
+	@Inject
+	public IoTOutputHttiClientRequestFilter(IoTOutputHttpClientSettings clientSettings) {
+		this.username = clientSettings.getUsername();
+		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
 	}
 
-	@Override
-	public RawData[] processRawData(RawData input) throws Exception {
-		log.info("RawData is " + input + ", content = " + input.getContentString());
-		RawData results[];
-		// are we acting as a terminator or a step in the process ?
-		if (passthrough) {
-			results = new RawData[1];
-			results[0] = input;
-		} else {
-			results = new RawData[0];
-		}
-		return results;
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.finer("Adding user auth username=" + this.username);
+		request.basicAuth(this.username, this.password);
 	}
 
-	@Override
-	public int getOrder() {
-		return order;
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for IoTOutputHttiClientRequestFilter username=" + this.username);
 	}
-
-	@Override
-	public String getName() {
-		return "Text output handler (raw)";
-	}
-
-	@Override
-	public String getConfig() {
-		return getName() + " order " + getOrder() + " passthrough " + passthrough;
-	}
-
 }

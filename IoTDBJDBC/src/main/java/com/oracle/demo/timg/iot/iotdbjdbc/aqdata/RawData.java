@@ -64,11 +64,15 @@ public class RawData extends IoTDataCore {
 	private String contentType;
 	private String timeReceived;
 
-	public String getContent() {
-		if (MediaType.of(contentType).isTextBased()) {
+	public String getContentString() {
+		if (getMediaType().isTextBased()) {
 			return new String(content);
 		} else {
 			return "Blob data, non next based content type of " + content.length + " bytes";
 		}
+	}
+
+	public MediaType getMediaType() {
+		return MediaType.of(contentType);
 	}
 }

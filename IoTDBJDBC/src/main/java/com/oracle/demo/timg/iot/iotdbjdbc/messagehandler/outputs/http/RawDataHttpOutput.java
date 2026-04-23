@@ -34,39 +34,73 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.testtools;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
+
+import java.util.Base64;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.output.rawdata.textoutput.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.textoutput.order")
+@Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.output.rawdata.httpclient.enabled.order")
 @Log
-public class RawDataTextMessageOutput implements RawDataMessageHandler {
+public class RawDataHttpOutput implements RawDataMessageHandler {
+	private final IoTOutputHttpClient httpClient;
 	private final int order;
-	private final boolean passthrough;
+	private final HttpOutputType type;
 
-	public RawDataTextMessageOutput(@Property(name = "messagehandler.output.rawdata.textoutput.order") int order,
-			@Property(name = "messagehandler.output.rawdata.textoutput.passthrough", defaultValue = "true") boolean passthrough) {
+	@Inject
+	public RawDataHttpOutput(IoTOutputHttpClient httpClient,
+			@Property(name = "messagehandler.output.rawdata.httpclient.enabled.order") int order,
+			@Property(name = "messagehandler.output.rawdata.httpclient.enabled.type", defaultValue = "STRING") HttpOutputType type) {
+		this.httpClient = httpClient;
 		this.order = order;
-		this.passthrough = passthrough;
+		this.type = type;
 	}
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
-		log.info("RawData is " + input + ", content = " + input.getContentString());
-		RawData results[];
-		// are we acting as a terminator or a step in the process ?
-		if (passthrough) {
-			results = new RawData[1];
+		log.finer(() -> "RawData is " + input);
+		switch (type) {
+		case BASE64_BYTES: {
+			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
+			boolean result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
+					input.getContentType(), bodyContent);
+			RawData results[] = new RawData[1];
 			results[0] = input;
+			return results;
+		}
+		case STRING: {
+			if (input.getMediaType().isTextBased()) {
+				boolean result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
+						input.getContentType(), input.getContentString());
+
+				RawData results[] = new RawData[1];
+				results[0] = input;
+				return results;
+			} else {
+				throw new NotAStringBasedMediaType("Media type "+)
+			}
+		}
+		default:
+			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
+			break;
+
+		}
+		return new RawData[0];
+		RawData results[];
+		if (input.getContentType().equalsIgnoreCase(type)) {
+			log.fine(() -> input.getContentType() + " is the same type as  " + type);
+
 		} else {
+			log.fine(() -> input.getContentType() + " is a different type than  " + type);
 			results = new RawData[0];
 		}
 		return results;
@@ -79,12 +113,12 @@ public class RawDataTextMessageOutput implements RawDataMessageHandler {
 
 	@Override
 	public String getName() {
-		return "Text output handler (raw)";
+		return "IoT HTTP Client";
 	}
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " passthrough " + passthrough;
+		return getName() + " order " + getOrder() + " output type " + type;
 	}
 
 }
