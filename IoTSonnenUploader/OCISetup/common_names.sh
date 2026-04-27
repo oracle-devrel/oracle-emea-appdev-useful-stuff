@@ -47,6 +47,9 @@ export DIGITAL_TWIN_ADAPTER_NAME=sonnen-multiple-routes
 # this is the id of the digital twin instance, it will be created if needed, but you can setup your own of course
 export DIGITAL_TWIN_INSTANCE_DEVICE_NAME=timssonnen
 
+# this is used by the additional script for creating a second instance
+export ADDITIONAL_DIGITAL_TWIN_INSTANCE_DEVICE_NAME=additionalsonnen
+
 #these are for the  DB direct connection VCN and VM
 export SSH_PUBLIC_KEY_PATH="$HOME/.ssh/id_rsa.pub" 
 export VCN_NAME="iotdemosvcn"

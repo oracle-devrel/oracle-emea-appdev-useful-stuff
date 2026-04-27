@@ -52,14 +52,23 @@ echo "Got secret $APEX_PASSWORD_SECRET_NAME base 64 contents $IOT_APEX_INITIAL_P
 echo "Configuring APEX access to domain"
 oci iot domain configure-apex-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-workspace-admin-initial-password $IOT_APEX_INITIAL_PASSWORD  --wait-for-state SUCCEEDED --wait-for-state FAILED
 
+export IOT_WORKSPACE="$IOT_DOMAIN_SHORT_ID"__WKSP
+export IOT_SCHEMA="$IOT_DOMAIN_SHORT_ID"__IOT
 #Get the apex URL 
 echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex"
 #get the user id and workspace
-echo APEX_Workspace  "$IOT_DOMAIN_SHORT_ID"__WKSP
-echo APEX_User  "$IOT_DOMAIN_SHORT_ID"__WKSP
-echo APEX_Schema  "$IOT_DOMAIN_SHORT_ID"__IOT
+echo APEX_Workspace  "$IOT_WORKSPACE"
+echo APEX_User  "$IOT_WORKSPACE"
+echo APEX_Schema  "IOT_SCHEMA"
 echo APEX_Password $IOT_APEX_INITIAL_PASSWORD
 
 #  usefull commands
 echo "To access data uploaded using the SQL workbench this command can get the most recent 10 raw data rows"
-echo 'select TIME_RECEIVED, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) from RAW_DATA order by TIME_RECEIVED FETCH FIRST 10 ROWS ONLY'
+echo "SELECT digital_twin_instance_id, endpoint, time_received, content_type, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) as content FROM $IOT_SCHEMA"".RAW_DATA ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY"
+
+
+echo "To access data uploaded using the SQL workbench this command can get the most recent 10 raw data rows"
+echo "SELECT DIGITAL_TWIN_INSTANCE_ID,	ENDPOINT,	utl_raw.cast_to_varchar2(dbms_lob.substr(content)) as CONTENT,	CONTENT_TYPE,	TIME_RECEIVED	REASON_CODE	REASON_MESSAGE $IOT_SCHEMA"".RAW_DATA ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY"
+
+echo "To access data uploaded using the SQL workbench this command can get the most recent 20 snapshot data rows"
+echo "select * from mhamjoes34ocq__IOT.snapshot_DATA order by time_observed DESC FROM $IOT_SCHEMA"".SNAPSHOT_DATA ORDER BY TIME_RECEIVED FETCH FIRST 20 ROWS ONLY"
