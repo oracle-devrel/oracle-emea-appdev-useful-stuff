@@ -4,7 +4,7 @@ source ../OCISetup/common_names.sh
 if [ $# -lt 1 ]
 then
   echo "Using default display name for new digital twin instance of $ADDITIONAL_DIGITAL_TWIN_INSTANCE_DEVICE_NAME"
-echo
+else
   ADDITIONAL_DIGITAL_TWIN_INSTANCE_DEVICE_NAME=$1
   echo "Using specified display name for new digital twin instance of $ADDITIONAL_DIGITAL_TWIN_INSTANCE_DEVICE_NAME"
 fi
