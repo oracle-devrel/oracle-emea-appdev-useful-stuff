@@ -59,16 +59,18 @@ echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex"
 #get the user id and workspace
 echo APEX_Workspace  "$IOT_WORKSPACE"
 echo APEX_User  "$IOT_WORKSPACE"
-echo APEX_Schema  "IOT_SCHEMA"
+echo APEX_Schema  "$IOT_SCHEMA"
 echo APEX_Password $IOT_APEX_INITIAL_PASSWORD
 
 #  usefull commands
 echo "To access data uploaded using the SQL workbench this command can get the most recent 10 raw data rows"
-echo "SELECT digital_twin_instance_id, endpoint, time_received, content_type, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) as content FROM $IOT_SCHEMA"".RAW_DATA ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY"
+echo "SELECT digital_twin_instance_id, endpoint, time_received, content_type, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) AS content FROM $IOT_SCHEMA"".raw_data ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY;"
 
-
-echo "To access data uploaded using the SQL workbench this command can get the most recent 10 raw data rows"
-echo "SELECT DIGITAL_TWIN_INSTANCE_ID,	ENDPOINT,	utl_raw.cast_to_varchar2(dbms_lob.substr(content)) as CONTENT,	CONTENT_TYPE,	TIME_RECEIVED	REASON_CODE	REASON_MESSAGE $IOT_SCHEMA"".RAW_DATA ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY"
+echo "To access data uploaded using the SQL workbench this command can get the most recent 10 rejected data rows"
+echo "SELECT digital_twin_instance_id, endpoint, utl_raw.cast_to_varchar2(dbms_lob.substr(content)) AS content, content_type, time_received,reason_code, reason_message FROM $IOT_SCHEMA"".rejected_data ORDER BY TIME_RECEIVED FETCH FIRST 10 ROWS ONLY;"
 
 echo "To access data uploaded using the SQL workbench this command can get the most recent 20 snapshot data rows"
-echo "select * from mhamjoes34ocq__IOT.snapshot_DATA order by time_observed DESC FROM $IOT_SCHEMA"".SNAPSHOT_DATA ORDER BY TIME_RECEIVED FETCH FIRST 20 ROWS ONLY"
+echo "SELECT * FROM $IOT_SCHEMA"".snapshot_data ORDER BY time_observed DESC FETCH FIRST 20 ROWS ONLY;"
+
+echo "To access data uploaded using the SQL workbench this command can get the most recent 20 history data rows"
+echo "SELECT * FROM $IOT_SCHEMA"".historized_data ORDER BY time_observed DESC,content_path ASC FETCH FIRST 20 ROWS ONLY;"
