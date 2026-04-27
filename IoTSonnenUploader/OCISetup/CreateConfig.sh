@@ -118,7 +118,7 @@ echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/h
 
 echo "To send test data for the configuration using mqttx "
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
-echo mqttx pub -t house/sonnenconfiguration -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"softwareVersion\\\": \\\"1.18.8\\\",\\\"time\\\": $CURRENT_TS}\"
+echo mqttx pub -t house/sonnenconfiguration -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"softwareVersion\\\": \\\"1.18.8\\\",\\\"time\\\": \$CURRENT_TS}\"
 echo "To send text data for the status"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo mqttx pub -t house/sonnenstatus -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"batteryCharging\\\": false,\\\"consumptionAvgWattsLastMinute\\\": 339,\\\"currentBatteryCapacityPercentage\\\": 59,\\\"operatingMode\\\": 2,\\\"reservedBatteryCapacityPercentage\\\": 5,\\\"solarProductionWattsPointInTime\\\": 131,\\\"time\\\": \$CURRENT_TS}\" 

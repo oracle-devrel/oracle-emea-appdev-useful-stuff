@@ -23,7 +23,7 @@ echo Getting OCIDs
 export IOT_DOMAIN_GROUP_OCID=`oci iot domain-group list --display-name $IOT_DOMAIN_GROUP_NAME --compartment-id $IOT_COMPARTMENT_OCID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
 if [[ -n  "$IOT_DOMAIN_GROUP_OCID" ]]
 then
-  echo "Got iotdomaingroup ( $IOT_DOMAIN_GROUP ) ocid, looking for domain"
+  echo "Got iotdomaingroup ( $IOT_DOMAIN_GROUP_NAME ) ocid, looking for domain"
   export IOT_DOMAIN_OCID=`oci iot domain list --display-name $IOT_DOMAIN_NAME --compartment-id $IOT_COMPARTMENT_OCID --iot-domain-group-id $IOT_DOMAIN_GROUP_OCID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE" or ."lifecycle-state" == "FAILED") | ."id"'`
 else 
   echo "Can't locate IOT domain group so can't locate iot domain"
@@ -109,7 +109,7 @@ echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/h
 
 echo "To send test data for the configuration using mqttx but no device specific endpoint"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
-echo mqttx pub -t house/sonnenconfiguration -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"softwareVersion\\\": \\\"1.18.8\\\",\\\"time\\\": $CURRENT_TS}\"
+echo mqttx pub -t house/sonnenconfiguration -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"softwareVersion\\\": \\\"1.18.8\\\",\\\"time\\\": \$CURRENT_TS}\"
 echo "To send text data for the status"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo mqttx pub -t house/sonnenstatus -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"batteryCharging\\\": false,\\\"consumptionAvgWattsLastMinute\\\": 339,\\\"currentBatteryCapacityPercentage\\\": 59,\\\"operatingMode\\\": 2,\\\"reservedBatteryCapacityPercentage\\\": 5,\\\"solarProductionWattsPointInTime\\\": 131,\\\"time\\\": \$CURRENT_TS}\" 
