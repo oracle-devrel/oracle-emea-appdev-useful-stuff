@@ -109,11 +109,17 @@ export DIGITAL_TWIN_INSTANCE_SECRET_BASE64=`oci secrets secret-bundle get --secr
 export DIGITAL_TWIN_INSTANCE_SECRET=`echo $DIGITAL_TWIN_INSTANCE_SECRET_BASE64 | base64 --decode`
 export DIGITAL_TWIN_INSTANCE_CREDENTIALS="$DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY":"$DIGITAL_TWIN_INSTANCE_SECRET"
 echo "Digital twin instance credentials $DIGITAL_TWIN_INSTANCE_CREDENTIALS"
-echo "To send test data for the configuration"
+echo "To send test data for the configuration using https"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/house/sonnenconfiguration/$DIGITAL_TWIN_INSTANCE_DEVICE_NAME\" -H \'Content-Type: application/json\' -d \"{\\\"softwareVersion\\\": \\\"1.18.4\\\",\\\"time\\\": \$CURRENT_TS}\"
 echo "To send text data for the status"
 echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo curl -u \"$DIGITAL_TWIN_INSTANCE_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/house/sonnenstatus/$DIGITAL_TWIN_INSTANCE_DEVICE_NAME\" -H \'Content-Type: application/json\' -d \"{\\\"batteryCharging\\\": false,\\\"consumptionAvgWattsLastMinute\\\": 339,\\\"currentBatteryCapacityPercentage\\\": 59,\\\"operatingMode\\\": 2,\\\"reservedBatteryCapacityPercentage\\\": 5,\\\"solarProductionWattsPointInTime\\\": 131,\\\"time\\\": \$CURRENT_TS}\"
 
- 
+echo "To send test data for the configuration using mqttx "
+echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
+echo mqttx pub -t house/sonnenconfiguration -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"softwareVersion\\\": \\\"1.18.8\\\",\\\"time\\\": $CURRENT_TS}\"
+echo "To send text data for the status"
+echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
+echo mqttx pub -t house/sonnenstatus -ct application/json  -u $DIGITAL_TWIN_INSTANCE_EXTERNAL_KEY -P $DIGITAL_TWIN_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"batteryCharging\\\": false,\\\"consumptionAvgWattsLastMinute\\\": 339,\\\"currentBatteryCapacityPercentage\\\": 59,\\\"operatingMode\\\": 2,\\\"reservedBatteryCapacityPercentage\\\": 5,\\\"solarProductionWattsPointInTime\\\": 131,\\\"time\\\": \$CURRENT_TS}\" 
+
