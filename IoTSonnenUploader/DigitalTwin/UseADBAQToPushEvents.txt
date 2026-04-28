@@ -1,0 +1,70 @@
+The Database and hence ADB has a feature called AQ (short for advanced queues one presumes) that can be used to provide a pub / sub model for iot events as they arrive.
+The IoT documentation details are at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/stream-normalized-queue.htm
+Oracle is also developing an AQ subscriber for Node Red, this project is at https://github.com/oracle-samples/node-red-nodes
+There is documentation on using python to dequeue the messages here https://python-oracledb.readthedocs.io/en/latest/user_guide/aq.html#
+also examples at https://github.com/oracle-samples/oci-iot-samples/tree/main/samples/python/queues
+
+Note that to do this you need to have the rights to do a direct DB connection - see https://github.com/oracle-samples/oci-iot-samples/blob/main/samples/python/query-db/README.md
+
+When the IOT DB Schema is configured as the service is setup the AQ queues for raw (in & out), rejected and normalized data are automatrically setup, all that's needed to handle this data is to have a subscriber identified and then for it to connect
+
+from the python example:
+
+The following queues are available:
+
+| Queue name       | Data type             | Description                      |
+| ---------------- | --------------------- | -------------------------------- |
+| raw_data_in      | raw_data_in_type      | Incoming raw messages            |
+| raw_data_out     | raw_data_out_type     | Outgoing raw messages (commands) |
+| normalized_data  | JSON                  | Normalized data                  |
+| rejected_data_in | rejected_data_in_type | Rejected incoming messages       |
+
+The `normalized_data` queues is a JSON queue, while the others use an Abstract Data Type
+(ADT).
+
+
+Nore = if using the python version as of 4th march 2026 there was a bug in the oracle driver, this may well have been fixed, but if not here's the diff
+Patch to apply to oci_tokens.py  (in site-packages/oracledb/plugins )
+--- oci_tokens.py.orig	2025-12-16 15:39:58.072445580 +0100
++++ oci_tokens.py	2025-12-16 15:45:52.644953047 +0100
+@@ -46,6 +46,8 @@
+         return _simple_authentication(token_auth_config)
+     elif auth_type == "instanceprincipal":
+         return _instance_principal_authentication(token_auth_config)
++    elif auth_type == "securitytoken":
++        return _security_token_authentication(token_auth_config)
+     else:
+         raise ValueError(
+             f"Unrecognized auth_type authentication method {user_auth_type}"
+@@ -153,6 +155,31 @@
+     return _generate_access_token(client, token_auth_config)
+
+
++def _security_token_authentication(token_auth_config):
++    """
++    Session token authentication
++    """
++    file_location = token_auth_config.get(
++        "file_location", oci.config.DEFAULT_LOCATION
++    )
++    profile = token_auth_config.get("profile", oci.config.DEFAULT_PROFILE)
++
++    # Load OCI config
++    config = oci.config.from_file(file_location, profile)
++
++    # Read key file
++    token_file = config["security_token_file"]
++    token = None
++    with open(token_file, "r") as f:
++        token = f.read()
++    private_key = oci.signer.load_private_key_from_file(config["key_file"])
++
++    client = oci.identity_data_plane.DataplaneClient(
++        config=config,
++        signer=oci.auth.signers.SecurityTokenSigner(token, private_key))
++    return _generate_access_token(client, token_auth_config)
++
++
+ def oci_token_hook(params: oracledb.ConnectParams):
+     """
+     OCI-specific hook for generating a token.

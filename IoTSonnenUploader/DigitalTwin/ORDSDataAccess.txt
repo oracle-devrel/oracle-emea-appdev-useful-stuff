@@ -1,4 +1,13 @@
 setup ORDS data access as described in the documentation at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-iot-ords.htm
+# Critical things to note
+# unclear which, but I could only get this to work if the domain was in the same compartment as the iot service AND MFA was disabled. 
+# needs further testing, but possible the domain also needs to be in the home region (in which case you need to enable replication and  replicate it to the region you're running in)
+
+# the replication MUST be setup before you try and get a token if you're not in the home region)
+#
+# the Client SECRET (IOT_ORDS_OAUTH_SECRET below) MUST be unencoded, NOT base64 as the docs say
+# the command to get the token MUST be the one below, ( the one in the docs used GET not POST and --data-urlencoded, not --data though it needs testing to see if --data-urlencoded would work )
+
 
 # get the various system values from the setup and use them here
 # sub steps are from "Step 1: Create a Confidential Application for your Identity Domain"
@@ -19,6 +28,7 @@ oci iot domain configure-ords-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-
 # this uses the above to get the token and so on
 export IOT_IDENTITY_DOMAIN_HOST_SHORT=`echo $IOT_IDENTITY_DOMAIN_HOST | tr '.' ' ' | awk '{print $1}'`
 export IOT_IDENTITY_DOMAIN_URL=https://$IOT_IDENTITY_DOMAIN_HOST:443/oauth2/v1/token
+
 # the IOT_DOMAIN_GROUP_SHORT_ID and IOT_DOMAIN_SHORT_ID were set in the Instructions.txt 
 export IOT_ORDS_AUTH_DETAILS=`curl -s --request POST --url "${IOT_IDENTITY_DOMAIN_URL}" --header 'Content-Type: application/x-www-form-urlencoded'  --user "${IOT_ORDS_OAUTH_ID}:${IOT_ORDS_OAUTH_SECRET}"   --data "scope=/${IOT_DOMAIN_GROUP_SHORT_ID}/iot/${IOT_DOMAIN_SHORT_ID}"   --data "grant_type=password"   --data "username=${IOT_ORDS_IDCS_USERNAME}"  --data "password=${IOT_ORDS_IDCS_PASSWORD}"`
 export IOT_ORDS_AUTH_ACCESS_TOKEN=`echo $IOT_ORDS_AUTH_DETAILS | jq -r '.access_token'`

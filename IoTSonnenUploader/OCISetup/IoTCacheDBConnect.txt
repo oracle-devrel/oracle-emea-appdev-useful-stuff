@@ -1,0 +1,17 @@
+(description=
+  (retry_count=20)
+  (retry_delay=3)
+  (address=
+    (protocol=tcps)
+    (port=1521)
+    (host=adb.uk-london-1.oraclecloud.com)
+  )
+  (connect_data=(service_name=g896eaa614b05d8_zgadzmoftnvhy_low.adb.oraclecloud.com))
+  (security=
+    (ssl_server_dn_match=yes)
+    (password_auth=OCI_TOKEN)
+    (oci_iam_url=https://auth.uk-london-1.oraclecloud.com/v1/actions/generateScopedAccessBearerToken)
+    (oci_tenancy=ocid1.tenancy.oc1..aaaaaaaa4wptnxymnypvjjltnejidchjhz6uimlhru7rdi5qb6qlnmrtgu3a)
+    (oci_compartment=ocid1.compartment.oc1..aaaaaaaakepwnl3nox7xbfxmw5j6f742vhf5aoccoo6iknq5ttzww4njrf2q)
+  )
+)

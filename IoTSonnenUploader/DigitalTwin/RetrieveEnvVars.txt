@@ -16,7 +16,7 @@ export DEVICE_VAULT_SECRET_OCID=<the secret ocid>
 # change these names as required
 export IOT_DOMAIN_GROUP_NAME=iot-domain-group-timg
 export IOT_DOMAIN_NAME=iot-domain-timg
-export DEVICE_ID=timssonnen
+export DIGITAL_TWIN_INSTANCE_DEVICE_NAME=timssonnen
 # note that this is set for homebattery (the generic model), but it might well be sonnenbattery for the sonnen specific model
 export DIGITAL_TWIN_MODEL_NAME=homebattery
 # DIGITAL_TWIN_MODEL_FILE_NAME should be the name of the file containing the model for example HomeBatteryDTMI.json for the generic home battery, SonnenSpecificDTMI.json for the sonnen specific version
@@ -47,7 +47,7 @@ export DIGITAL_TWIN_ADAPTER_OCID=`oci iot digital-twin-adapter  list --iot-domai
 # the digital twin instance itself
 # this can work if there is not a model or adaptor configured
 # get the OCID of the digital twin
-export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DEVICE_ID | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+export DIGITAL_TWIN_INSTANCE_OCID=`oci iot digital-twin-instance list --iot-domain-id $IOT_DOMAIN_OCID --display-name $DIGITAL_TWIN_INSTANCE_DEVICE_NAME | jq -r '.data.items[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
 # and the external key
 export DEVICE_EXTERNAL_KEY=`oci iot digital-twin-instance get --digital-twin-instance-id  $DIGITAL_TWIN_INSTANCE_OCID | jq -r  '.data."external-key"'`
 echo Device external key $DEVICE_EXTERNAL_KEY

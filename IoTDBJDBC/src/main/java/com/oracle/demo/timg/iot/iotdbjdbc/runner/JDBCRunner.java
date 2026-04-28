@@ -1,0 +1,174 @@
+/*Copyright (c) 2026 Oracle and/or its affiliates.
+
+The Universal Permissive License (UPL), Version 1.0
+
+Subject to the condition set forth below, permission is hereby granted to any
+person obtaining a copy of this software, associated documentation and/or data
+(collectively the "Software"), free of charge and under any and all copyright
+rights in the Software, and any and all patent rights owned or freely
+licensable by each licensor hereunder covering either (i) the unmodified
+Software as contributed to or provided by such licensor, or (ii) the Larger
+Works (as defined below), to deal in both
+
+(a) the Software, and
+(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+one is included with the Software (each a "Larger Work" to which the Software
+is contributed by such licensors),
+
+without restriction, including without limitation the rights to copy, create
+derivative works of, display, perform, and distribute the Software and make,
+use, sell, offer for sale, import, export, have made, and have sold the
+Software and the Larger Work(s), and to sublicense the foregoing rights on
+either these or other terms.
+
+This license is subject to the following condition:
+The above copyright notice and either this complete permission notice or at
+a minimum a reference to the UPL must be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+package com.oracle.demo.timg.iot.iotdbjdbc.runner;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.dataread.IoTDBClient;
+
+import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
+
+@Singleton
+@Log
+/*
+ * Using the @Context annotation is general a bad thing as it will force the
+ * instantiation at start up, not using lazy instantiation.
+ * 
+ * Of course we could tell micronaut to instantiate all the @Singleton beans it
+ * controls which would have the same effect, but this way we know for certain
+ * it's going to be started
+ */
+@Context
+public class JDBCRunner {
+
+	private final List<IoTDBClient> ioTDBClients;
+	// we only want a single thread to call things later on
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+	private final int aqRuntime;
+
+	private final List<IoTDBClient> configuredClients;
+
+	public JDBCRunner(List<IoTDBClient> ioTDBClients, @Property(name = "datasources.default.url") String url,
+			@Property(name = "iotdatacache.schemaname") String schemaName,
+			@Property(name = "datasources.default.username", defaultValue = "") String username,
+			@Property(name = "datasources.default.password", defaultValue = "") String password,
+			@Property(name = "iotdatacache.aqruntime", defaultValue = "0") int aqRuntime) {
+		log.info("Using URL " + url);
+		log.info("Will use IOT Schema named " + schemaName);
+		log.info("username is :" + username + ":");
+		log.info("password is :" + password + ":");
+		log.info("aqRuntime is :" + aqRuntime + ":");
+
+		this.aqRuntime = aqRuntime;
+		this.ioTDBClients = ioTDBClients.stream().sorted().toList();
+		String iotDBClientDetails = this.ioTDBClients.stream()
+				.map(client -> client.getName() + "(" + client.getConfig() + ")").collect(Collectors.joining(", "));
+		log.info("There are " + this.ioTDBClients.size() + " IoTDBClients configured - " + iotDBClientDetails);
+		// place to put the clients we have started
+		configuredClients = new ArrayList<>(ioTDBClients.size());
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) throws SQLException, Exception {
+		// get the clients running
+		executor.execute(() -> configureAndStartDBClients());
+		// if there is a time limit then schedule a shutdown
+		if (aqRuntime > 0) {
+			executor.schedule(() -> {
+				stopAndUnconfigureDBClients();
+				// get the executor itself to shutdown when we've exited this call
+				executor.shutdown();
+			}, aqRuntime, TimeUnit.SECONDS);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void configureAndStartDBClients() {
+		log.info("Configuring all the clients");
+		ioTDBClients.stream().forEach(client -> {
+			log.info("Configuring client " + client.getName());
+			try {
+				client.configureDBClient();
+				// stash it away for the next stage
+				configuredClients.add(client);
+				log.info("Configured client " + client.getName());
+			} catch (Exception e) {
+				log.info("Exception configuring client " + client.getName() + " with configuration "
+						+ client.getConfig() + ", " + e.getLocalizedMessage());
+			}
+		});
+
+		log.info("Starting processing of the clients");
+		configuredClients.stream().forEach(client -> {
+			log.info("Starting processing for client " + client.getName());
+			try {
+				client.startDBProcessing();
+				// stash it away for the next stage
+				configuredClients.add(client);
+				log.info("Configured client " + client.getName());
+			} catch (Exception e) {
+				log.info("Exception configuring client " + client.getName() + " with configuration "
+						+ client.getConfig() + ", " + e.getLocalizedMessage());
+			}
+		});
+	}
+
+	/**
+	 * 
+	 */
+	protected void stopAndUnconfigureDBClients() {
+		log.info("Stopping all the clients");
+		configuredClients.stream().forEach(client -> {
+			log.info("Stopping client processing" + client.getName());
+			try {
+				client.stopDBProcessing();
+				log.info("Stopped client " + client.getName());
+			} catch (Exception e) {
+				log.info("Exception stopping client " + client.getName() + " with configuration " + client.getConfig()
+						+ ", " + e.getLocalizedMessage());
+			}
+		});
+
+		log.info("Unconfiguring the clients");
+		configuredClients.stream().forEach(client -> {
+			log.info("Unconfiguring client " + client.getName());
+			try {
+				client.unconfigureDBClient();
+				// stash it away for the next stage
+				configuredClients.add(client);
+				log.info("Unconfigured client " + client.getName());
+			} catch (Exception e) {
+				log.info("Exception unconfigured client " + client.getName() + " with configuration "
+						+ client.getConfig() + ", " + e.getLocalizedMessage());
+			}
+		});
+	}
+}

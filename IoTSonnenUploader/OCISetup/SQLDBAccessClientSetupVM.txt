@@ -1,0 +1,26 @@
+once VM is in place and you're connected using the bastion
+install java and maven to allow for compilation as well as the sqlcl command
+we also need git to get the code itself
+sudo dnf install java-21-openjdk-devel --assumeyes
+sudo dnf install maven -assumeyes
+sudo dnf install git-all --assumeyes
+wget https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+unzip sqlcl-latest.zip
+
+use the oci cli to get the token you get the scope from the iot domain group -> data access -> database token scope page (It's NOT the same as the iot domain groups compartment)
+
+ oci iam db-token get --auth instance_principal --scope urn:oracle:db::id::ocid1.compartment.oc1..<rest of compartment id>
+ 
+
+use the oci cli to setup the DB access token (this is NOT the compartment id, but the database connect string on the iot domain group page - will need to 
+remove the retry info and add the token name if using the sqlcl from above (or at least escape the & in the string it gives you)e.g. 
+
+ ./bin/sql /@"jdbc:oracle:thin:@tcps:adb.uk-london-1.oraclecloud.com:1521/<stuff>_low.adb.oraclecloud.com?TOKEN_AUTH=OCI_TOKEN"
+ 
+in the sql you ae in the domain group (__WKSP) schema, you want to be in the __IOT one to manage the data otherwise yoiu have to prefix the iot schema name to every table.
+alter session set current_schema=<Iot domain short id>__iot 
+e.g.
+alter session set current_schema=yieh4avra3mt2__iot 
+
+now you can just query the data e.g.
+select * from snapshot_data ;

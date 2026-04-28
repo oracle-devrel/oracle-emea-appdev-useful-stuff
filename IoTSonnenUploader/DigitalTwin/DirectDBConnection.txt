@@ -1,0 +1,56 @@
+based on instructions at https://docs.oracle.com/en-us/iaas/Content/internet-of-things/connect-database.htm
+
+
+The script below is AI generated, just be warned
+
+#!/bin/bash
+
+# --- Configuration ---
+# the get_oci_compartment_ocid.sh script is in the OCI setup folder, but I use it so much it's also in my bin directory
+COMPARTMENT_PATH=/domain-specialists/tim.graves/iot
+COMPARTMENT_ID=`get_oci_compartment_ocid.sh $COMPARTMENT_PATH`
+SSH_PUBLIC_KEY_PATH="$HOME/.ssh/id_rsa.pub" 
+VCN_NAME="IoT_Project_VCN"
+VCN_CIDR="10.0.0.0/16"
+SUBNET_CIDR="10.0.1.0/24"
+
+# --- 1. Network Infrastructure ---
+SERVICE_ID=$(oci network service list --query "data[?contains(name, 'All ')].id | [0]" --raw-output)
+VCN_ID=$(oci network vcn create --compartment-id "$COMPARTMENT_ID" --display-name "$VCN_NAME" --cidr-block "$VCN_CIDR" --query "data.id" --raw-output)
+IG_ID=$(oci network internet-gateway create --compartment-id "$COMPARTMENT_ID" --vcn-id "$VCN_ID" --display-name "IGW" --is-enabled true --query "data.id" --raw-output)
+SG_ID=$(oci network service-gateway create --compartment-id "$COMPARTMENT_ID" --vcn-id "$VCN_ID" --display-name "SG" --services "[{\"serviceId\":\"$SERVICE_ID\"}]" --query "data.id" --raw-output)
+
+# --- 2. Security List with VCN-Wide DB Egress ---
+SL_ID=$(oci network security-list create \
+    --compartment-id "$COMPARTMENT_ID" \
+    --vcn-id "$VCN_ID" \
+    --display-name "VCN_Wide_DB_Security" \
+    --egress-security-rules "[
+        {\"destination\":\"0.0.0.0/0\",\"protocol\":\"all\",\"description\":\"Allow all outbound for internet/updates\"},
+        {\"destination\":\"$VCN_CIDR\",\"protocol\":\"6\",\"tcpOptions\":{\"destinationPortRange\":{\"max\":1522,\"min\":1521}},\"description\":\"Allow DB access to any resource in the VCN\"}
+    ]" \
+    --ingress-security-rules "[
+        {\"source\":\"0.0.0.0/0\",\"protocol\":\"6\",\"tcpOptions\":{\"destinationPortRange\":{\"max\":22,\"min\":22}},\"description\":\"Public SSH Access\"},
+        {\"source\":\"$SUBNET_CIDR\",\"protocol\":\"6\",\"tcpOptions\":{\"destinationPortRange\":{\"max\":1522,\"min\":1521}},\"description\":\"Allow DB traffic from this subnet\"}
+    ]" --query "data.id" --raw-output)
+
+# --- 3. Routing and Subnet ---
+PUB_RT_ID=$(oci network route-table create --compartment-id "$COMPARTMENT_ID" --vcn-id "$VCN_ID" --display-name "Public_RT" --route-rules "[{\"cidrBlock\":\"0.0.0.0/0\",\"nextHopIds\":\"$IG_ID\"}]" --query "data.id" --raw-output)
+PUB_SUBNET_ID=$(oci network subnet create --compartment-id "$COMPARTMENT_ID" --vcn-id "$VCN_ID" --display-name "IoT_Subnet" --cidr-block "$SUBNET_CIDR" --route-table-id "$PUB_RT_ID" --security-list-ids "[\"$SL_ID\"]" --query "data.id" --raw-output)
+
+# --- 4. Compute Instance ---
+AD_NAME=$(oci iam availability-domain list --compartment-id "$COMPARTMENT_ID" --query "data[0].name" --raw-output)
+IMAGE_ID=$(oci compute image list --compartment-id "$COMPARTMENT_ID" --operating-system "Oracle Linux" --operating-system-version "8" --shape "VM.Standard.E2.1.Micro" --query "data[0].id" --raw-output)
+
+INSTANCE_ID=$(oci compute instance launch \
+    --compartment-id "$COMPARTMENT_ID" \
+    --availability-domain "$AD_NAME" \
+    --display-name "Micronaut_App_VM" \
+    --image-id "$IMAGE_ID" \
+    --shape "VM.Standard.E2.1.Micro" \
+    --subnet-id "$PUB_SUBNET_ID" \
+    --assign-public-ip true \
+    --ssh-authorized-keys-file "$SSH_PUBLIC_KEY_PATH" \
+    --query "data.id" --raw-output)
+
+echo "✅ Deployment Complete. The VM can now initiate connections to any DB on ports 1521-1522 within $VCN_CIDR."

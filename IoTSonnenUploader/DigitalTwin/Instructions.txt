@@ -58,7 +58,7 @@ export IOT_APEX_INITIAL_PASSWORD=<your password>
 oci iot domain configure-apex-data-access --iot-domain-id $IOT_DOMAIN_OCID --db-workspace-admin-initial-password $IOT_APEX_INITIAL_PASSWORD  --wait-for-state SUCCEEDED --wait-for-state FAILED
 
 #Get the apex URL 
-echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex/"
+echo APEX_URL "https://$IOT_DOMAIN_GROUP_DATA_HOST/ords/apex"
 #get the user id and workspace
 echo APEX_Workspace  "$IOT_DOMAIN_SHORT_ID"__WKSP
 echo APEX_User  "$IOT_DOMAIN_SHORT_ID"__WKSP
@@ -292,7 +292,7 @@ oci iot digital-twin-instance get-content  --digital-twin-instance-id $DIGITAL_T
 
 but what if we want to send a command to the IOT service to pass on to the device, for example changing it's configuration? In the data you'll have seen the telemetry value CommandDemoPlaceholder with the value "CommandTestPlaceholder" let's use MQTT to change that. 
 
-Before you do this you **MUST** ensure that the client is running as it sets up  subscription to the mqtt server, without that then the mqtt topics used to send the command and receive the do not exist and the request will be rejected by the IOT Service.
+Before you do this you **MUST** ensure that the client is running as it sets up  subscription to the mqtt server, without that then the mqtt topics used to send the command and receive the do not exist and the request will be rejected by the IOT Service. It is possible to have the client register to the command topic with clean session / clean start set to false in which case once registered the server will hold outgoing messages until the client connects again (and in doing so will maintain it's knowledge of the clients topic)
 
 While it's running look at the output and check that the CommandDemoPlaceholder is set to the default, do this using the output of the client OR the SQL interface or by getting the content of the instance :
 oci iot digital-twin-instance get-content  --digital-twin-instance-id $DIGITAL_TWIN_INSTANCE_OCID | jq -r '.data'

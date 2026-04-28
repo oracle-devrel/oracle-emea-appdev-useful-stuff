@@ -53,7 +53,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
 
-@Client(id = "iotservicehttps", path = "/home")
+@Client(id = "iotservicehttps", path = "/house")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 @Header(name = ACCEPT, value = "application/json")
 @Requires(property = DeviceSettings.PREFIX + ".id")

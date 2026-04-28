@@ -68,7 +68,7 @@
 			],
 			"displayName": "Battery Is Charging",
 			"name": "BatteryCharging",
-			"schema": "string"
+			"schema": "boolean"
 		},
 		{
 			"@type": [

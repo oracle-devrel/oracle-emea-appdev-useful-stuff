@@ -1,6 +1,6 @@
 [
 	{
-		"condition": "${endpoint(2) == \"sonnenstatus\"}",
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"sonnenstatus\"}",
 		"description": "Handle status messages",
 		"reference-payload": {
 			"dataFormat": "JSON",
@@ -37,7 +37,7 @@
 		}
 	},
 	{
-		"condition": "${endpoint(2) == \"sonnenconfiguration\"}",
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"sonnenconfiguration\"}",
 		"description": "Handle configuration messages",
 		"reference-payload": {
 			"dataFormat": "JSON",
