@@ -1,5 +1,5 @@
 {
-  "reference-endpoint": "house/sonnen/status",
+  "reference-endpoint": "house/sonnenstatus",
   "reference-payload": {
          "data": {
            "batteryCharging": false,
