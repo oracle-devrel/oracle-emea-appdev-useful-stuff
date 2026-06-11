@@ -181,15 +181,16 @@ public abstract class DeviceModelMessageFilterCore implements MessageHandler {
 		}
 		log.fine(() -> "instance is unknown retrieving its model, " + instanceId);
 		// we don't know about it, using the device ID query the DB to get the model id
-		String instanceModelId;
+		String instanceModelIdTemp = null;
 		try {
-			instanceModelId = getModelIdFromInstanceId(instanceId);
+			instanceModelIdTemp = getModelIdFromInstanceId(instanceId);
 		} catch (SQLException e) {
 			log.warning("SQLException locating instances model id for model " + instanceId + ", "
 					+ e.getLocalizedMessage());
-			instanceModelId = null;
 		}
-		// can't use a lambda here as instanceModelId is
+		// can't use a lambda for the debugging unless we do this as instanceModelId
+		// must be final
+		String instanceModelId = instanceModelIdTemp;
 		log.fine("instance has model id, " + instanceModelId);
 		if (instanceModelId == null) {
 			// no model id found, this I guess is possible for an instance that is not
