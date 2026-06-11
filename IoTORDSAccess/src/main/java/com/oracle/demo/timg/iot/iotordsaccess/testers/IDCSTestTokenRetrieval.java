@@ -57,9 +57,6 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = "iot.idcs.test-token-retrieval", value = "true", defaultValue = "false")
 public class IDCSTestTokenRetrieval {
-	@Inject
-	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRequest;
-
 	private int counter = 0;
 	@Inject
 	private IDCSOAuthApplicationTokenRetriever idcsoAuthApplicationTokenRetriever;
