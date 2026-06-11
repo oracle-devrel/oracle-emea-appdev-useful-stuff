@@ -9,12 +9,34 @@ This is example code only, it is not in any way an Oracle product, supported, an
 The short version is that it listens for data requests coming in, and will send them to the iot service using the https connection, if required creating a new digital twin instance. There are pluggable mechanisms for transforming the incoming device id and payload if needed. While the code does try and ensure that digital twin instance (and associated resources) creation along with data upload does happen in the right order there are some possible race situations when a large number of events are submitted in a sort time on a digital twin that needs creating, so use of this code in a production environment is not a good idea. Additionally it holds the various queues it uses internally in memory, so in the event of a failure of the application or JVM that datw will be lost, it's recommended that anyone implementing a real gateway themselves use some form of genuine persistence mechanism to ensure that data is not lost in the event of a failure of the code or it's runtime.
 
 ##Testing
-There is an associated project called IotDemoGatewayClient that provides a simple way to send test data to this demo gateway (using some demo digital twin models / adapters). This uses 
+There is an associated project called IotDemoGatewayClient that provides a simple way to send test data to this demo gateway (using some demo digital twin models / adapters). This uses REST to send JSON or XML (to demonstrate the conversion approaches).
 
 ##How it works
 Please see the configuration properties section later on to understand the various settings in the configuration file.
 
-This makes use of the Micronaut AOP approach to dynamically construct and inject instances of classes under the control of property files. For example in this code the device id transforms implement the InstanceKeyTransformer interface, but the creation of an instance can be controlled using the `@Required` annotation to only create an instance if a property is set to enable it. A list of create instances is then injected into a management class, which orders them as required (in the examples provided this is done using a configuration property to allow you to change the order easily) then when a transformation is needed they instance key transformers are called in the specified order, for example converting to lower case and then from my_key_identifier to myKeyIdentifier (reversing the order would result in a different outcome of mykeyidentifier). By using this approach it's possible for other developers to add additional transformer and insert them into the sequence in the right order for your use case without modifying anything other than the config.yml file and ensuring that their transformer classes are in the class path.
+This makes use of Micronaut's dynamic dependency injection to construct the transformation pipeline from the configuration file. The gateway has two transformer chains:
+
+- external key transformers implement `InstanceKeyTransformer` and reformat the incoming device or instance key before it is used as the IoT digital twin external key.
+- payload transformers implement `EventDataTransformer` and reformat the event payload before it is uploaded to the IoT service.
+
+Each transformer implementation is a Micronaut `@Singleton` bean guarded by an `@Requires` annotation. The `@Requires` annotation checks a configuration property, so a transformer is only created when its `.enabled` property is set to `true`. If the property is missing or set to `false`, Micronaut does not create that transformer bean and it is not injected into the application.
+
+For external keys, the current transformer beans are enabled with properties such as:
+
+- `gateway.instance.keytransformer.passthrough.enabled=true`
+- `gateway.instance.keytransformer.tolowercase.enabled=true`
+- `gateway.instance.keytransformer.snakecasetocamelcase.enabled=true`
+
+For payloads, the current transformer beans are enabled with properties such as:
+
+- `gateway.eventdatatransformer.passthrough.enabled=true`
+- `gateway.eventdatatransformer.xmlinputtojsonoutput.enabled=true`
+
+The two transformer services, `InstanceKeyTransformService` and `EventDataTransformService`, receive Micronaut-injected `List<InstanceKeyTransformer>` and `List<EventDataTransformer>` values containing only the enabled transformer beans. Each service sorts its list using the transformer's configured `.order` property, such as `gateway.instance.keytransformer.tolowercase.order` or `gateway.eventdatatransformer.xmlinputtojsonoutput.order`, then applies the transformers in sequence. The output of one transformer becomes the input to the next. For example, an external key can first be converted to lower case and then converted from `my_key_identifier` to `myKeyIdentifier`. Reversing the configured order would produce a different result, because each transformer sees the output of the previous one.
+
+If no transformer beans are enabled for a chain, the injected list is empty and the service returns the original value unchanged. This means the gateway can run with no external key or payload transformation, or with any configured combination of transformers, without code changes.
+
+`EventQueueProcessor` uses both services while processing queued events. It first transforms the incoming instance key into the external key used to locate or create the digital twin instance. It then transforms the payload before uploading the event. By adding another class that implements `InstanceKeyTransformer` or `EventDataTransformer`, annotating it with `@Singleton` and suitable `@Requires` properties, and putting it on the class path, developers can add new transformations and place them in the chain using only configuration.
 
 To minimize the number of round trips to the OCI API several caches are used, in practice this is not likely to be an issue, but people using this as an example should be aware that there is a potential for cache inconsistency if for example the secret holving the devices credentials is changes and code it not implemented to update (or invalidate) the cache entries. Also if a highly secure environment is needed caching credentials in memory in the JVM is probably not the best option form a security perspective (But for a demo showing a concept it's fine as long as you're aware of it).
 

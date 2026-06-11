@@ -43,10 +43,8 @@ import lombok.Data;
 @Data
 public class IoTOutputHttpClientSettings {
 	public static final String PREFIX = "messagehandler.output.iotoutputhttpclient";
-	// @Property(name = IoTOutputHttpClientSettings.PREFIX + ".username",
-	// defaultValue = "")
+	// as we are operating as a configuration then the fields are set based on the
+	// config tree
 	private String username;
-	// @Property(name = IoTOutputHttpClientSettings.PREFIX + ".password",
-	// defaultValue = "")
 	private String password;
 }

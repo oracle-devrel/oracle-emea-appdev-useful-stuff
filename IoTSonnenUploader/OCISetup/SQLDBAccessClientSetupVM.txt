@@ -1,4 +1,6 @@
-once VM is in place and you're connected using the bastion
+Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to enable the basion agent)
+
+once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
 install java and maven to allow for compilation as well as the sqlcl command
 we also need git to get the code itself
 sudo dnf install java-21-openjdk-devel --assumeyes
@@ -17,7 +19,7 @@ remove the retry info and add the token name if using the sqlcl from above (or a
 
  ./bin/sql /@"jdbc:oracle:thin:@tcps:adb.uk-london-1.oraclecloud.com:1521/<stuff>_low.adb.oraclecloud.com?TOKEN_AUTH=OCI_TOKEN"
  
-in the sql you ae in the domain group (__WKSP) schema, you want to be in the __IOT one to manage the data otherwise yoiu have to prefix the iot schema name to every table.
+in the sql you are in the domain group (__WKSP) schema, you want to be in the __IOT one to manage the data otherwise you will have to prefix the iot schema name to every table.
 alter session set current_schema=<Iot domain short id>__iot 
 e.g.
 alter session set current_schema=yieh4avra3mt2__iot 

@@ -55,53 +55,53 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 	private final IoTOutputHttpClient httpClient;
 	private final int order;
 	private final HttpOutputType type;
+	private final boolean sentDataIsCompleted;
 
 	@Inject
 	public RawDataHttpOutput(IoTOutputHttpClient httpClient,
-			@Property(name = "messagehandler.output.rawdata.httpclient.enabled.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.enabled.type", defaultValue = "STRING") HttpOutputType type) {
+			@Property(name = "messagehandler.output.rawdata.httpclient.order") int order,
+			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
+			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;
+		this.sentDataIsCompleted = sentDataIsCompleted;
 	}
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
 		log.finer(() -> "RawData is " + input);
+		boolean result;
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
-			boolean result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
+			result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
 					input.getContentType(), bodyContent);
-			RawData results[] = new RawData[1];
-			results[0] = input;
-			return results;
+			break;
 		}
 		case STRING: {
 			if (input.getMediaType().isTextBased()) {
-				boolean result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
+				result = httpClient.postRawDataAsString(input.getDigitalTwinInstanceId(), input.getEndpoint(),
 						input.getContentType(), input.getContentString());
-
-				RawData results[] = new RawData[1];
-				results[0] = input;
-				return results;
 			} else {
-				throw new NotAStringBasedMediaType("Media type "+)
+				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
 			}
+			break;
 		}
 		default:
 			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
-			break;
-
 		}
-		return new RawData[0];
 		RawData results[];
-		if (input.getContentType().equalsIgnoreCase(type)) {
-			log.fine(() -> input.getContentType() + " is the same type as  " + type);
-
+		if (result) {
+			if (sentDataIsCompleted) {
+				results = new RawData[1];
+				results[0] = input;
+			} else {
+				results = new RawData[0];
+			}
 		} else {
-			log.fine(() -> input.getContentType() + " is a different type than  " + type);
-			results = new RawData[0];
+			results = new RawData[1];
+			results[0] = input;
 		}
 		return results;
 	}

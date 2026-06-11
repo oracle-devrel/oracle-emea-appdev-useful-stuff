@@ -1,0 +1,40 @@
+[
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"sonnenstatus\"}",
+		"description": "Handle status messages",
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"batteryCharging": false,
+				"consumptionAvgWattsLastMinute": 339,
+				"currentBatteryCapacityPercentage": 59,
+				"operatingMode": 2,
+				"reservedBatteryCapacityPercentage": 5,
+				"solarProductionWattsPointInTime": 131,
+				"time": 1763981430279
+			}
+		},
+		"payload-mapping": {
+			"$.BatteryCharging": "$.batteryCharging",
+			"$.DischargeRateAvgLastMinute": "$.consumptionAvgWattsLastMinute",
+			"$.CurrentChargePercentage": "$.currentBatteryCapacityPercentage",
+			"$.OperatingMode": "${if (.operatingMode == 1)  then \"Manual\" elif (.operatingMode == 2) then \"Automatic - Self-Consumption\" elif (.operatingMode == 6) then \"Battery-Module-Extension (30%)\" elif (.operatingMode == 10) then \"Time-Of-Use\" else \"Unknown Mode\" end}",
+			"$.ReservedChargePercentage": "$.reservedBatteryCapacityPercentage",
+			"$.SolarGeneration": "$.solarProductionWattsPointInTime"
+		}
+	},
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"sonnenconfiguration\"}",
+		"description": "Handle configuration messages",
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"softwareVersion": "1.18.4",
+				"time": 1764004099418
+			}
+		},
+		"payload-mapping": {
+			"$.SoftwareVersion": "$.softwareVersion"
+		}
+	}
+]
