@@ -1,3 +1,4 @@
+
 All examples below use the default oci config entry
 Make sure you have the latest OCI command line client 3.70.1 works as may earlier versions, but 3.45 does not. On Macos you can use homebrew - https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#InstallingCLI__macos_homebrew other instrucitons are at  - see https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/climanualinst.htm
 
