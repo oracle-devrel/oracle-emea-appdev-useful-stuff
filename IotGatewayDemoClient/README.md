@@ -8,7 +8,7 @@ In the config file specify the hostname (or IP address) of the machine running t
 
 Also specify the names of the compartment that the iot domain group and iot domain are in, along with the vault used to hold the secrets containing the instance credentials. You will also need to specify the iot domain group name and the iot domain name. These must have already been created.
 
-You will also need the TimGUtils package (v 1.2.2 at a minimum) as that handles various IO functions, this is not currently held in the central Maven repo, but the source can be accessed from https://github.com/atimgraves/timg-utilities
+You will also need the TimGUtils package (v 1.0.13 at a minimum) as that handles various IO functions, this is not currently held in the central Maven repo, but the source can be accessed from https://github.com/atimgraves/timg-utilities
 
 Note that if you chose to use the JSON or XML upload options that these are using the IoT data structure specified in the IotDemoGateway test model, adapters and envelope. If you have not set those up then the IoT service will be unable to parse the data. 
 
