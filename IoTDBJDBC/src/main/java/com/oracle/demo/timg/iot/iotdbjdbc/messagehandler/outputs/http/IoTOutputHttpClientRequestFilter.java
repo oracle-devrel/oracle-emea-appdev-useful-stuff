@@ -49,12 +49,12 @@ import lombok.extern.java.Log;
 
 @ClientFilter(patterns = { "${messagehandler.output.iotoutputhttpclient:/api/v1/iotdata}/**"})
 @Log
-public class IoTOutputHttiClientRequestFilter {
+public class IoTOutputHttpClientRequestFilter {
 	private final String username;
 	private final String password;
 
 	@Inject
-	public IoTOutputHttiClientRequestFilter(IoTOutputHttpClientSettings clientSettings) {
+	public IoTOutputHttpClientRequestFilter(IoTOutputHttpClientSettings clientSettings) {
 		this.username = clientSettings.getUsername();
 		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
 	}
@@ -67,6 +67,6 @@ public class IoTOutputHttiClientRequestFilter {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttiClientRequestFilter username=" + this.username);
+		log.info("Startup event received for IoTOutputHttpClientRequestFilter username=" + this.username);
 	}
 }
