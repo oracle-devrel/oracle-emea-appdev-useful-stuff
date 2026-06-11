@@ -1,9 +1,9 @@
 <factorypath>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-inject-java/4.10.10/micronaut-inject-java-4.10.10.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-inject-java/4.10.23/micronaut-inject-java-4.10.23.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-core-processor/4.10.10/micronaut-core-processor-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-aop/4.10.10/micronaut-aop-4.10.10.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-core-processor/4.10.23/micronaut-core-processor-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-aop/4.10.23/micronaut-aop-4.10.23.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/github/javaparser/javaparser-symbol-solver-core/3.27.0/javaparser-symbol-solver-core-3.27.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/github/javaparser/javaparser-core/3.27.0/javaparser-core-3.27.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/checkerframework/checker-qual/3.49.4/checker-qual-3.49.4.jar" enabled="true" runInBatchMode="false"/>
@@ -13,24 +13,24 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/ow2/asm/asm-tree/9.8/asm-tree-9.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/ow2/asm/asm-util/9.8/asm-util-9.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/ow2/asm/asm-analysis/9.8/asm-analysis-9.8.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-core-reactive/4.10.10/micronaut-core-reactive-4.10.10.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-core-reactive/4.10.23/micronaut-core-reactive-4.10.23.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/ow2/asm/asm/9.8/asm-9.8.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-graal/4.10.10/micronaut-graal-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-validation/4.10.10/micronaut-http-validation-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-server/4.10.10/micronaut-http-server-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-router/4.10.10/micronaut-router-4.10.10.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-graal/4.10.23/micronaut-graal-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-validation/4.10.23/micronaut-http-validation-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-server/4.10.23/micronaut-http-server-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-router/4.10.23/micronaut-router-4.10.23.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/projectreactor/reactor-core/3.7.12/reactor-core-3.7.12.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-websocket/4.10.10/micronaut-websocket-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-client-core/4.10.10/micronaut-http-client-core-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-discovery-core/4.10.10/micronaut-discovery-core-4.10.10.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-processor/1.7.3/micronaut-json-schema-processor-1.7.3.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-websocket/4.10.23/micronaut-websocket-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-http-client-core/4.10.23/micronaut-http-client-core-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-discovery-core/4.10.23/micronaut-discovery-core-4.10.23.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-processor/1.7.4/micronaut-json-schema-processor-1.7.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-inject/4.10.4/micronaut-inject-4.10.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/micronaut-core/4.10.4/micronaut-core-4.10.4.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-annotations/1.7.3/micronaut-json-schema-annotations-1.7.3.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-common/1.7.3/micronaut-json-schema-common-1.7.3.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-annotations/1.7.4/micronaut-json-schema-annotations-1.7.4.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/micronaut/jsonschema/micronaut-json-schema-common/1.7.4/micronaut-json-schema-common-1.7.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar" enabled="true" runInBatchMode="false"/>
