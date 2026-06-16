@@ -51,12 +51,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.enabled.IGNORETHISONE", value = "true", defaultValue = "false")
 @Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.order")
 @Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.modelname")
 @Requires(property = "iotdatacache.schemaname")
 @Log
-public class RawDataDeviceModelMessageFilter extends DeviceModelMessageFilterCore implements RawDataMessageHandler {
+public class RawDataDeviceModelMessageFilter extends DeviceModelMessageFilterCoreOrig implements RawDataMessageHandler {
 
 	private PreparedStatement selectModelIdByInstanceIdPS;
 
@@ -72,7 +72,7 @@ public class RawDataDeviceModelMessageFilter extends DeviceModelMessageFilterCor
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
-		if (doesIoTDataCoreMatchModel(input)) {
+		if (doesIoTDataCoreMatchModel(input.getDigitalTwinInstanceId())) {
 			RawData result[] = new RawData[1];
 			result[0] = input;
 			return result;

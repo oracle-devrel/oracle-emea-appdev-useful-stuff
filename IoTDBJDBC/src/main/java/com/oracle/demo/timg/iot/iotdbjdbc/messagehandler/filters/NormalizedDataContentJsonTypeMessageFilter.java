@@ -36,60 +36,78 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
 
-import java.util.regex.Pattern;
+import java.util.Set;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
+import oracle.sql.json.OracleJsonValue.OracleJsonType;
 
 @Singleton
-@Requires(property = "messagehandler.filter.normalizeddata.contentpathfilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.normalizeddata.contentpathfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.contentjsontypefilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.contentjsontypefilter.order")
 @Log
-public class NormalizedDataContentPathMessageFilter implements NormalizedDataMessageHandler {
-	private final int order;
-	private final String regexpPattern;
-	private final boolean caseInsensitive;
-	private final FindOutcomes findOutcomes;
-	private final Pattern pattern;
+public class NormalizedDataContentJsonTypeMessageFilter implements NormalizedDataMessageHandler {
 
-	public NormalizedDataContentPathMessageFilter(
-			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.order") int order,
-			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.regexp") String regexpPattern,
-			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive,
-			@Property(name = "messagehandler.filter.normalizeddata.contentpathfilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
+	private final int order;
+	private final Set<OracleJsonType> contentTypes;
+	private final FindOutcomes findOutcomes;
+
+	/**
+	 * the schema name is from the IoT service, basically the data cache user name
+	 * like all handlers order is where in the list this is executed
+	 * the modelNames are one or more names, they are loaded as a list. for  properties file that is done like this :
+	 * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[0]=DECIMAL
+     * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[1]=OBJECT
+     * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[2]=DOUBLE
+	 * 
+	// @formatter:off
+	 * For a yaml file the names are provided like this
+	 * messagehandler:
+	 *   filter:
+	 *     normalizeddata:
+	 *       contentjsontypefilter:
+	 *         contentype:
+	 *           - DECIMAL
+	 *           - OBJECT
+	 *           - DOUBLE
+	 * 
+	// @formatter:on
+     * Note that content type names MUST be capable of being converted using the OracleJsonType.valueOf(name) so you should only use names that match that
+	 * @param order where in the filter order this should be run
+	 * @param contentTypes a list of the OracleJsonTYpe names (e.g. OBJECT, STRING, FLOAT etc.)
+	 * @param filterOnMatches if true will accept the only content types specified, if false will reject content types specified
+	 */
+	@Inject
+	public NormalizedDataContentJsonTypeMessageFilter(
+			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.contentype") Set<OracleJsonType> contentTypes,
+			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
 		this.order = order;
-		this.regexpPattern = regexpPattern;
-		this.caseInsensitive = caseInsensitive;
-		int flags = 0;
-		if (caseInsensitive) {
-			flags |= Pattern.CASE_INSENSITIVE;
-		}
-		this.pattern = Pattern.compile(regexpPattern, flags);
+		this.contentTypes = contentTypes;
 		this.findOutcomes = findOutcomes;
 	}
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		log.finer(() -> "NormalizedData is " + input);
-		NormalizedData results[];
-		// are we acting as a terminator or a step in the process ?
+		// is it in the types we were provided with ?
+		boolean typeIsPresent = contentTypes.contains(input.getContentJsonType());
+		// are we accepting or rejecting inputs of those types ?
 		boolean match = switch (findOutcomes) {
-		case FOUND -> pattern.matcher(input.getContentPath()).find();
-		case NOT_FOUND -> !pattern.matcher(input.getContentPath()).find();
+		case FOUND -> typeIsPresent;
+		case NOT_FOUND -> !typeIsPresent;
 		};
+		// if it passes then hand it on, otherwise don't
+		NormalizedData results[];
 		if (match) {
-			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
-					+ caseInsensitive + " in content path " + input);
 			results = new NormalizedData[1];
 			results[0] = input;
 		} else {
-			log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
-					+ caseInsensitive + "in content path " + input);
 			results = new NormalizedData[0];
 		}
 		return results;
@@ -102,13 +120,12 @@ public class NormalizedDataContentPathMessageFilter implements NormalizedDataMes
 
 	@Override
 	public String getName() {
-		return "Content path filter";
+		return "Content type filter";
 	}
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " will match " + regexpPattern + ", caseInsensitive is "
-				+ caseInsensitive + ", findoutcomes is " + findOutcomes;
+		return getName() + " order " + getOrder() + ", " + contentTypes + " (" + contentTypes.size()
+				+ " elements), findoutcomes is " + findOutcomes;
 	}
-
 }

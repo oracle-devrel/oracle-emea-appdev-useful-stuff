@@ -36,35 +36,58 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
 
+import java.util.List;
+
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
-import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.enabled.IGNORETHISONE", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.order")
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.modelname")
 @Requires(property = "iotdatacache.schemaname")
 @Log
-public class NormalizedDataDeviceModelMessageFilter extends DeviceModelMessageFilterCoreOrig
+public class NormalizedDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore
 		implements NormalizedDataMessageHandler {
-
+	/**
+	 * the schema name is from the IoT service, basically the data cache user name
+	 * like all handlers order is where in the list this is executed
+	 * the modelNames are one or more names, they are loaded as a list. for  properties file that is done like this :
+	 * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[0]=battery
+     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[1]=windows
+     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[2]=doors
+	 * 
+	// @formatter:off
+	 * For a yaml file the names are provided like this
+	 * messagehandler:
+	 *   filter:
+	 *     normalizeddata:
+	 *       devicemodelsfilter:
+	 *         modelnames:
+	 *           - battery
+	 *           - windows
+	 *           - doors
+	 * 
+	// @formatter:on
+	 * @param schemaName
+	 * @param order
+	 * @param modelNames
+	 * @param nullModelIdIsError
+	 * @param caseInsensitive
+	 */
 	@Inject
-	public NormalizedDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
-			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.order") int order,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError) {
-		super(dbConnectionSupplier, schemaName, order, modelName, preloadExisting, nullModelIdIsError);
+	public NormalizedDataDeviceModelsMessageFilter(@Property(name = "iotdatacache.schemaname") String schemaName,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames") List<String> modelNames,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.caseinsensitive", defaultValue = "true") boolean caseInsensitive) {
+		super(order, modelNames, caseInsensitive, true, "NormalizedDataDeviceModelListener");
 	}
 
 	@Override
