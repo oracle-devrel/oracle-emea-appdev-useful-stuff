@@ -51,8 +51,7 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = "messagehandler.filter.rawdata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
 @Requires(property = "messagehandler.filter.rawdata.devicemodelsfilter.order")
-@Requires(property = "messagehandler.filter.rawdata.devicemodelsfilter.modelname")
-@Requires(property = "iotdatacache.schemaname")
+//don't require the messagehandler.filter.rawdata.devicemodelsfilter.modelnames we want an error to be thrown if it's not there so we can see the cause of the problem
 @Log
 public class RawDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore implements RawDataMessageHandler {
 

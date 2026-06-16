@@ -50,8 +50,7 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
 @Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.order")
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.modelname")
-@Requires(property = "iotdatacache.schemaname")
+// don't require the messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames we want an error to be thrown if it's not there so we can see the cause of the problem
 @Log
 public class NormalizedDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore
 		implements NormalizedDataMessageHandler {
