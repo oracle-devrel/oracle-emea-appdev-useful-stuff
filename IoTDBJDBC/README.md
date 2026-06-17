@@ -50,11 +50,13 @@ Raw and normalized messages are handled by separate chains:
 
 As with input clients, only handlers whose `@Requires` properties match the runtime configuration are created and injected. Each handler provides an order value from configuration, and the service sorts the injected handlers before processing messages. A handler returns an array of messages. Returning one or more messages passes those messages to the next handler in the chain; returning an empty array stops that branch. This allows the same mechanism to support filters, test processors, and final output handlers.
 
-The raw data handler chain can include filters such as:
+The raw data handler chain can include these active filters:
 
-- `messagehandler.filter.rawdata.contenttype.*`
-- `messagehandler.filter.rawdata.endpointfilter.*`
-- `messagehandler.filter.rawdata.devicemodelfilter.*`
+| Filter class | Configuration prefix | What it checks |
+| --- | --- | --- |
+| `RawDataContentTypeMessageFilter` | `messagehandler.filter.rawdata.contenttype.*` | The raw message content type. The configured `type` is compared ignoring case. |
+| `RawDataEndpointMessageFilter` | `messagehandler.filter.rawdata.endpointfilter.*` | A regular expression against the raw message endpoint. `findoutcome=FOUND` keeps matching endpoints; `findoutcome=NOT_FOUND` keeps endpoints that do not match. |
+| `RawDataDeviceModelsMessageFilter` | `messagehandler.filter.rawdata.devicemodelsfilter.*` | The device model display name for the raw message's digital twin instance. It accepts one or more configured `modelnames[...]` entries. |
 
 It can also include outputs such as:
 
@@ -62,18 +64,63 @@ It can also include outputs such as:
 - HTTP output enabled with `messagehandler.output.rawdata.httpclient.enabled`; the current code reads its order and type from `messagehandler.output.rawdata.httpclient.enabled.order` and `messagehandler.output.rawdata.httpclient.enabled.type`
 - NoSQL output settings under `messagehandler.output.rawdata.nosql.*`; the current code enables this bean with `messagehandler.filter.rawdata.nosql.enabled`
 
-The normalized data handler chain can include filters and test processors such as:
+The normalized data handler chain can include these active filters and test processors:
 
-- `messagehandler.filter.normalizeddata.contentpathfilter.*`
-- `messagehandler.filter.normalizeddata.devicemodelfilter.*`
-- `messagehandler.filter.normalizeddata.randomfilter.*`
-- `messagehandler.processor.normalizeddata.duplicator.*`
+| Filter or processor class | Configuration prefix | What it checks or does |
+| --- | --- | --- |
+| `NormalizedDataContentJsonTypeMessageFilter` | `messagehandler.filter.normalizeddata.contentjsontypefilter.*` | The Oracle JSON type of the normalized `value` payload, using `NormalizedData.getContentJsonType()`. `findoutcome=FOUND` keeps listed JSON types; `findoutcome=NOT_FOUND` keeps messages whose JSON type is not listed. |
+| `NormalizedDataContentPathsMessageFilter` | `messagehandler.filter.normalizeddata.contentpathsfilter.*` | Exact content path membership using configured `matchingcontentpath[...]` entries. It supports optional case-insensitive comparison and `findoutcome=FOUND` or `NOT_FOUND`. |
+| `NormalizedDataDeviceModelsMessageFilter` | `messagehandler.filter.normalizeddata.devicemodelsfilter.*` | The device model display name for the normalized message's digital twin instance. It accepts one or more configured `modelnames[...]` entries. |
+| `NormalizedDataRandomMessageFilter` | `messagehandler.filter.normalizeddata.randomfilter.*` | Test-only random filtering. |
+| `NormalizedDataDuplicatorMessageProcessor` | `messagehandler.processor.normalizeddata.duplicator.*` | Test-only message duplication before later handlers run. |
 
 It can also include the diagnostic text output:
 
 - `messagehandler.output.normalizeddata.textoutput.*`
 
 The usual pattern is to set a handler's `.enabled` property to `true` and provide its `.order` property. Lower order values run earlier. Filters normally sit before outputs, and outputs can either pass the message through to later handlers or terminate that branch by returning no messages.
+
+The current plural device-model filters replace the older single-model filter path. `RawDataDeviceModelMessageFilter`, `NormalizedDataDeviceModelMessageFilter`, and `NormalizedDataContentPathRegexpMessageFilter` are still present in the source, but their `@Requires` annotations use `.enabled.IGNORETHISONE`, so the normal `.enabled=true` property will not create those beans. Use the plural `devicemodelsfilter` entries and the exact-match `contentpathsfilter` entries described above.
+
+Device-model filters use `DeviceModelMessageFilterCore` and `DeviceModelInstancesCache`. The cache opens a database connection, switches to `iotdatacache.schemaname`, and reads `digital_twin_models` and `digital_twin_instances` to map instance ids, external keys, model ids, and model display names. It keeps in-memory maps of successful lookups and sets of known missing ids so repeated messages for the same instance do not repeatedly query the database.
+
+The cache needs these properties:
+
+| Property | Required | Purpose |
+| --- | --- | --- |
+| `iotdatacache.schemaname` | Yes | IoT data-cache schema, normally `<IOT Domain Shortid>__iot`. The cache uses this as the current database schema. |
+| `devicemodelinstancescache.preloadexistingmodels` | No, defaults to `true` | Preload all model ids and display names at handler configuration time. |
+| `devicemodelinstancescache.preloadexistinginstances` | No, defaults to `true` | Preload all instance ids, external keys, and model ids at handler configuration time. |
+| `datasources.default.url` | Yes for the current DB connection supplier | JDBC URL used to connect to the IoT database. The sample builds it from `iotdatacache.ociregion` and `iotdatacache.connectionname`. |
+| `oci.dbtoken.scope` | Yes when using the access-token DB connection supplier | Scope used by `DBTokenRetriever` when creating the database access token. |
+| `oci.auth.type` | Yes when using the access-token DB connection supplier | Selects the OCI auth provider. The current values are `InstancePrinciple` or `ConfigFile`. |
+| `oci.auth.config.section` | No, defaults to `DEFAULT` | OCI config profile section when `oci.auth.type=ConfigFile`. |
+
+Raw device-model filter example:
+
+```properties
+messagehandler.filter.rawdata.devicemodelsfilter.enabled=true
+messagehandler.filter.rawdata.devicemodelsfilter.order=10
+messagehandler.filter.rawdata.devicemodelsfilter.modelnames[0]=homeBattery
+messagehandler.filter.rawdata.devicemodelsfilter.modelnames[1]=homeHeating
+messagehandler.filter.rawdata.devicemodelsfilter.caseinsensitive=true
+
+iotdatacache.schemaname=<IOT Domain Shortid>__iot
+devicemodelinstancescache.preloadexistingmodels=true
+devicemodelinstancescache.preloadexistinginstances=true
+```
+
+Normalized JSON value-type filter example:
+
+```properties
+messagehandler.filter.normalizeddata.contentjsontypefilter.enabled=true
+messagehandler.filter.normalizeddata.contentjsontypefilter.order=10
+messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[0]=DECIMAL
+messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[1]=DOUBLE
+messagehandler.filter.normalizeddata.contentjsontypefilter.findoutcome=FOUND
+```
+
+The `contentype` spelling in that example is deliberate: it is the property name the current constructor reads. The filter uses `findoutcome`; older sample comments that mention `filteronmatches` do not match the current code.
 
 Example:
 
