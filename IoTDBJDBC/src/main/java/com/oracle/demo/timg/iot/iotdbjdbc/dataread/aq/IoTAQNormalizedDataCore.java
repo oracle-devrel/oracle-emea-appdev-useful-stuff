@@ -46,6 +46,7 @@ import oracle.jdbc.aq.AQMessage;
 import oracle.sql.json.OracleJsonDatum;
 import oracle.sql.json.OracleJsonObject;
 import oracle.sql.json.OracleJsonValue;
+import oracle.sql.json.OracleJsonValue.OracleJsonType;
 
 @Log
 public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
@@ -75,11 +76,13 @@ public abstract class IoTAQNormalizedDataCore extends IoTAQCore {
 		String digitalTwinInstanceId = payload.getString(DIGITAL_TWIN_INSTANCE_ID_COLUMN_NAME, "");
 		String contentPath = payload.getString(CONTENT_PATH_COLUMN_NAME, "");
 		String timeObserved = payload.getString(TIME_OBSERVED_COLUMN_NAME, "");
-		OracleJsonValue valueJson = payload.get(VALUE_COLUMN_NAME);
-		String contentType = valueJson.getOracleJsonType().toString();
+		OracleJsonValue contentJsonValue = payload.get(VALUE_COLUMN_NAME);
+		OracleJsonType contentJsonType = contentJsonValue.getOracleJsonType();
+		String contentType = contentJsonType.toString();
 		// use content as that's the column name
-		String content = (valueJson == null ? "" : valueJson.toString());
+		String content = (contentJsonValue == null ? "" : contentJsonValue.toString());
 		return NormalizedData.builder().digitalTwinInstanceId(digitalTwinInstanceId).contentPath(contentPath)
-				.timeObserved(timeObserved).contentType(contentType).content(content).build();
+				.timeObserved(timeObserved).contentType(contentType).content(content).contentJsonValue(contentJsonValue)
+				.contentJsonType(contentJsonType).build();
 	}
 }
