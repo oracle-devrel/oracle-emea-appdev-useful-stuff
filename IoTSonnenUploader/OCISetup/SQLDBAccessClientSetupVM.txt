@@ -3,8 +3,27 @@ Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to 
 once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
 install java and maven to allow for compilation as well as the sqlcl command
 we also need git to get the code itself
-sudo dnf install java-21-openjdk-devel --assumeyes
-sudo dnf install maven -assumeyes
+# install the java version
+sudo dnf install java-25-openjdk-devel --assumeyes
+# this insista on installing jdk 17 with maven, so don't do that
+#sudo dnf install maven --assumeyes
+# get maven
+cd /tmp
+curl -LO https://dlcdn.apache.org/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
+
+sudo tar -xzf apache-maven-3.9.16-bin.tar.gz -C /opt
+sudo ln -sfn /opt/apache-maven-3.9.16 /opt/maven
+# setup it's config
+sudo tee /etc/profile.d/maven.sh > /dev/null <<'EOF'
+export M2_HOME=/opt/maven
+export MAVEN_HOME=/opt/maven
+export PATH=$M2_HOME/bin:$PATH
+EOF
+# reload the config
+source /etc/profile.d/maven.sh
+# make sure it worked
+mvn -v
+# install git
 sudo dnf install git-all --assumeyes
 wget https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
 unzip sqlcl-latest.zip
