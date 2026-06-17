@@ -36,8 +36,11 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.rawdata;
 
+import java.util.regex.Pattern;
+
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.FindOutcomes;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -45,32 +48,49 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.filter.rawdata.contenttype.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.rawdata.contenttype.order")
+@Requires(property = "messagehandler.filter.rawdata.endpointregexpfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.rawdata.endpointregexpfilter.order")
 @Log
-public class RawDataContentTypeMessageFilter implements RawDataMessageHandler {
+public class RawDataEndpointRegexpMessageFilter implements RawDataMessageHandler {
 	private final int order;
-	private final String type;
+	private final String regexpPattern;
+	private final boolean caseInsensitive;
+	private final FindOutcomes findOutcomes;
+	private final Pattern pattern;
 
-	public RawDataContentTypeMessageFilter(
-			@Property(name = "messagehandler.filter.rawdata.contenttype.order") int order,
-			@Property(name = "messagehandler.filter.rawdata.contenttype.type") String type) {
+	public RawDataEndpointRegexpMessageFilter(
+			@Property(name = "messagehandler.filter.rawdata.endpointregexpfilter.order") int order,
+			@Property(name = "messagehandler.filter.rawdata.endpointregexpfilter.regexp") String regexpPattern,
+			@Property(name = "messagehandler.filter.rawdata.endpointregexpfilter.caseinsensitive", defaultValue = "false") boolean caseInsensitive,
+			@Property(name = "messagehandler.filter.rawdata.endpointregexpfilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
 		this.order = order;
-		this.type = type;
+		this.regexpPattern = regexpPattern;
+		this.caseInsensitive = caseInsensitive;
+		int flags = 0;
+		if (caseInsensitive) {
+			flags |= Pattern.CASE_INSENSITIVE;
+		}
+		this.pattern = Pattern.compile(regexpPattern, flags);
+		this.findOutcomes = findOutcomes;
 	}
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
 		log.finer(() -> "RawData is " + input);
 		RawData results[];
-		if (input.getContentType().equalsIgnoreCase(type)) {
-			log.fine(() -> input.getContentType() + " is the same type as  " + type);
+		// are we acting as a terminator or a step in the process ?
+		boolean match = switch (findOutcomes) {
+		case FOUND -> pattern.matcher(input.getEndpoint()).find();
+		case NOT_FOUND -> !pattern.matcher(input.getEndpoint()).find();
+		};
+		if (match) {
 			results = new RawData[1];
 			results[0] = input;
 		} else {
-			log.fine(() -> input.getContentType() + " is a different type than  " + type);
 			results = new RawData[0];
 		}
+		log.fine(() -> findOutcomes + " is " + match + " for pattern " + regexpPattern + " case insensitive "
+				+ caseInsensitive + " in content path " + input);
 		return results;
 	}
 
@@ -81,12 +101,13 @@ public class RawDataContentTypeMessageFilter implements RawDataMessageHandler {
 
 	@Override
 	public String getName() {
-		return "Content type filter";
+		return "Content path filter";
 	}
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " will match type " + type;
+		return getName() + " order " + getOrder() + " will match " + regexpPattern + ", caseInsensitive is "
+				+ caseInsensitive + ", findoutcomes is " + findOutcomes;
 	}
 
 }

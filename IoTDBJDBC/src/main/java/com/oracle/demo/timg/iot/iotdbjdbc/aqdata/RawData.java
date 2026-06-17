@@ -44,6 +44,7 @@ import io.micronaut.http.MediaType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
 
@@ -60,6 +61,8 @@ public class RawData extends IoTDataCore {
 			MediaType.TEXT_HTML.toLowerCase(), MediaType.TEXT_XML.toLowerCase(), MediaType.TEXT_JSON.toLowerCase(),
 			MediaType.TEXT_MARKDOWN.toLowerCase(), MediaType.TEXT_PLAIN.toLowerCase()));
 	private String endpoint;
+	// we don't want to dump raw text
+	@ToString.Exclude
 	private byte content[];
 	private String contentType;
 	private String timeReceived;
@@ -73,6 +76,9 @@ public class RawData extends IoTDataCore {
 	}
 
 	public MediaType getMediaType() {
+		if ((contentType == null) || contentType.isEmpty()) {
+			return MediaType.TEXT_PLAIN_TYPE;
+		}
 		return MediaType.of(contentType);
 	}
 }

@@ -96,6 +96,7 @@ public class NormalizedDataContentJsonTypeMessageFilter implements NormalizedDat
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
+		log.finer(() -> "NormalizedData is " + input);
 		// is it in the types we were provided with ?
 		boolean typeIsPresent = contentTypes.contains(input.getContentJsonType());
 		// are we accepting or rejecting inputs of those types ?
@@ -108,8 +109,12 @@ public class NormalizedDataContentJsonTypeMessageFilter implements NormalizedDat
 		if (match) {
 			results = new NormalizedData[1];
 			results[0] = input;
+			log.fine(
+					() -> "Match, Input " + input + " has a json type that is " + findOutcomes + " in " + contentTypes);
 		} else {
 			results = new NormalizedData[0];
+			log.fine(() -> "Not Match, Input " + input + " has a json type that is " + findOutcomes + " in "
+					+ contentTypes);
 		}
 		return results;
 	}

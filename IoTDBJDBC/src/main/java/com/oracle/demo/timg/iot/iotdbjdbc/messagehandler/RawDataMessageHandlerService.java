@@ -63,9 +63,8 @@ public class RawDataMessageHandlerService {
 	@Inject
 	public RawDataMessageHandlerService(List<RawDataMessageHandler> handlers) {
 		this.handlers = new ArrayList<>(handlers.stream().sorted().toList());
-		handlersChainDetails = "There are " + this.handlers.size() + " normalized data handlers which are "
-				+ this.handlers.stream().map(h -> h.getName() + " (config" + h.getConfig() + ")")
-						.collect(Collectors.joining(", "));
+		handlersChainDetails = "There are " + this.handlers.size() + " raw data handlers which are " + this.handlers
+				.stream().map(h -> h.getName() + " (config" + h.getConfig() + ")").collect(Collectors.joining(", "));
 		if (this.handlers.size() == 0) {
 			log.warning("No handlers configured");
 		} else {
@@ -87,7 +86,7 @@ public class RawDataMessageHandlerService {
 		// run the handler and get the response
 		RawData handledRawData[];
 		try {
-			log.fine(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+			log.finer(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
 					+ rawData);
 			handledRawData = handler.processRawData(rawData);
 		} catch (Exception e) {
@@ -107,7 +106,7 @@ public class RawDataMessageHandlerService {
 			RawDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
-			log.finer("Resulting data from handler " + handledRawData.length + " results, calling handler "
+			log.finest("Resulting data from handler " + handledRawData.length + " results, calling handler "
 					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
 			// use a stream for fun
 			IntStream.range(0, handledRawData.length).forEachOrdered((i) -> {
@@ -115,7 +114,7 @@ public class RawDataMessageHandlerService {
 				handle(nextHandlerIndex, nextHandler, handledRawData[i]);
 			});
 		} else {
-			log.fine("There were no elements returned or there are no subsequent handlers");
+			log.finer("There were no elements returned or there are no subsequent handlers");
 		}
 
 	}

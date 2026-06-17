@@ -87,15 +87,13 @@ public class NormalizedDataContentPathsMessageFilter implements NormalizedDataMe
 		case NOT_FOUND -> !contentPaths.contains(path);
 		};
 		if (match) {
-			log.fine(() -> findOutcomes + " is " + match + " for pattern " + contentPaths + " case insensitive "
-					+ caseInsensitive + " in content path " + input);
 			results = new NormalizedData[1];
 			results[0] = input;
 		} else {
-			log.fine(() -> findOutcomes + " is " + match + " for pattern " + contentPaths + " case insensitive "
-					+ caseInsensitive + "in content path " + input);
 			results = new NormalizedData[0];
 		}
+		log.fine(() -> findOutcomes + " is " + match + " for " + contentPaths + " case insensitive " + caseInsensitive
+				+ " in content path " + input);
 		return results;
 	}
 

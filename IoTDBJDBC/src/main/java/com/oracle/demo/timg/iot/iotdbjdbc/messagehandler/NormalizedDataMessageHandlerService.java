@@ -74,7 +74,7 @@ public class NormalizedDataMessageHandlerService {
 	}
 
 	public void handle(@NonNull NormalizedData normalizedData) {
-		log.info("Handling NormalizedData " + normalizedData + " with chain " + handlersChainDetails);
+		log.fine("Handling NormalizedData " + normalizedData + " with chain " + handlersChainDetails);
 		if (handlers.size() == 0) {
 			log.warning("No NormalizedDataMessageHandler loaded, cannot process " + normalizedData);
 		} else {
@@ -88,7 +88,7 @@ public class NormalizedDataMessageHandlerService {
 		// run the handler and get the response
 		NormalizedData handledNormalizedData[];
 		try {
-			log.fine(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
+			log.finer(() -> "Calling handler " + handler.getName() + " at index " + handlerIndex + " to process "
 					+ normalizedData);
 			handledNormalizedData = handler.processNormalizedData(normalizedData);
 		} catch (Exception e) {
@@ -108,15 +108,15 @@ public class NormalizedDataMessageHandlerService {
 			NormalizedDataMessageHandler nextHandler = handlers.get(nextHandlerIndex);
 			// this meets the ordering requirements as arrays.stream returns a sequential
 			// stream
-			log.finer("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
+			log.finest("Resulting data from handler " + handledNormalizedData.length + " results, calling handler "
 					+ nextHandler.getName() + " at index " + nextHandlerIndex + " on them");
 			// use a stream for fun
 			IntStream.range(0, handledNormalizedData.length).forEachOrdered((i) -> {
-				log.finer(() -> "Processing data element " + i + " from previous handler");
+				log.finest(() -> "Processing data element " + i + " from previous handler");
 				handle(nextHandlerIndex, nextHandler, handledNormalizedData[i]);
 			});
 		} else {
-			log.fine("There were no elements returned or there are no subsequent handlers");
+			log.finer("There were no elements returned or there are no subsequent handlers");
 		}
 
 	}
