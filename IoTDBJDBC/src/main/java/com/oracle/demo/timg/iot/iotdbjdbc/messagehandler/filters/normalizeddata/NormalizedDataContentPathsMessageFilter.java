@@ -34,7 +34,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.normalizeddata;
 
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.FindOutcomes;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;

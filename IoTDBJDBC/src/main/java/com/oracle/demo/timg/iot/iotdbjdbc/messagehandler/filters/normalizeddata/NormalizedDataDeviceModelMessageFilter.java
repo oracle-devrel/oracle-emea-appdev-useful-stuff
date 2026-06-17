@@ -34,12 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.normalizeddata;
 
-import java.sql.PreparedStatement;
-
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.common.DeviceModelMessageFilterCoreOrig;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
@@ -51,33 +50,32 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.enabled.IGNORETHISONE", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.order")
-@Requires(property = "messagehandler.filter.rawdata.devicemodelfilter.modelname")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.enabled.IGNORETHISONE", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname")
 @Requires(property = "iotdatacache.schemaname")
 @Log
-public class RawDataDeviceModelMessageFilter extends DeviceModelMessageFilterCoreOrig implements RawDataMessageHandler {
-
-	private PreparedStatement selectModelIdByInstanceIdPS;
+public class NormalizedDataDeviceModelMessageFilter extends DeviceModelMessageFilterCoreOrig
+		implements NormalizedDataMessageHandler {
 
 	@Inject
-	public RawDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
+	public NormalizedDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "messagehandler.filter.rawdata.devicemodelfilter.order") int order,
-			@Property(name = "messagehandler.filter.rawdata.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
-			@Property(name = "messagehandler.filter.rawdata.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting,
-			@Property(name = "messagehandler.filter.rawdata.devicemodelfilter.nullmodelidiserror", defaultValue = "false") boolean nullModelIdIsError) {
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.modelname") @NotNull @NotBlank String modelName,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.preloadexistinginstances", defaultValue = "true") boolean preloadExisting,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError) {
 		super(dbConnectionSupplier, schemaName, order, modelName, preloadExisting, nullModelIdIsError);
 	}
 
 	@Override
-	public RawData[] processRawData(RawData input) throws Exception {
+	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
 		if (doesIoTDataCoreMatchModel(input.getDigitalTwinInstanceId())) {
-			RawData result[] = new RawData[1];
+			NormalizedData result[] = new NormalizedData[1];
 			result[0] = input;
 			return result;
 		} else {
-			return new RawData[0];
+			return new NormalizedData[0];
 		}
 	}
 }

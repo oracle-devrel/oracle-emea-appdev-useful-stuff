@@ -1,4 +1,4 @@
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common;
 
 import lombok.experimental.StandardException;
 

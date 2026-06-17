@@ -34,98 +34,70 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.normalizeddata;
 
-import java.util.Set;
+import java.util.List;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.common.DeviceModelMessageFilterCore;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
-import oracle.sql.json.OracleJsonValue.OracleJsonType;
 
 @Singleton
-@Requires(property = "messagehandler.filter.normalizeddata.contentjsontypefilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.normalizeddata.contentjsontypefilter.order")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.order")
+// don't require the messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames we want an error to be thrown if it's not there so we can see the cause of the problem
 @Log
-public class NormalizedDataContentJsonTypeMessageFilter implements NormalizedDataMessageHandler {
-
-	private final int order;
-	private final Set<OracleJsonType> contentTypes;
-	private final FindOutcomes findOutcomes;
-
+public class NormalizedDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore
+		implements NormalizedDataMessageHandler {
 	/**
 	 * the schema name is from the IoT service, basically the data cache user name
 	 * like all handlers order is where in the list this is executed
 	 * the modelNames are one or more names, they are loaded as a list. for  properties file that is done like this :
-	 * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[0]=DECIMAL
-     * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[1]=OBJECT
-     * messagehandler.filter.normalizeddata.contentjsontypefilter.contentype[2]=DOUBLE
+	 * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[0]=battery
+     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[1]=windows
+     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[2]=doors
 	 * 
 	// @formatter:off
 	 * For a yaml file the names are provided like this
 	 * messagehandler:
 	 *   filter:
 	 *     normalizeddata:
-	 *       contentjsontypefilter:
-	 *         contentype:
-	 *           - DECIMAL
-	 *           - OBJECT
-	 *           - DOUBLE
+	 *       devicemodelsfilter:
+	 *         modelnames:
+	 *           - battery
+	 *           - windows
+	 *           - doors
 	 * 
 	// @formatter:on
-     * Note that content type names MUST be capable of being converted using the OracleJsonType.valueOf(name) so you should only use names that match that
-	 * @param order where in the filter order this should be run
-	 * @param contentTypes a list of the OracleJsonTYpe names (e.g. OBJECT, STRING, FLOAT etc.)
-	 * @param filterOnMatches if true will accept the only content types specified, if false will reject content types specified
+	 * @param schemaName
+	 * @param order
+	 * @param modelNames
+	 * @param nullModelIdIsError
+	 * @param caseInsensitive
 	 */
 	@Inject
-	public NormalizedDataContentJsonTypeMessageFilter(
-			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.order") int order,
-			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.contentype") Set<OracleJsonType> contentTypes,
-			@Property(name = "messagehandler.filter.normalizeddata.contentjsontypefilter.findoutcome", defaultValue = "FOUND") FindOutcomes findOutcomes) {
-		this.order = order;
-		this.contentTypes = contentTypes;
-		this.findOutcomes = findOutcomes;
+	public NormalizedDataDeviceModelsMessageFilter(@Property(name = "iotdatacache.schemaname") String schemaName,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.order") int order,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames") List<String> modelNames,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError,
+			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.caseinsensitive", defaultValue = "true") boolean caseInsensitive) {
+		super(order, modelNames, caseInsensitive, true, "NormalizedDataDeviceModelListener");
 	}
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		// is it in the types we were provided with ?
-		boolean typeIsPresent = contentTypes.contains(input.getContentJsonType());
-		// are we accepting or rejecting inputs of those types ?
-		boolean match = switch (findOutcomes) {
-		case FOUND -> typeIsPresent;
-		case NOT_FOUND -> !typeIsPresent;
-		};
-		// if it passes then hand it on, otherwise don't
-		NormalizedData results[];
-		if (match) {
-			results = new NormalizedData[1];
-			results[0] = input;
+		if (doesIoTDataCoreMatchModel(input.getDigitalTwinInstanceId())) {
+			NormalizedData result[] = new NormalizedData[1];
+			result[0] = input;
+			return result;
 		} else {
-			results = new NormalizedData[0];
+			return new NormalizedData[0];
 		}
-		return results;
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	@Override
-	public String getName() {
-		return "Content type filter";
-	}
-
-	@Override
-	public String getConfig() {
-		return getName() + " order " + getOrder() + ", " + contentTypes + " (" + contentTypes.size()
-				+ " elements), findoutcomes is " + findOutcomes;
 	}
 }

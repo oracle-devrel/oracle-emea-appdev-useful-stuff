@@ -34,12 +34,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.rawdata;
 
 import java.util.List;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.common.DeviceModelMessageFilterCore;
+import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -48,25 +50,25 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.normalizeddata.devicemodelsfilter.order")
-// don't require the messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames we want an error to be thrown if it's not there so we can see the cause of the problem
+@Requires(property = "messagehandler.filter.rawdata.devicemodelsfilter.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.filter.rawdata.devicemodelsfilter.order")
+//don't require the messagehandler.filter.rawdata.devicemodelsfilter.modelnames we want an error to be thrown if it's not there so we can see the cause of the problem
 @Log
-public class NormalizedDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore
-		implements NormalizedDataMessageHandler {
+public class RawDataDeviceModelsMessageFilter extends DeviceModelMessageFilterCore implements RawDataMessageHandler {
+
 	/**
 	 * the schema name is from the IoT service, basically the data cache user name
 	 * like all handlers order is where in the list this is executed
 	 * the modelNames are one or more names, they are loaded as a list. for  properties file that is done like this :
-	 * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[0]=battery
-     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[1]=windows
-     * messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames[2]=doors
+	 * messagehandler.filter.rawdata.devicemodelsfilter.modelnames[0]=battery
+     * messagehandler.filter.rawdata.devicemodelsfilter.modelnames[1]=windows
+     * messagehandler.filter.rawdata.devicemodelsfilter.modelnames[2]=doors
 	 * 
 	// @formatter:off
 	 * For a yaml file the names are provided like this
 	 * messagehandler:
 	 *   filter:
-	 *     normalizeddata:
+	 *     rawdata:
 	 *       devicemodelsfilter:
 	 *         modelnames:
 	 *           - battery
@@ -81,22 +83,21 @@ public class NormalizedDataDeviceModelsMessageFilter extends DeviceModelMessageF
 	 * @param caseInsensitive
 	 */
 	@Inject
-	public NormalizedDataDeviceModelsMessageFilter(@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.order") int order,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.modelnames") List<String> modelNames,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.nullmodelidiserror", defaultValue = "true") boolean nullModelIdIsError,
-			@Property(name = "messagehandler.filter.normalizeddata.devicemodelsfilter.caseinsensitive", defaultValue = "true") boolean caseInsensitive) {
-		super(order, modelNames, caseInsensitive, true, "NormalizedDataDeviceModelListener");
+	public RawDataDeviceModelsMessageFilter(DBConnectionSupplier dbConnectionSupplier,
+			@Property(name = "messagehandler.filter.rawdata.devicemodelsfilter.order") int order,
+			@Property(name = "messagehandler.filter.rawdata.devicemodelsfilter.modelnames") List<String> modelNames,
+			@Property(name = "messagehandler.filter.rawdata.devicemodelsfilter.caseinsensitive", defaultValue = "true") boolean caseInsensitive) {
+		super(order, modelNames, caseInsensitive, true, "RawDataDeviceModelListener");
 	}
 
 	@Override
-	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
+	public RawData[] processRawData(RawData input) throws Exception {
 		if (doesIoTDataCoreMatchModel(input.getDigitalTwinInstanceId())) {
-			NormalizedData result[] = new NormalizedData[1];
+			RawData result[] = new RawData[1];
 			result[0] = input;
 			return result;
 		} else {
-			return new NormalizedData[0];
+			return new RawData[0];
 		}
 	}
 }

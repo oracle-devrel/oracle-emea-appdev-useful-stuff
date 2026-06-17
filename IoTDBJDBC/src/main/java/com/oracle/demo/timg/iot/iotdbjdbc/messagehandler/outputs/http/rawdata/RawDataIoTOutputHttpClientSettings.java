@@ -34,59 +34,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
-
-import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;
-import jakarta.inject.Singleton;
-import lombok.extern.java.Log;
+import lombok.Data;
 
-@Singleton
-@Requires(property = "messagehandler.filter.rawdata.contenttype.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.filter.rawdata.contenttype.order")
-@Log
-public class RawDataContentTypeMessageFilter implements RawDataMessageHandler {
-	private final int order;
-	private final String type;
-
-	public RawDataContentTypeMessageFilter(
-			@Property(name = "messagehandler.filter.rawdata.contenttype.order") int order,
-			@Property(name = "messagehandler.filter.rawdata.contenttype.type") String type) {
-		this.order = order;
-		this.type = type;
-	}
-
-	@Override
-	public RawData[] processRawData(RawData input) throws Exception {
-		log.finer(() -> "RawData is " + input);
-		RawData results[];
-		if (input.getContentType().equalsIgnoreCase(type)) {
-			log.fine(() -> input.getContentType() + " is the same type as  " + type);
-			results = new RawData[1];
-			results[0] = input;
-		} else {
-			log.fine(() -> input.getContentType() + " is a different type than  " + type);
-			results = new RawData[0];
-		}
-		return results;
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	@Override
-	public String getName() {
-		return "Content type filter";
-	}
-
-	@Override
-	public String getConfig() {
-		return getName() + " order " + getOrder() + " will match type " + type;
-	}
-
+// need the username and password to run
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
+@ConfigurationProperties(RawDataIoTOutputHttpClientSettings.PREFIX)
+@Data
+public class RawDataIoTOutputHttpClientSettings {
+	public static final String PREFIX = "messagehandler.output.rawdata.iotoutputhttpclient";
+	// as we are operating as a configuration then the fields are set based on the
+	// config tree
+	private String username;
+	private String password;
 }

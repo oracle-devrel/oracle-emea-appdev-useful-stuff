@@ -34,12 +34,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
 
 import java.util.Base64;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.HttpOutputType;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.InvalidHttpOutputTypeException;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.NotAStringBasedMediaType;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -48,17 +51,21 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
+// need the username and password
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
+@Requires(property = "micronaut.http.services.rawdataiotoutputhttpclient.url")
 @Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
 @Requires(property = "messagehandler.output.rawdata.httpclient.enabled.order")
 @Log
 public class RawDataHttpOutput implements RawDataMessageHandler {
-	private final IoTOutputHttpClient httpClient;
+	private final RawDataIoTOutputHttpClient httpClient;
 	private final int order;
 	private final HttpOutputType type;
 	private final boolean sentDataIsCompleted;
 
 	@Inject
-	public RawDataHttpOutput(IoTOutputHttpClient httpClient,
+	public RawDataHttpOutput(RawDataIoTOutputHttpClient httpClient,
 			@Property(name = "messagehandler.output.rawdata.httpclient.order") int order,
 			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {

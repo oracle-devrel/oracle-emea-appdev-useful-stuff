@@ -1,4 +1,4 @@
-/*Copyright (c) 2026 Oracle and/or its affiliates.
+/*Copyright (c) 2025 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,17 +34,42 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
 
-import io.micronaut.context.annotation.ConfigurationProperties;
-import lombok.Data;
+import java.util.Base64;
 
-@ConfigurationProperties(IoTOutputHttpClientSettings.PREFIX)
-@Data
-public class IoTOutputHttpClientSettings {
-	public static final String PREFIX = "messagehandler.output.iotoutputhttpclient";
-	// as we are operating as a configuration then the fields are set based on the
-	// config tree
-	private String username;
-	private String password;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Inject;
+import lombok.extern.java.Log;
+
+// needs a endpoint
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
+@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
+@ClientFilter(patterns = { "${messagehandler.output.rawdata.iotoutputhttpclient:/api/v1/iotdata}/**" })
+@Log
+public class RawDataIoTOutputHttpClientRequestFilter {
+	private final String username;
+	private final String password;
+
+	@Inject
+	public RawDataIoTOutputHttpClientRequestFilter(RawDataIoTOutputHttpClientSettings clientSettings) {
+		this.username = clientSettings.getUsername();
+		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
+	}
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.finer("Adding user auth username=" + this.username);
+		request.basicAuth(this.username, this.password);
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for RawDataIoTOutputHttpClientRequestFilter username=" + this.username);
+	}
 }
