@@ -76,7 +76,7 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	}
 
 	public OtlpMetricsJsonBuilder addGauge(OtlpMetricsJsonBuilder builder, NormalizedData input) {
-		return builder.addGauge(metricName(input), description, unit, metricValue(input), observedAt(input),
+		return builder.addGauge(metricName(input), null, null, metricValue(input), observedAt(input),
 				attributes(input));
 	}
 
