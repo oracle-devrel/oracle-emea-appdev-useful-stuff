@@ -14,7 +14,6 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHa
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.TimeSeriesDBOAuthTokenRetriever;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsJsonBuilder;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpNormalizedDataMetricMapper;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata.RawDataIoTOutputHttpClient;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -37,16 +36,8 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	@Inject
 	private TimeSeriesDBOAuthTokenRetriever authTokenRetriever;
 
-//	@Inject
-//	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
-//			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
-//			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
-//		this.order = order;
-//		this.sentDataIsCompleted = sentDataIsCompleted;
-//	}
 	@Inject
-	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
-			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
+	public TimeSeriesOutputORDS(@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
 			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SENT_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted) {
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;
