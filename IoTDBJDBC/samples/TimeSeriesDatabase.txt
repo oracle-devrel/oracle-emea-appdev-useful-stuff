@@ -1,0 +1,176 @@
+THIS SECTION IS FOR SETTING THINGS UP, it cam be done manually in advance and is a one-off process.
+For OCI ADB's
+Create the ADB instance as usual, 
+Make sure that the display name and DB name are the same, use the transaction type - ATP DB
+BUT ... add a tag in namespace none, named "ADB$TOOLS" with the value "TEL" in Advanced Options -> Tags while provisioning the database.
+The telemetry admin user is admin with the same password as you set when creating the DB (basically the ADB admin user).
+
+Login to the SQL web stuff using the OCI ADB console
+SELECT username FROM all_users WHERE username LIKE '%TEL%' ;
+TEL$DATA
+TELEMETRY_DEFAULT_WORKSPACE
+
+There should be a user TEL$DATA, and the default telemety workspace TELEMETRY_DEFAULT_WORKSPACE
+
+You can check the workspaces that already exist
+SELECT dbms_cloud_telemetry_admin.get_workspaces() from dual ;
+[{"workspace_name":"TELEMETRY_DEFAULT_WORKSPACE","cloud_database_name":"OCID1.AUTONOMOUSDATABASE.OC1.UK-LONDON-1.ANWGILJSUEVFTMQ.....","ingest_enabled":false}]
+
+If you want a work space other than the default (recommended) then
+use dbms_cloud_telemetry_admin.create_workspace from the admin user to create a workspace with any name you choose (here I use iotworkspace) note that the / at the end seems to be imporetant to get things to run
+
+BEGIN
+  dbms_cloud_telemetry_admin.create_workspace(
+    workspace_name => 'iotworkspace'
+    );
+END;
+/
+   
+You can now re-run the get workspaces  to make sure it's been added (the output may be long so you may have to scroll the window / expand the output columns
+SELECT dbms_cloud_telemetry_admin.get_workspaces() from dual ;
+[{"workspace_name":"IOTWORKSPACE","cloud_database_name":"OCID1.AUTONOMOUSDATABASE.OC1.UK-LONDON-1.ANWGILJSUEVFTMQAAQRDUC2A.....","ingest_enabled":false},{"workspace_name":"TELEMETRY_DEFAULT_WORKSPACE","cloud_database_name":"OCID1.AUTONOMOUSDATABASE.OC1.UK-LONDON-1.ANWGILJSUEVFTMQ.....","ingest_enabled":false}]
+
+For the instrcutions I'm assumign that the created user is called iotingestuser
+Use the ADB admin console to add a user for ingest at least (and maybe others for query), in the DB console go to the users / user management page, click on create user
+In the form set the user name and passwordm make sure password expired is turned off
+IMPORTANT, make sure to enable the REST, GraphQL, MongoDB, and Web access option then click on the create user button
+
+Using SQL Web test the user account has been created by trying to sign in using it.
+
+Switch back to the admin user in the web developer
+
+I'm assuming from here that the user created is called iotingestuser
+
+Use dbms_cloud_telemetry_admin.register_workspace_user to register the database user(s) as ingest/query users for the telementry workspace. 
+ingest_user true means they can upload data
+query_user true means they can query the data
+alert_user true means they can setup and manage alerts
+
+BEGIN
+  dbms_cloud_telemetry_admin.register_workspace_user(
+     workspace_name  => 'iotworkspace',
+     username => 'iotingestuser', 
+     ingest_user => true,
+     query_user => false ,
+     alert_user => false 
+  );
+END;
+/
+
+You can get the users datails
+SET serveroutput ON;
+DECLARE
+result clob ;
+BEGIN
+  result := dbms_cloud_telemetry_admin.get_workspace_users('iotworkspace') ;
+  dbms_output.put_line(result) ;
+end;
+/
+
+The results will include the details for iotingestuser
+[{"workspace_name":"IOTWORKSPACE","workspace_user":"IOTINGESTUSER","workspace_roles":["INGEST"]}]
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.366
+
+USE THE USER credentials (so user = iotingestuser, password whatever you set) and sign in to SQL developer web
+enable the ingestion process
+exec dbms_cloud_telemetry_ingest.start_ingestion ;
+
+
+You now need the endpoints to use when accessing the ADB
+
+USE THE USER credentials (so user = iotingestuser, password whatever you set) and sign in to SQL developer web
+
+
+SET serveroutput ON;
+DECLARE
+  output clob ;
+BEGIN
+  output := dbms_cloud_telemetry_ingest.get_ingestion_endpoints;
+  dbms_output.put_line(output) ;
+END;
+/
+
+the resulting text will be JSON including the various URL's, you need the token url and the otlp url
+
+{"token":{"url":"https://G9.....8-IOTTELEMETRY.adb.uk-london-1.oraclecloudapps.com/tel/token?x=zep-78&y=9021"},"otlp":{"url":"https://G90.....8-IOTTELEMETRY.adb.uk-london-1.oraclecloudapps.com/tel/v1/metrics?x=zep-78&y=9001"}}
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.165
+
+
+The user requests the OAuth token using it's id and secret
+curl -k --request POST  \
+    --header 'Request-Id: <unique uuid>'\
+    --header 'Content-Type: application/json'\
+    --data '{"username": "iotworkspaceuser", "password":"<user password>", "tennant_name":"<tenancy ocid>", "database_name":"<db name - is also in token url>"}'
+    --location <TOKEN_URL>
+    
+It gets a standard OAuth type response
+{"access_token":"B1o38ikZ55tNMXsuPlksDQ","token_type":"bearer","expires_in":3600}
+
+the client needs to track the expiry time and re-request as neeeded, as per standard oauth processes.
+
+Now the user can upload the telemetry data, note thet this currently ONLY supports numerical data.
+
+The line protocol is for uploading individual real time entries - the ingest url ends with /ingestlp
+This example is usingf a file data.json, but the data can also be inlined in the body of the request
+curl -k --request POST -i 
+    --header "Authorization: Bearer <token from above>" \
+    --header "Content-Type: application/json" \
+    --data @data.json -v <ingest url otlp_url from the endpoints above>
+response
+ {"metrics_data_size":79,"metrics_ingested":1,
+         "metrics_given":1,"metrics_metadata":1,"ingest_duration_ms":10,
+         "ingest_format":"line","ingest_method":"ords","ingest_user_name":"ingest1"}
+         
+with data
+<measurement>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>]
+for example
+trig,host=phoenix92613 sine=0 1752215852000000000
+mem,host=phoenix92613 sine=0 1752215852000000000
+
+this might also work as a way to upload multiple values, but this needs more investigation
+
+You can login in to SQL developer web as a user with query rights (a user can do both, so for somplicity maybe create a single user ?)
+SELECT COUNT(*) FROM telemetry_metrics;
+will show the data volumes
+SELECT * FROM telemetry_metrics;
+will give the data
+
+
+finally the client uploads the data using the token it just got for auth, the text here is for the telemetry protocol, which is a batch upload mechanism
+curl -k --request POST -i -H "Authorization: Bearer {ingest user token}" \
+    --header "Content-Type: application/json" \
+    --data @<file_name> -v <INGESTION URL>
+    
+this is the telemetry protocol based approach (URL ends in /ingest) for multiple entries the payload looks like 
+{ "metrics" : [
+                 [<metric_name>, <tags as JSON>, <value>, <time in secs since epoch>],
+                 [<metric_name>, <tags as JSON>, <value>, <time in secs since epoch>]
+                 ..
+              ]
+}
+
+for example
+{ "metrics" : [
+                 ["scrape_duration_seconds", {"http_scheme":"http","net_host_port":"2112"}, 0, 1704700084],
+                 ["scrape_samples_scraped", {"http_scheme":"http","net_host_port":"2112"}, 12, 1704700085]
+                 ..
+              ]
+}
+
+for example
+curl -k --request POST -i -H "Authorization: Bearer B1o38ikZ55tNMXsuPlksDQ" \
+    --header "Content-Type: application/json" \
+    --data @data.json -v https://example.com:8000/ords/workspace1/ingest1/ingest
+
+response
+{"metrics_data_size":79,"metrics_ingested":1,
+         "metrics_given":1,"metrics_metadata":1,"ingest_duration_ms":10,
+         "ingest_format":"line","ingest_method":"ords","ingest_user_name":"ingest1"}
