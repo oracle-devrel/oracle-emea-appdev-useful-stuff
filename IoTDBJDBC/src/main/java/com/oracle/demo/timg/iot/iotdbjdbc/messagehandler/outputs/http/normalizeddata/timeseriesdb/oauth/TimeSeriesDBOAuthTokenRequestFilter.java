@@ -75,8 +75,9 @@ public class TimeSeriesDBOAuthTokenRequestFilter {
 		String randomUUID = UUID.randomUUID().toString();
 		request.getHeaders().add(HEADER_REQUEST_ID, randomUUID);
 		log.info("Added header " + HEADER_REQUEST_ID + " with id " + randomUUID);
-		request.basicAuth(this.username, this.password);
-		log.info("Added usename " + this.username + " and password " + this.password);
+		// request.basicAuth(this.username, this.password);
+		// log.info("Added username " + this.username + " and password " +
+		// this.password);
 		log.info("request uri " + request.getUri().toASCIIString());
 		log.info("request path " + request.getPath());
 		log.info("request params = " + request.getParameters().asMap().toString());
