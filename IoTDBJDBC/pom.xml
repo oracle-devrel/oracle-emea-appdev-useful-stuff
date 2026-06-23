@@ -78,6 +78,17 @@ SOFTWARE. -->
 	<dependencies>
 
 		<dependency>
+			<groupId>io.micronaut</groupId>
+			<artifactId>micronaut-http-client</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micronaut.jsonschema</groupId>
+			<artifactId>micronaut-json-schema-annotations</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.micronaut.serde</groupId>
 			<artifactId>micronaut-serde-jackson</artifactId>
 			<scope>compile</scope>
@@ -112,6 +123,11 @@ SOFTWARE. -->
 			<version>${version.slf4j}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.micronaut.jsonschema</groupId>
+			<artifactId>micronaut-json-schema-validation</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- OCI SDK: common utilities (HTTP client, auth plumbing, etc.) -->
 		<dependency>
 			<groupId>com.oracle.oci.sdk</groupId>
@@ -143,11 +159,11 @@ SOFTWARE. -->
 			<version>${version.nosql}</version>
 		</dependency>-->
 		<dependency>
-  <groupId>com.oracle.nosql.sdk</groupId>
-  <artifactId>nosqldriver</artifactId>
-  <version>5.3.7</version>
-  <!--<version>5.4.21</version>-->
-</dependency>
+			<groupId>com.oracle.nosql.sdk</groupId>
+			<artifactId>nosqldriver</artifactId>
+			<version>5.3.7</version>
+			<!--<version>5.4.21</version>-->
+		</dependency>
 		<dependency>
 			<groupId>io.micronaut</groupId>
 			<artifactId>micronaut-http-client</artifactId>
@@ -225,11 +241,15 @@ SOFTWARE. -->
 							<artifactId>micronaut-graal</artifactId>
 							<version>${micronaut.core.version}</version>
 						</path>
-						<!--<path>
+						<path>
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-http-validation</artifactId>
 							<version>${micronaut.core.version}</version>
-						</path>-->
+						</path>
+						<path>
+							<groupId>io.micronaut.jsonschema</groupId>
+							<artifactId>micronaut-json-schema-processor</artifactId>
+						</path>
 						<path>
 							<groupId>io.micronaut.serde</groupId>
 							<artifactId>micronaut-serde-processor</artifactId>
@@ -241,17 +261,6 @@ SOFTWARE. -->
 								</exclusion>
 							</exclusions>
 						</path>
-						<!--<path>
-							<groupId>io.micronaut.validation</groupId>
-							<artifactId>micronaut-validation-processor</artifactId>
-							<version>${micronaut.validation.version}</version>
-							<exclusions>
-								<exclusion>
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject</artifactId>
-								</exclusion>
-							</exclusions>
-						</path>-->
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<arg>

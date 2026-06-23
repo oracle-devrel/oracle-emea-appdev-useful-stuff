@@ -17,12 +17,11 @@ import jakarta.ws.rs.PathParam;
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface RawDataIoTOutputHttpClient {
 	@Post(value = "/rawdata/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAsString(@PathParam(value = "digitaltwinid") String digitalTwinId,
-			@PathParam(value = "endpoint") String endpoint, @PathParam(value = "timestamp") String timestamp,
-			@Body String content);
+	public boolean postRawDataAsString(@PathParam("digitaltwinid") String digitaltwinid,
+			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp, @Body String content);
 
 	@Post(value = "/rawdata/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAsBase64(@PathParam(value = "digitaltwinid") String digitalTwinId,
-			@PathParam(value = "endpoint") String endpoint, @PathParam(value = "timestamp") String timestamp,
+	public boolean postRawDataAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
+			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
 			@Body String base64content);
 }
