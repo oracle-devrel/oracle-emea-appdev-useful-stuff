@@ -11,7 +11,6 @@ import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.HttpOutputType;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.TimeSeriesDBOAuthTokenRetriever;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsJsonBuilder;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpNormalizedDataMetricMapper;
@@ -31,18 +30,16 @@ import lombok.extern.java.Log;
 public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 
 	private final int order;
-	private final HttpOutputType type;
 	private final boolean sentDataIsCompleted;
+	private final String metricNamePrefix = "iot.normalized";
 	@Inject
 	private TimeSeriesDBOAuthTokenRetriever authTokenRetriever;
 
 	@Inject
 	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
 			@Property(name = "messagehandler.output.normalizeddata.timeseriesords.enabled.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
 		this.order = order;
-		this.type = type;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 	}
 
@@ -68,9 +65,20 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 		return new NormalizedData[0];
 	}
 
-	@Scheduled(fixedRate = "5m")
+	long resetTime = System.currentTimeMillis();
+
+	@Scheduled(fixedRate = "60s", initialDelay = "")
 	private void resetToken() {
 		log.info("Setting token expiry in 1 milis from now");
+		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
+		resetTime = System.currentTimeMillis() + 60000;
+		log.info("Token should expire for next get token call");
+	}
+
+	@Scheduled(fixedRate = "10s")
+	private void testToken() {
+		long timetoreset = (resetTime - System.currentTimeMillis()) / 1000;
+		log.info("Getting token, seconds to reset is " + timetoreset);
 		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
 		log.info("Token should expire for next get token call");
 	}

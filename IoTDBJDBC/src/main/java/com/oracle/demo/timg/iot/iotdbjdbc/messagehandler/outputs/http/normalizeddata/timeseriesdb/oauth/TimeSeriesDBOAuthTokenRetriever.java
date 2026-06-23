@@ -54,17 +54,17 @@ import lombok.extern.java.Log;
 
 @Singleton
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_X)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_Y)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 @Log
 public class TimeSeriesDBOAuthTokenRetriever {
 	@Inject
 	private TimeSeriesDBCredentials tsDBuserCredentials;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_RENEWAL_PREEMPT, defaultValue = "PT60S")
 	private Duration renewalPreempt;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_X)
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
 	private String queryX;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_Y)
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 	private String queryY;
 	@Getter
 	private LocalDateTime currentTokenRenewTime = null;
@@ -94,7 +94,7 @@ public class TimeSeriesDBOAuthTokenRetriever {
 		currentTokenRenewTime = LocalDateTime.now().plus(expiryOffset);
 	}
 
-	public String getToken() throws OAuthTokenRetrievalException {
+	public synchronized String getToken() throws OAuthTokenRetrievalException {
 		if ((currentToken == null) || (currentTokenRenewTime == null)
 				|| LocalDateTime.now().isAfter(currentTokenRenewTime)) {
 			OAuthTokenResponse atr;

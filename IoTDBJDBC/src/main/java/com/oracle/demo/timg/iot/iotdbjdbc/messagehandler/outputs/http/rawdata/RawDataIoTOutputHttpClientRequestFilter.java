@@ -1,4 +1,5 @@
-/*Copyright (c) 2025 Oracle and/or its affiliates.
+
+/*Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -50,7 +51,7 @@ import lombok.extern.java.Log;
 // needs a endpoint
 @Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
 @Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@ClientFilter(patterns = { "${messagehandler.output.rawdata.iotoutputhttpclient:/api/v1/iotdata}/**" })
+@ClientFilter(patterns = { "${messagehandler.output.rawdata.iotoutputhttpclient.path:/api/v1/iotdata}/**" })
 @Log
 public class RawDataIoTOutputHttpClientRequestFilter {
 	private final String username;

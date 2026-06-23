@@ -174,3 +174,7 @@ response
 {"metrics_data_size":79,"metrics_ingested":1,
          "metrics_given":1,"metrics_metadata":1,"ingest_duration_ms":10,
          "ingest_format":"line","ingest_method":"ords","ingest_user_name":"ingest1"}
+         
+         
+see if it's loaded, login as a query user
+select count(*) from TELEMETRY_METRICS
