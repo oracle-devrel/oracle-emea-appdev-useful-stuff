@@ -79,7 +79,7 @@ public class TimeSeriesDBOAuthTokenRequestFilter {
 		log.info("Added usename " + this.username + " and password " + this.password);
 		log.info("request uri " + request.getUri().toASCIIString());
 		log.info("request path " + request.getPath());
-		log.info("request params = " + request.getParameters().toString());
+		log.info("request params = " + request.getParameters().asMap().toString());
 		log.info("Request body " + request.getBody(String.class));
 	}
 
