@@ -98,6 +98,8 @@ public class TimeSeriesDBOAuthTokenRetriever {
 		if ((currentToken == null) || (currentTokenRenewTime == null)
 				|| LocalDateTime.now().isAfter(currentTokenRenewTime)) {
 			OAuthTokenResponse atr;
+			log.info("Retrieveing token from DB");
+			;
 			try {
 				atr = authClient.getOAuthToken(queryX, queryY, tsDBuserCredentials);
 			} catch (HttpClientException e) {
@@ -109,6 +111,9 @@ public class TimeSeriesDBOAuthTokenRetriever {
 			// need to, yes we should probably allow for better control or retrieval times
 			// but this is a demo, and not supposed to be production.
 			this.currentTokenRenewTime = LocalDateTime.now().plusSeconds(atr.getExpiresIn()).minus(renewalPreempt);
+			log.info("Got token details " + atr);
+		} else {
+			log.info("Using existing token");
 		}
 		// we have a current token and it is still valid
 		return currentToken;
