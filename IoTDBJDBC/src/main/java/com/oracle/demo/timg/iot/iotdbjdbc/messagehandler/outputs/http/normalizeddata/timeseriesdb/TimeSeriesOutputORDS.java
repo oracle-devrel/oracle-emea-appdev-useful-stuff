@@ -47,7 +47,7 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	@Inject
 	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
 			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
-			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SEND_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted) {
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SENT_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted) {
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 	}
