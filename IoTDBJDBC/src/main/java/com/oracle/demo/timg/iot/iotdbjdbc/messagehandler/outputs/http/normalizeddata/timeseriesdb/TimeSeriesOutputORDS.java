@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.OAuthTokenRetrievalException;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.TimeSeriesDBOAuthTokenRetriever;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsJsonBuilder;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpNormalizedDataMetricMapper;
@@ -79,8 +80,12 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	public void testToken() {
 		long timetoreset = (resetTime - System.currentTimeMillis()) / 1000;
 		log.info("Getting token, seconds to reset is " + timetoreset);
-		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
-		log.info("Token should expire for next get token call");
+		try {
+			log.info("Token retrieved is " + authTokenRetriever.getToken());
+		} catch (OAuthTokenRetrievalException e) {
+			log.severe("Exception getting token");
+			e.printStackTrace();
+		}
 	}
 
 	@EventListener
