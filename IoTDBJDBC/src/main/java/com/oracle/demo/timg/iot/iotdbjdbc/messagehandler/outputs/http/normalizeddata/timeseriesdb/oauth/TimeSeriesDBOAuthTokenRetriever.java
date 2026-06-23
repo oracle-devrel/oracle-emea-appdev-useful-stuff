@@ -36,6 +36,7 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -47,6 +48,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.runtime.event.annotation.EventListener;
+import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.Getter;
@@ -58,6 +60,8 @@ import lombok.extern.java.Log;
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 @Log
 public class TimeSeriesDBOAuthTokenRetriever {
+	@Inject
+	private ObjectMapper mapper;
 	@Inject
 	private TimeSeriesDBCredentials tsDBuserCredentials;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_RENEWAL_PREEMPT, defaultValue = "PT60S")
@@ -99,11 +103,15 @@ public class TimeSeriesDBOAuthTokenRetriever {
 				|| LocalDateTime.now().isAfter(currentTokenRenewTime)) {
 			OAuthTokenResponse atr;
 			log.info("Retrieveing token from DB");
-			;
 			try {
-				atr = authClient.getOAuthToken(queryX, queryY, tsDBuserCredentials);
+				String credentials = mapper.writeValueAsString(tsDBuserCredentials);
+				log.info("Setting body to " + credentials);
+				atr = authClient.getOAuthToken(queryX, queryY, credentials);
 			} catch (HttpClientException e) {
 				throw new OAuthTokenRetrievalException("Problem getting the OAuth token " + e.getLocalizedMessage(), e);
+			} catch (IOException e) {
+				throw new OAuthTokenRetrievalException(
+						"IOException building mapping, this should not happen " + e.getLocalizedMessage(), e);
 			}
 			this.currentToken = atr.getAccessToken();
 			this.tokenType = atr.getTokenType();

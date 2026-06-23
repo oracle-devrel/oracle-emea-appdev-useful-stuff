@@ -38,7 +38,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalize
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBCredentials;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBProperties;
 
 import io.micronaut.context.annotation.Requires;
@@ -60,6 +59,6 @@ public interface TimeSeriesDBOAuthClient {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}")
 	public OAuthTokenResponse getOAuthToken(@QueryValue("x") String queryParamX, @QueryValue("y") String queryParamY,
-			@Body TimeSeriesDBCredentials timeSeriesDBCredentials) throws HttpClientException;
+			@Body String timeSeriesDBCredentials) throws HttpClientException;
 
 }
