@@ -63,8 +63,8 @@ public class TimeSeriesDBCredentials {
 	private String password;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
 	@JsonProperty(value = "tenant_name")
-	private String tenancyOcid;
+	private String tenant_name;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
 	@JsonProperty(value = "database_name")
-	private String databaseName;
+	private String database_name;
 }
