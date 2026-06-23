@@ -2,8 +2,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalize
 
 public class TimeSeriesDBProperties {
 	public static final String TIME_SERIES_PROPERTY_PREFIX = "messagehandler.output.normalizeddata.timeseries";
-	public static final String TIME_SERIES_PROPERTY_USERNAME = TIME_SERIES_PROPERTY_PREFIX + ".username";
-	public static final String TIME_SERIES_PROPERTY_PASSWORD = TIME_SERIES_PROPERTY_PREFIX + ".password";
 	public static final String TIME_SERIES_PROPERTY_ENABLED = TIME_SERIES_PROPERTY_PREFIX + ".enabled";
 	public static final String TIME_SERIES_PROPERTY_ORDER = TIME_SERIES_PROPERTY_PREFIX + ".order";
 	// things for the oauth token
@@ -16,6 +14,8 @@ public class TimeSeriesDBProperties {
 	public static final String TIME_SERIES_PROPERTY_OAUTH_PATH = TIME_SERIES_PROPERTY_OAUTH + ".path";
 	public static final String TIME_SERIES_PROPERTY_OAUTH_RENEWAL_PREEMPT = TIME_SERIES_PROPERTY_OAUTH
 			+ ".renewalpreempt";
+	public static final String TIME_SERIES_PROPERTY_OAUTH_USERNAME = TIME_SERIES_PROPERTY_OAUTH + ".username";
+	public static final String TIME_SERIES_PROPERTY_OAUTH_PASSWORD = TIME_SERIES_PROPERTY_OAUTH + ".password";
 	public static final String TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID = TIME_SERIES_PROPERTY_OAUTH + ".tenancyocid";
 	public static final String TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME = TIME_SERIES_PROPERTY_OAUTH + ".databasename";
 	// these are the metrics endpoints

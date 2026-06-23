@@ -44,8 +44,8 @@ import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_PASSWORD)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
@@ -53,10 +53,10 @@ import lombok.Data;
 // flag as jackson serdable
 @Serdeable
 public class TimeSeriesDBCredentials {
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_USERNAME)
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
 	@JsonProperty(value = "username")
 	private String username;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_PASSWORD)
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
 	@JsonProperty(value = "password")
 	private String password;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
