@@ -4,6 +4,8 @@ public class TimeSeriesDBProperties {
 	public static final String TIME_SERIES_PROPERTY_PREFIX = "messagehandler.output.normalizeddata.timeseries";
 	public static final String TIME_SERIES_PROPERTY_ENABLED = TIME_SERIES_PROPERTY_PREFIX + ".enabled";
 	public static final String TIME_SERIES_PROPERTY_ORDER = TIME_SERIES_PROPERTY_PREFIX + ".order";
+	public static final String TIME_SERIES_PROPERTY_SEND_DATA_IS_COMPLETED = TIME_SERIES_PROPERTY_PREFIX
+			+ ".sentdataiscompleted";
 	// things for the oauth token
 	public static final String TIME_SERIES_PROPERTY_OAUTH = TIME_SERIES_PROPERTY_PREFIX + ".oauth";
 	public static final String TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS = TIME_SERIES_PROPERTY_OAUTH + ".query";

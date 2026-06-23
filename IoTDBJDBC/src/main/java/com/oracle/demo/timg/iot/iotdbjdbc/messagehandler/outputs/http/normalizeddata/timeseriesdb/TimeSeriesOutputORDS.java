@@ -18,14 +18,16 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata.Ra
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = "messagehandler.output.normalizeddata.timeseriesords.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.normalizeddata.timeseriesords.enabled.order")
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
 @Log
 public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 
@@ -35,10 +37,17 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	@Inject
 	private TimeSeriesDBOAuthTokenRetriever authTokenRetriever;
 
+//	@Inject
+//	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
+//			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
+//			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
+//		this.order = order;
+//		this.sentDataIsCompleted = sentDataIsCompleted;
+//	}
 	@Inject
 	public TimeSeriesOutputORDS(RawDataIoTOutputHttpClient httpClient,
-			@Property(name = "messagehandler.output.normalizeddata.timeseriesords.enabled.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SEND_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted) {
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 	}
@@ -67,7 +76,7 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 
 	long resetTime = System.currentTimeMillis();
 
-	@Scheduled(fixedRate = "60s", initialDelay = "")
+	@Scheduled(fixedRate = "60s", initialDelay = "20s")
 	public void resetToken() {
 		log.info("Setting token expiry in 1 milis from now");
 		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
@@ -75,12 +84,17 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 		log.info("Token should expire for next get token call");
 	}
 
-	@Scheduled(fixedRate = "10s")
+	@Scheduled(fixedRate = "10s", initialDelay = "20s")
 	public void testToken() {
 		long timetoreset = (resetTime - System.currentTimeMillis()) / 1000;
 		log.info("Getting token, seconds to reset is " + timetoreset);
 		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
 		log.info("Token should expire for next get token call");
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for TimeSeriesOutputORDS");
 	}
 
 	public OtlpMetricsJsonBuilder addGauge(OtlpMetricsJsonBuilder builder, NormalizedData input) {
