@@ -40,8 +40,8 @@ public class OtlpNormalizedDataMetricsOutput implements NormalizedDataMessageHan
 			@Property(name = OtlpProperties.SERVICE_INSTANCE_ID, defaultValue = "") String serviceInstanceId,
 			@Property(name = OtlpProperties.SCOPE_NAME, defaultValue = "com.oracle.demo.timg.iot.iotdbjdbc") String scopeName,
 			@Property(name = OtlpProperties.SCOPE_VERSION, defaultValue = "") String scopeVersion,
-			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_X) String queryX,
-			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_Y) String queryY,
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X) String queryX,
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y) String queryY,
 			@Property(name = OtlpProperties.METRIC_NAME_PREFIX, defaultValue = OtlpNormalizedDataMetricMapper.DEFAULT_METRIC_PREFIX) String metricNamePrefix,
 			@Property(name = OtlpProperties.METRIC_UNIT, defaultValue = OtlpNormalizedDataMetricMapper.DEFAULT_UNIT) String metricUnit,
 			@Property(name = OtlpProperties.METRIC_DESCRIPTION, defaultValue = "IoT normalized data value") String metricDescription) {

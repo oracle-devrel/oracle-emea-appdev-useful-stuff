@@ -68,7 +68,7 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	long resetTime = System.currentTimeMillis();
 
 	@Scheduled(fixedRate = "60s", initialDelay = "")
-	private void resetToken() {
+	public void resetToken() {
 		log.info("Setting token expiry in 1 milis from now");
 		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));
 		resetTime = System.currentTimeMillis() + 60000;
@@ -76,7 +76,7 @@ public class TimeSeriesOutputORDS implements NormalizedDataMessageHandler {
 	}
 
 	@Scheduled(fixedRate = "10s")
-	private void testToken() {
+	public void testToken() {
 		long timetoreset = (resetTime - System.currentTimeMillis()) / 1000;
 		log.info("Getting token, seconds to reset is " + timetoreset);
 		authTokenRetriever.forceTokenRetrievalAfter(Duration.ofMillis(1));

@@ -22,8 +22,8 @@ import lombok.extern.java.Log;
 @Requires(property = OtlpProperties.ENABLED, value = "true", defaultValue = "false")
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_X)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_URI_QUERY_PARAMS_Y)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
+@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 @Log
 public class OtlpMetricsRequestFilter {
 	private final TimeSeriesDBOAuthTokenRetriever tokenRetriever;
@@ -39,7 +39,8 @@ public class OtlpMetricsRequestFilter {
 			String token = tokenRetriever.getToken();
 			String tokenType = tokenRetriever.getTokenType();
 			request.getHeaders().add(AUTHORIZATION, (tokenType == null ? "Bearer" : tokenType) + " " + token);
-			request.getHeaders().add(TimeSeriesDBOAuthTokenRequestFilter.HEADER_REQUEST_ID, UUID.randomUUID().toString());
+			request.getHeaders().add(TimeSeriesDBOAuthTokenRequestFilter.HEADER_REQUEST_ID,
+					UUID.randomUUID().toString());
 		} catch (OAuthTokenRetrievalException e) {
 			throw new IllegalStateException("Unable to retrieve an OAuth token for OTLP metrics upload", e);
 		}
