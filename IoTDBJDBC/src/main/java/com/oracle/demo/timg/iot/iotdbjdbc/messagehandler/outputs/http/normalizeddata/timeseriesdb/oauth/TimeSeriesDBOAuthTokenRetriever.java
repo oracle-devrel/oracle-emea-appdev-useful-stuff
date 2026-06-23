@@ -101,9 +101,7 @@ public class TimeSeriesDBOAuthTokenRetriever {
 			log.info("Retrieveing token from DB");
 			;
 			try {
-				atr = authClient.getOAuthToken(queryX, queryY, tsDBuserCredentials.getUsername(),
-						tsDBuserCredentials.getPassword(), tsDBuserCredentials.getTenancyOcid(),
-						tsDBuserCredentials.getDatabaseName());
+				atr = authClient.getOAuthToken(queryX, queryY, tsDBuserCredentials);
 			} catch (HttpClientException e) {
 				throw new OAuthTokenRetrievalException("Problem getting the OAuth token " + e.getLocalizedMessage(), e);
 			}
