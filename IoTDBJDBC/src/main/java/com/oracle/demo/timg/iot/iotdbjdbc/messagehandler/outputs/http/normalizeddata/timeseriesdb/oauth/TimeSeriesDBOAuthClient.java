@@ -45,8 +45,8 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Consumes;
+import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
-import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
@@ -58,7 +58,7 @@ import jakarta.ws.rs.QueryParam;
 public interface TimeSeriesDBOAuthClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Post(value = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}")
+	@Get(value = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}")
 	public OAuthTokenResponse getOAuthToken(@QueryParam("x") String queryParamX, @QueryParam("y") String queryParamY,
 			@Body TimeSeriesDBCredentials credentials) throws HttpClientException;
 
