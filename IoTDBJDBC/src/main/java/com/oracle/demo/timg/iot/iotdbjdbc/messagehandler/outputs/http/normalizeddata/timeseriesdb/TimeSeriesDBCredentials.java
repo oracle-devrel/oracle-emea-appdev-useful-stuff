@@ -41,7 +41,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -52,7 +51,6 @@ import lombok.NoArgsConstructor;
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 // flag as jackson serdable
 @Serdeable
