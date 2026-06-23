@@ -38,19 +38,17 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalize
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBCredentials;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBProperties;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
-import jakarta.ws.rs.QueryParam;
 
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Client(id = "timeseriesoauth")
@@ -59,7 +57,7 @@ public interface TimeSeriesDBOAuthClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}")
-	public OAuthTokenResponse getOAuthToken(@QueryParam("x") String queryParamX, @QueryParam("y") String queryParamY,
-			@Body TimeSeriesDBCredentials credentials) throws HttpClientException;
+	public OAuthTokenResponse getOAuthToken(@QueryValue("x") String queryParamX, @QueryValue("y") String queryParamY,
+			String username, String password, String tenancy_name, String database_name) throws HttpClientException;
 
 }
