@@ -21,7 +21,6 @@ import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = "datasources." + TimeSeriesEndpointsRetriever.TIME_SERIES_DATA_SOURCE_NAME + ".dialect")
 @Log
 @Singleton
 public class TimeSeriesEndpointsRetriever {
