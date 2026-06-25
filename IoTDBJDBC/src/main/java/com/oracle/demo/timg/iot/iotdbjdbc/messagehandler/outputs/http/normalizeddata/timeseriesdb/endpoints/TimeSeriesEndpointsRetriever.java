@@ -27,7 +27,7 @@ import lombok.extern.java.Log;
 @Log
 @Singleton
 public class TimeSeriesEndpointsRetriever {
-	public final static String TIME_SERIES_DATA_SOURCE_NAME = "timeseries";
+	public final static String TIME_SERIES_DATA_SOURCE_NAME = "default";
 	public final static String TIME_SERIES_ENDPOINTS_QUERY = "select dbms_cloud_telemetry_ingest.get_ingestion_endpoints as endpoints from dual";
 	private final DataSource dataSource;
 	@Inject
