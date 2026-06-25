@@ -34,47 +34,55 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
+import lombok.Getter;
+
+//{"token":{"url":"https://G9051959400A6D8-TELEMETRY.adb.uk-london-1.oraclecloudapps.com/tel/token?x=zep-111&y=9019"},"otlp":{"url":"https://G9051959400A6D8-TELEMETRY.adb.uk-london-1.oraclecloudapps.com/tel/v1/metrics?x=zep-111&y=9005"}}
 
 @Serdeable
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SonnenConfiguration {
-	// get the UTC TZ once to speed things later
-	@JsonIgnore
-	private final static ZoneId utcTz = ZoneId.of("UTC");
-	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
-	// store this in two formats as the IoT service uses the Unix time, but we might
-	// want to process it based on time zone data, however force the zone to be GMT
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
-	public ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
-	public long time = System.currentTimeMillis();
+public class TimeSeriesEndpointsResponse {
+	private URLHolder token;
+	private URLHolder otlp;
 
-	@JsonProperty("EM_ToU_Schedule")
-	public void setTimeOfUseScheduleFromSonnen(String timeOfUseSchedule) {
-		this.timeOfUseSchedule = timeOfUseSchedule;
+	@Serdeable
+	public class URLHolder {
+		@Getter
+		private String url;
+		private Map<String, String> queryParams;
+
+		public String getQueryParam(String name) throws URISyntaxException {
+			if (queryParams == null) {
+				getQueryParams();
+			}
+			return queryParams.get(name);
+		}
+
+		// get the first query param that matches the provided name.
+		private void getQueryParams() throws URISyntaxException {
+			URI uri = new URI(url);
+			queryParams = new HashMap<>();
+			String query = uri.getRawQuery();
+			if (query == null || query.isEmpty()) {
+				return;
+			}
+			for (String pair : query.split("&")) {
+				String[] keyValue = pair.split("=", 2);
+				String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
+				String value = keyValue.length > 1 ? URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8) : "";
+				queryParams.put(key, value);
+			}
+			return;
+		}
 	}
-
-	private String timeOfUseSchedule;
-
-	@JsonProperty("DE_Software")
-	public void setSoftwareVersionFromSonnen(String softwareVersion) {
-		this.softwareVersion = softwareVersion;
-	}
-
-	private String softwareVersion;
-
-	private String commandDemoPlaceholder = PLACE_HOLDER_VALUE;
-
 }

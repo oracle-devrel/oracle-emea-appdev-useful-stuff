@@ -42,6 +42,8 @@ import java.time.LocalDateTime;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBCredentials;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBProperties;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsQueryParams;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsRetriever;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -56,8 +58,8 @@ import lombok.extern.java.Log;
 
 @Singleton
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
+//@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
+//@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 @Log
 public class TimeSeriesDBOAuthTokenRetriever {
 	@Inject
@@ -66,16 +68,25 @@ public class TimeSeriesDBOAuthTokenRetriever {
 	private TimeSeriesDBCredentials tsDBuserCredentials;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_RENEWAL_PREEMPT, defaultValue = "PT60S")
 	private Duration renewalPreempt;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
-	private String queryX;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
-	private String queryY;
+	// @Property(name =
+	// TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
+	private final String queryX;
+	// @Property(name =
+	// TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
+	private final String queryY;
 	@Getter
 	private LocalDateTime currentTokenRenewTime = null;
 
 	private String currentToken = null;
 	@Getter
 	private String tokenType;
+
+	@Inject
+	public TimeSeriesDBOAuthTokenRetriever(TimeSeriesEndpointsRetriever endpointsRetriever) {
+		TimeSeriesEndpointsQueryParams endpointsQueryParams = endpointsRetriever.getQueryParams();
+		this.queryX = endpointsQueryParams.getOauthQueryX();
+		this.queryY = endpointsQueryParams.getOauthQueryY();
+	}
 
 	@Inject
 	private TimeSeriesDBOAuthClient authClient;
