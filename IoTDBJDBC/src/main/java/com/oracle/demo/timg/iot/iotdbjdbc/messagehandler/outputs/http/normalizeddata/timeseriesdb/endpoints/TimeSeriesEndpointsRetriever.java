@@ -53,7 +53,8 @@ public class TimeSeriesEndpointsRetriever {
 			@Property(name = TIME_SERIES_JDBC_USERNAME) String username,
 			@Property(name = TIME_SERIES_JDBC_PASSWORD) String password,
 			@Property(name = TIME_SERIES_JDBC_DRIVER, defaultValue = "jdbc:oracle:thin:") String driver)
-			throws SQLException, URISyntaxException, IOException, TimeSeriesEndpointsNothingRetrievedException {
+			throws SQLException, URISyntaxException, IOException, TimeSeriesEndpointsNothingRetrievedException,
+			TimeSeriesEndpointsNoRowsRetrievedException {
 
 		this.connectionname = connectionname;
 		this.walletpath = walletpath;
@@ -92,6 +93,9 @@ public class TimeSeriesEndpointsRetriever {
 		} catch (TimeSeriesEndpointsNothingRetrievedException e) {
 			log.severe("Returned query params is null " + e.getLocalizedMessage());
 			throw e;
+		} catch (TimeSeriesEndpointsNoRowsRetrievedException e) {
+			log.severe("No rows retrieved from query " + TIME_SERIES_ENDPOINTS_QUERY + ", " + e.getLocalizedMessage());
+			throw e;
 		}
 	}
 
@@ -99,7 +103,8 @@ public class TimeSeriesEndpointsRetriever {
 		if (endpointsQueryParams == null) {
 			try {
 				loadEndpointsQueryParams();
-			} catch (URISyntaxException | SQLException | IOException | TimeSeriesEndpointsNothingRetrievedException e) {
+			} catch (URISyntaxException | SQLException | IOException | TimeSeriesEndpointsNothingRetrievedException
+					| TimeSeriesEndpointsNoRowsRetrievedException e) {
 				log.severe("Problem getting the query params " + e.getLocalizedMessage());
 				return null;
 			}
@@ -107,19 +112,27 @@ public class TimeSeriesEndpointsRetriever {
 		return endpointsQueryParams;
 	}
 
-	private void loadEndpointsQueryParams()
-			throws URISyntaxException, SQLException, IOException, TimeSeriesEndpointsNothingRetrievedException {
+	private void loadEndpointsQueryParams() throws URISyntaxException, SQLException, IOException,
+			TimeSeriesEndpointsNothingRetrievedException, TimeSeriesEndpointsNoRowsRetrievedException {
 		// try to request the endpoints form the database, micronaut will handle the
 		// connection side of things
 		try (Connection connection = dataSource.getConnection();
 				Statement s = connection.createStatement();
 				ResultSet rs = s.executeQuery(TIME_SERIES_ENDPOINTS_QUERY)) {
-			Clob endpointsClob = rs.getClob("endpoints");
-			if (endpointsClob == null) {
-				throw new TimeSeriesEndpointsNothingRetrievedException("Retrieved clob is null");
+			if (rs.next()) {
+				Clob endpointsClob = rs.getClob("endpoints");
+				if (endpointsClob == null) {
+					throw new TimeSeriesEndpointsNothingRetrievedException("Retrieved clob is null");
+				}
+				String endpoints = endpointsClob.getSubString(1, (int) endpointsClob.length());
+				endpointsResponse = mapper.readValue(endpoints, TimeSeriesEndpointsResponse.class);
+			} else {
+				throw new TimeSeriesEndpointsNoRowsRetrievedException(
+						"No rows in the result set, had the DB been configured for the telemetry ?");
 			}
-			String endpoints = endpointsClob.getSubString(1, (int) endpointsClob.length());
-			endpointsResponse = mapper.readValue(endpoints, TimeSeriesEndpointsResponse.class);
+		} catch (TimeSeriesEndpointsNoRowsRetrievedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		// let's try and get the params from these
 		endpointsQueryParams = TimeSeriesEndpointsQueryParams.builder()
