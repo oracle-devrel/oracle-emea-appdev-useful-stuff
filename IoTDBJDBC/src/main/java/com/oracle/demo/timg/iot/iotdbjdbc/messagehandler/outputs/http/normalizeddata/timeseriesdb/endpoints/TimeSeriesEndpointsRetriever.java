@@ -53,7 +53,7 @@ public class TimeSeriesEndpointsRetriever {
 			@Property(name = TIME_SERIES_JDBC_USERNAME) String username,
 			@Property(name = TIME_SERIES_JDBC_PASSWORD) String password,
 			@Property(name = TIME_SERIES_JDBC_DRIVER, defaultValue = "jdbc:oracle:thin:") String driver)
-			throws SQLException, URISyntaxException, IOException {
+			throws SQLException, URISyntaxException, IOException, TimeSeriesEndpointsNothingRetrievedException {
 
 		this.connectionname = connectionname;
 		this.walletpath = walletpath;
@@ -89,6 +89,9 @@ public class TimeSeriesEndpointsRetriever {
 		} catch (IOException e) {
 			log.severe("IOException getting query params " + e.getLocalizedMessage());
 			throw e;
+		} catch (TimeSeriesEndpointsNothingRetrievedException e) {
+			log.severe("Returned query params is null " + e.getLocalizedMessage());
+			throw e;
 		}
 	}
 
@@ -96,7 +99,7 @@ public class TimeSeriesEndpointsRetriever {
 		if (endpointsQueryParams == null) {
 			try {
 				loadEndpointsQueryParams();
-			} catch (URISyntaxException | SQLException | IOException e) {
+			} catch (URISyntaxException | SQLException | IOException | TimeSeriesEndpointsNothingRetrievedException e) {
 				log.severe("Problem getting the query params " + e.getLocalizedMessage());
 				return null;
 			}
