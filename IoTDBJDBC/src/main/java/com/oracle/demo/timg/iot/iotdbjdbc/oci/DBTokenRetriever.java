@@ -93,14 +93,14 @@ public class DBTokenRetriever {
 		log.fine("generating key pair");
 		KeyPair keyPair = generateKeyPair();
 		String publicKeyPem = toPublicKeyPem(keyPair);
-		log.fine("Creating request");
+		log.info("Creating request using scope " + scope);
 		GenerateScopedAccessTokenRequest request = GenerateScopedAccessTokenRequest.builder()
 				.generateScopedAccessTokenDetails(
 						GenerateScopedAccessTokenDetails.builder().scope(scope).publicKey(publicKeyPem).build())
 				.build();
 		try {
 			String token = dataplaneClient.generateScopedAccessToken(request).getSecurityToken().getToken();
-			log.info("Request generated, returning new token");
+			log.info("Request generated, result is " + token + " returning new token");
 			return AccessToken.createJsonWebToken(token.toCharArray(), keyPair.getPrivate());
 		} catch (Exception e) {
 			// problem, throw an error

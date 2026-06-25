@@ -129,26 +129,26 @@ SOFTWARE. -->
 			<scope>test</scope>
 		</dependency>
 		<!-- these let us get the time series DB oauth endpoint details-->
-		<dependency>
-			<groupId>io.micronaut.oraclecloud</groupId>
-			<artifactId>micronaut-oraclecloud-atp</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.micronaut.oraclecloud</groupId>
-			<artifactId>micronaut-oraclecloud-sdk</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.micronaut.data</groupId>
-			<artifactId>micronaut-data-jdbc</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.micronaut.sql</groupId>
-			<artifactId>micronaut-jdbc-ucp</artifactId>
-			<scope>compile</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>io.micronaut.oraclecloud</groupId>-->
+<!--			<artifactId>micronaut-oraclecloud-atp</artifactId>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>io.micronaut.oraclecloud</groupId>-->
+<!--			<artifactId>micronaut-oraclecloud-sdk</artifactId>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>io.micronaut.data</groupId>-->
+<!--			<artifactId>micronaut-data-jdbc</artifactId>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>io.micronaut.sql</groupId>-->
+<!--			<artifactId>micronaut-jdbc-ucp</artifactId>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
 		<!-- OCI SDK: common utilities (HTTP client, auth plumbing, etc.) -->
 		<dependency>
 			<groupId>com.oracle.oci.sdk</groupId>
@@ -257,17 +257,17 @@ SOFTWARE. -->
 							<artifactId>micronaut-inject-java</artifactId>
 							<version>${micronaut.core.version}</version>
 						</path>
-						<path>
-							<groupId>io.micronaut.data</groupId>
-							<artifactId>micronaut-data-processor</artifactId>
-							<version>${micronaut.data.version}</version>
-							<exclusions>
-								<exclusion>
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject</artifactId>
-								</exclusion>
-							</exclusions>
-						</path>
+<!--						<path>-->
+<!--							<groupId>io.micronaut.data</groupId>-->
+<!--							<artifactId>micronaut-data-processor</artifactId>-->
+<!--							<version>${micronaut.data.version}</version>-->
+<!--							<exclusions>-->
+<!--								<exclusion>-->
+<!--									<groupId>io.micronaut</groupId>-->
+<!--									<artifactId>micronaut-inject</artifactId>-->
+<!--								</exclusion>-->
+<!--							</exclusions>-->
+<!--						</path>-->
 						<path>
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-graal</artifactId>
