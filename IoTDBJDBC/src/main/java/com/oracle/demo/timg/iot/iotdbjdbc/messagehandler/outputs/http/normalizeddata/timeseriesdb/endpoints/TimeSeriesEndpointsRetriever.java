@@ -34,11 +34,11 @@ public class TimeSeriesEndpointsRetriever {
 	public final static String DRIVER_URL_SEP = "@";
 	public final static String DRIVER_TNS_NAME = "?TNS_ADMIN=";
 	public final static String TIME_SERIES_JDBC_PROPERTIES = "timeseriesdb.jdbc";
-	public final static String TIME_SERIES_JDBC_CONNECTION_NAME = ".connectionname";
-	public final static String TIME_SERIES_JDBC_WALLET_PATH = ".walletpath";
-	public final static String TIME_SERIES_JDBC_USERNAME = ".username";
-	public final static String TIME_SERIES_JDBC_PASSWORD = ".password";
-	public final static String TIME_SERIES_JDBC_DRIVER = ".driver";
+	public final static String TIME_SERIES_JDBC_CONNECTION_NAME = TIME_SERIES_JDBC_PROPERTIES + ".connectionname";
+	public final static String TIME_SERIES_JDBC_WALLET_PATH = TIME_SERIES_JDBC_PROPERTIES + ".walletpath";
+	public final static String TIME_SERIES_JDBC_USERNAME = TIME_SERIES_JDBC_PROPERTIES + ".username";
+	public final static String TIME_SERIES_JDBC_PASSWORD = TIME_SERIES_JDBC_PROPERTIES + ".password";
+	public final static String TIME_SERIES_JDBC_DRIVER = TIME_SERIES_JDBC_PROPERTIES + ".driver";
 	public final static String TIME_SERIES_ENDPOINTS_QUERY = "select dbms_cloud_telemetry_ingest.get_ingestion_endpoints as endpoints from dual";
 	private final String connectionname, walletpath, username, password, driver, connectionstring;
 	private final OracleDataSource dataSource;
