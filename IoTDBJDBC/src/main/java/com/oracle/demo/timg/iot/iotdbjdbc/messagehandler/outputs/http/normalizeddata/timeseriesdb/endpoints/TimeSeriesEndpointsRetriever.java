@@ -42,20 +42,20 @@ public class TimeSeriesEndpointsRetriever {
 	public final static String TIME_SERIES_ENDPOINTS_QUERY = "select dbms_cloud_telemetry_ingest.get_ingestion_endpoints as endpoints from dual";
 	private final String connectionname, walletpath, username, password, driver, connectionstring;
 	private final OracleDataSource dataSource;
-	@Inject
-	private ObjectMapper mapper;
+	private final ObjectMapper mapper;
 	private TimeSeriesEndpointsQueryParams endpointsQueryParams;
 	private TimeSeriesEndpointsResponse endpointsResponse;
 
 	@Inject
-	public TimeSeriesEndpointsRetriever(@Property(name = TIME_SERIES_JDBC_CONNECTION_NAME) String connectionname,
+	public TimeSeriesEndpointsRetriever(ObjectMapper mapper,
+			@Property(name = TIME_SERIES_JDBC_CONNECTION_NAME) String connectionname,
 			@Property(name = TIME_SERIES_JDBC_WALLET_PATH) String walletpath,
 			@Property(name = TIME_SERIES_JDBC_USERNAME) String username,
 			@Property(name = TIME_SERIES_JDBC_PASSWORD) String password,
 			@Property(name = TIME_SERIES_JDBC_DRIVER, defaultValue = "jdbc:oracle:thin:") String driver)
 			throws SQLException, URISyntaxException, IOException, TimeSeriesEndpointsNothingRetrievedException,
 			TimeSeriesEndpointsNoRowsRetrievedException {
-
+		this.mapper = mapper;
 		this.connectionname = connectionname;
 		this.walletpath = walletpath;
 		this.username = username;
