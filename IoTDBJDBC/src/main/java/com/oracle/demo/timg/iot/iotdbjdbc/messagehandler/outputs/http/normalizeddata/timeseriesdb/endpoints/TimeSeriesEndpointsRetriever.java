@@ -16,9 +16,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.serde.ObjectMapper;
-import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
@@ -36,7 +34,7 @@ public class TimeSeriesEndpointsRetriever {
 	private TimeSeriesEndpointsResponse endpointsResponse;
 
 	@Inject
-	public TimeSeriesEndpointsRetriever(@Named(TIME_SERIES_DATA_SOURCE_NAME) DataSource dataSource) {
+	public TimeSeriesEndpointsRetriever(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
@@ -52,7 +50,6 @@ public class TimeSeriesEndpointsRetriever {
 		return endpointsQueryParams;
 	}
 
-	@Transactional
 	void loadEndpointsQueryParams() throws URISyntaxException, SQLException, IOException {
 		// try to request the endpoints form the database, micronaut will handle the
 		// connection side of things
