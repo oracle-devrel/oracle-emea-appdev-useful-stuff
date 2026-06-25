@@ -60,7 +60,6 @@ import oracle.jdbc.pool.OracleDataSource;
 @Requires(property = "iotdatacache.url")
 @Requires(property = "iotdatacache.schemaname")
 public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
-
 	private final DBTokenRetriever dbTokenRetriever;
 
 	public final static String DRIVER_URL_SEP = "@";

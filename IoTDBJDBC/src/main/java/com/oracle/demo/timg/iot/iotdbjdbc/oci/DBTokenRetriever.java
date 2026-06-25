@@ -62,7 +62,7 @@ import oracle.jdbc.AccessToken;
  * This class is based on the IamDbTokenProvider by Philippe Vanhaesendonck but
  * using micronaut dependency injection
  */
-@Requires(property = "oci.dbtoken.scope")
+@Requires(property = "iotdatacache.oci.dbtoken.scope")
 public class DBTokenRetriever {
 
 	private final BasicAuthenticationDetailsProvider authProvider;
@@ -72,7 +72,8 @@ public class DBTokenRetriever {
 	private final DataplaneClient dataplaneClient;
 
 	@Inject
-	public DBTokenRetriever(OCIAuthProvider ociAuthProvider, @Property(name = "oci.dbtoken.scope") String scope) {
+	public DBTokenRetriever(OCIAuthProvider ociAuthProvider,
+			@Property(name = "iotdatacache.oci.dbtoken.scope") String scope) {
 		log.fine(() -> "Auth provider will return type " + ociAuthProvider.getAuthProviderType());
 		this.authProvider = ociAuthProvider.getAuthProvider();
 		this.scope = scope;
