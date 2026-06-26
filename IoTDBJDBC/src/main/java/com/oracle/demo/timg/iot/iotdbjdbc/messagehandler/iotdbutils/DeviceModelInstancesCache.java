@@ -109,6 +109,14 @@ public class DeviceModelInstancesCache {
 	public void configure() throws Exception {
 		log.fine("Getting connection");
 		connection = dbConnectionSupplier.getNewConnection(schemaName);
+
+		// set this up so we can re-use it later if we need to query for an instance we
+		// didn't know about
+		log.fine("Creating prepared statements");
+		selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
+		selectModelNameByModelIdPS = connection.prepareStatement(SELECT_MODEL_NAME_BY_MODEL_ID);
+		selectModelIdByModelNamePS = connection.prepareStatement(SELECT_MODEL_ID_BY_MODEL_NAME);
+		log.fine("Prepared statements created");
 		// try to pre-load the existing
 		if (preloadExistingModels) {
 			log.info("Pre-loading existing models");
@@ -123,13 +131,6 @@ public class DeviceModelInstancesCache {
 		} else {
 			log.info("Pre-loading existing instances is disabled, they will be loaded on demand");
 		}
-		// set this up so we can re-use it later if we need to query for an instance we
-		// didn't know about
-		log.fine("Creating prepared statements");
-		selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
-		selectModelNameByModelIdPS = connection.prepareStatement(SELECT_MODEL_NAME_BY_MODEL_ID);
-		selectModelIdByModelNamePS = connection.prepareStatement(SELECT_MODEL_ID_BY_MODEL_NAME);
-		log.fine("Prepared statements created");
 		log.info(getConfig());
 	}
 
