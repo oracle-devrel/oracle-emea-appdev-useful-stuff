@@ -11,6 +11,7 @@ public final class NormalizedDataMetricDtoExample {
 				.serviceName("IoTDBJDBC")
 				.scope("com.oracle.demo.timg.iot.iotdbjdbc", "1.0.0")
 				.metric("iot.normalized", "1", "IoT normalized data value")
-				.gaugeMetric(normalizedData);
+				.gaugeMetric(normalizedData)
+				.build();
 	}
 }
