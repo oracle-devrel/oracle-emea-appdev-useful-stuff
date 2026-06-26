@@ -2,8 +2,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalize
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import java.util.Map;
-
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.TimeSeriesDBProperties;
 
 import io.micronaut.context.annotation.Requires;
@@ -25,7 +23,7 @@ import jakarta.ws.rs.QueryParam;
 public interface OtlpMetricsClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Post(value = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/v1/metrics}")
+	@Post(value = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}")
 	HttpResponse<String> uploadMetrics(@QueryParam("x") String queryParamX, @QueryParam("y") String queryParamY,
-			@Body Map<String, Object> metrics);
+			@Body MetricsData metricsData);
 }

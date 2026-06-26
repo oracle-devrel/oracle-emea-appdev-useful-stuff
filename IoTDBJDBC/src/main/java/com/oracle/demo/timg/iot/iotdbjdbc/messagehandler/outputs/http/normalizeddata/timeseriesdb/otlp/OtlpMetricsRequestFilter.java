@@ -16,8 +16,8 @@ import io.micronaut.http.annotation.RequestFilter;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
-@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/v1/metrics}",
-		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/v1/metrics}/**" })
+@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}",
+		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}/**" })
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Requires(property = OtlpProperties.ENABLED, value = "true", defaultValue = "false")
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
@@ -44,6 +44,6 @@ public class OtlpMetricsRequestFilter {
 		} catch (OAuthTokenRetrievalException e) {
 			throw new IllegalStateException("Unable to retrieve an OAuth token for OTLP metrics upload", e);
 		}
-		log.finer("Added OAuth authorization headers for OTLP metrics upload");
+		log.info("Added OAuth authorization headers for OTLP metrics upload");
 	}
 }
