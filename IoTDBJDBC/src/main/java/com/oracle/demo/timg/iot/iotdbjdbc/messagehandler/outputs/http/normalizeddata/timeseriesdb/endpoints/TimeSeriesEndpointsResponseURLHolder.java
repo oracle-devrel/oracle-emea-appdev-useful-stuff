@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.micronaut.serde.annotation.Serdeable;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Serdeable
 @NoArgsConstructor
+@Data
 public class TimeSeriesEndpointsResponseURLHolder {
 	@Getter
 	private String url;
@@ -20,13 +22,13 @@ public class TimeSeriesEndpointsResponseURLHolder {
 
 	public String getQueryParam(String name) throws URISyntaxException {
 		if (queryParams == null) {
-			getQueryParams();
+			loadQueryParams();
 		}
 		return queryParams.get(name);
 	}
 
 	// get the first query param that matches the provided name.
-	private void getQueryParams() throws URISyntaxException {
+	private void loadQueryParams() throws URISyntaxException {
 		URI uri = new URI(url);
 		queryParams = new HashMap<>();
 		String query = uri.getRawQuery();

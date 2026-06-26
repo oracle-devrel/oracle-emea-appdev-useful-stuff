@@ -125,15 +125,14 @@ public class TimeSeriesEndpointsRetriever {
 					throw new TimeSeriesEndpointsNothingRetrievedException("Retrieved clob is null");
 				}
 				String endpoints = endpointsClob.getSubString(1, (int) endpointsClob.length());
+				log.info("Retrieved endpoints data " + endpoints);
 				endpointsResponse = mapper.readValue(endpoints, TimeSeriesEndpointsResponse.class);
 			} else {
 				throw new TimeSeriesEndpointsNoRowsRetrievedException(
-						"No rows in the result set, had the DB been configured for the telemetry ?");
+						"No rows in the result set, has the DB been configured for the telemetry ?");
 			}
-		} catch (TimeSeriesEndpointsNoRowsRetrievedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		log.info("Build endpoints info is " + endpointsResponse);
 		// let's try and get the params from these
 		endpointsQueryParams = TimeSeriesEndpointsQueryParams.builder()
 				.metricsQueryX(endpointsResponse.getOtlp().getQueryParam("x"))
