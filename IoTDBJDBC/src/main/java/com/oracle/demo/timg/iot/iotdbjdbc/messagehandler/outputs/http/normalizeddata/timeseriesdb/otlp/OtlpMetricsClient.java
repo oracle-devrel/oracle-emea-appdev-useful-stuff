@@ -16,7 +16,6 @@ import io.micronaut.http.client.annotation.Client;
 import jakarta.ws.rs.QueryParam;
 
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = OtlpProperties.ENABLED, value = "true", defaultValue = "false")
 @Requires(property = "micronaut.http.services." + OtlpProperties.METRICS_CLIENT_ID + ".url")
 @Client(id = OtlpProperties.METRICS_CLIENT_ID)
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
