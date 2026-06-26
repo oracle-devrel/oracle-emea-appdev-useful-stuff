@@ -19,7 +19,6 @@ import lombok.extern.java.Log;
 @ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}",
 		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}/**" })
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = OtlpProperties.ENABLED, value = "true", defaultValue = "false")
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
