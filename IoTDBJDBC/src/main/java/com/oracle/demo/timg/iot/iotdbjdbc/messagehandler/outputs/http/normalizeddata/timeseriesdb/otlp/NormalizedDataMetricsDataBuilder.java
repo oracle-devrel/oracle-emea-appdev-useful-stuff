@@ -27,6 +27,7 @@ public class NormalizedDataMetricsDataBuilder {
 	private String metricUnit = DEFAULT_METRIC_UNIT;
 	private String metricDescription = DEFAULT_METRIC_DESCRIPTION;
 	private final List<KeyValue> resourceAttributes = new ArrayList<>();
+	private final MetricsData metricsData = new MetricsData();
 
 	public NormalizedDataMetricsDataBuilder serviceName(String serviceName) {
 		if (hasText(serviceName)) {
@@ -79,13 +80,16 @@ public class NormalizedDataMetricsDataBuilder {
 		return this;
 	}
 
-	public MetricsData gaugeMetric(NormalizedData normalizedData) {
-		MetricsData metricsData = new MetricsData();
+	public NormalizedDataMetricsDataBuilder gaugeMetric(NormalizedData normalizedData) {
 		ResourceMetrics resourceMetrics = resourceMetrics(normalizedData);
 		ScopeMetrics scopeMetrics = scopeMetrics();
 		addMetrics(scopeMetrics, normalizedData);
 		resourceMetrics.getScopeMetrics().add(scopeMetrics);
 		metricsData.getResourceMetrics().add(resourceMetrics);
+		return this;
+	}
+
+	public MetricsData build() {
 		return metricsData;
 	}
 

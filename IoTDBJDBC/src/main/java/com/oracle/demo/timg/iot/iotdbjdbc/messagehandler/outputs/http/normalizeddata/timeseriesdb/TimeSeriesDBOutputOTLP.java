@@ -37,7 +37,6 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
@@ -46,12 +45,9 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.MissingInsta
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.MissingModelException;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsQueryParams;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsRetriever;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.KeyValue;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.MetricsData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.NormalizedDataMetricsDataBuilder;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpAttributeUtils;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsClient;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.Resource;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -112,14 +108,15 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData normalizedData) throws Exception {
-		MetricsData metricsData = new NormalizedDataMetricsDataBuilder().serviceName("IoTDBJDBC")
+		NormalizedDataMetricsDataBuilder builder = new NormalizedDataMetricsDataBuilder().serviceName("IoTDBJDBC")
 				.scope("com.oracle.demo.timg.iot.iotdbjdbc", "1.0.0")
 				.metric("iot.normalized", "1", "IoT normalized data value").gaugeMetric(normalizedData);
 
 		// we want to have a few "standard" attributes (modelId and name) added beyond
 		// it's default setup
-		Resource resource = metricsData.getResourceMetrics().get(0).getResource();
-		addResourceAttributes(resource, normalizedData);
+		addResourceAttributes(builder, normalizedData);
+
+		MetricsData metricsData = builder.build();
 
 		String metricsDataString = mapper.writeValueAsString(metricsData);
 		log.info("About to upload to time series db " + metricsDataString);
@@ -130,17 +127,16 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
 	}
 
-	private void addResourceAttributes(Resource resource, NormalizedData normalizedData) {
-		List<KeyValue> resourceAttributes = resource.getAttributes();
+	private void addResourceAttributes(NormalizedDataMetricsDataBuilder builder, NormalizedData normalizedData) {
 		String instanceId = normalizedData.getDigitalTwinInstanceId();
 		// if we have them add the model id and model name
 		try {
 			String modelId = deviceModelInstancesCache.getModelIdByInstanceId(instanceId, true);
-			resourceAttributes.add(OtlpAttributeUtils.attribute("iot.digital_twin.model_id", modelId));
+			builder.resourceAttribute("iot.digital_twin.model_id", modelId);
 			String modelName;
 			try {
 				modelName = deviceModelInstancesCache.getModelIdByModelName(modelId, true);
-				resourceAttributes.add(OtlpAttributeUtils.attribute("iot.digital_twin.model_name", modelName));
+				builder.resourceAttribute("iot.digital_twin.model_name", modelName);
 			} catch (MissingModelException e) {
 				log.severe("No model name found for modelid " + modelId);
 			} catch (SQLException e) {
