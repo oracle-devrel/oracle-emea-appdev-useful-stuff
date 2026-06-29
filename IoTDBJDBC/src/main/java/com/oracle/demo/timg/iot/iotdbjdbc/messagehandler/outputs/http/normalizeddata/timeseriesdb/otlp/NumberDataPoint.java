@@ -14,8 +14,10 @@ public class NumberDataPoint {
 	// avoid precision loss in JSON clients. Keep Java code type-safe with Longs and
 	// serialize only the wire representation as a String.
 	@Serdeable.Serializable(using = LongAsStringSerializer.class)
+	@Serdeable.Deserializable(using = LongAsStringSerializer.class)
 	private Long startTimeUnixNano;
 	@Serdeable.Serializable(using = LongAsStringSerializer.class)
+	@Serdeable.Deserializable(using = LongAsStringSerializer.class)
 	private Long timeUnixNano;
 	private Double asDouble;
 	private Long asInt;
