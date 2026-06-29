@@ -179,8 +179,10 @@ public class DeviceModelInstancesCache {
 				String modelId = rs.getString(MODEL_ID_COLUMN_NAME);
 				String modelName = rs.getString(MODEL_NAME_COLUMN_NAME);
 				modelIdToModelName.put(modelId, modelName);
+				log.info("Added id " + modelId + " to name " + modelName + " mapping");
 				if ((modelName != null) && (!modelName.isBlank())) {
 					modelNameToModelId.put(modelName, modelId);
+					log.info("Adding name " + modelName + " to id " + modelId + " mapping");
 				}
 				log.finer(() -> "Loaded model " + modelName + " with id " + modelId);
 			}
@@ -354,8 +356,13 @@ public class DeviceModelInstancesCache {
 				String externalKeyExistingInstance = rs.getString(EXTERNAL_KEY_COLUMN_NAME);
 				String modelName = modelIdToModelName.get(modelIdExistingInstance);
 				instanceIdToModelId.put(instanceIdExistingInstance, modelIdExistingInstance);
+				log.info("Added instance id " + instanceIdExistingInstance + " to modelId " + modelIdExistingInstance
+						+ " mapping");
 				instanceIdToModelName.put(instanceIdExistingInstance, modelName);
+				log.info("Added instance id " + instanceIdExistingInstance + " to modelName " + modelName + " mapping");
 				instanceIdToExternalKey.put(instanceIdExistingInstance, externalKeyExistingInstance);
+				log.info("Added instance id " + instanceIdExistingInstance + " to externalKey "
+						+ externalKeyExistingInstance + " mapping");
 				log.finer(() -> "Loaded instance " + instanceIdExistingInstance + " with model id "
 						+ modelIdExistingInstance + " which mapes to model name " + modelName);
 			}
@@ -571,9 +578,10 @@ public class DeviceModelInstancesCache {
 
 	public String getConfig() {
 		// this needs fixing
-		return getName() + " currently has schema " + schemaName + ", " + instanceIdToModelName.size()
-				+ " instance ids, " + modelIdToModelName.size() + " model ids, " + modelNameToModelId.size()
-				+ " model names, " + foundMissingModelIds.size() + " found missing model ids"
+		return getName() + " currently has schema " + schemaName + ", " + instanceIdToModelName.size() + " ( "
+				+ instanceIdToModelName + ")" + " instance ids, " + modelIdToModelName.size() + " ( "
+				+ modelIdToModelName + ")" + " model ids, " + modelNameToModelId.size() + " ( " + modelNameToModelId
+				+ ")" + " model names, " + foundMissingModelIds.size() + " found missing model ids"
 				+ foundMissingModelNames.size() + " found missing model names, " + foundMissingInstanceIds.size()
 				+ " found missing instance ids. preloadExistingModels=" + preloadExistingModels
 				+ ", preloadExistingInstances=" + preloadExistingInstances;
