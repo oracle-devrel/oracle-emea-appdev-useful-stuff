@@ -50,6 +50,9 @@ import java.util.Set;
 import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
+import io.micronaut.context.event.ShutdownEvent;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotEmpty;
@@ -94,6 +97,8 @@ public class DeviceModelInstancesCache {
 	private final boolean preloadExistingModels;
 	private final boolean preloadExistingInstances;
 
+	private boolean configured = false;
+
 	@Inject
 	// a lot of this needs to be wrapped up into a higher level class
 	public DeviceModelInstancesCache(DBConnectionSupplier dbConnectionSupplier,
@@ -106,32 +111,63 @@ public class DeviceModelInstancesCache {
 		this.preloadExistingInstances = preloadExistingInstances;
 	}
 
-	public void configure() throws Exception {
-		log.fine("Getting connection");
-		connection = dbConnectionSupplier.getNewConnection(schemaName);
-
-		// set this up so we can re-use it later if we need to query for an instance we
-		// didn't know about
-		log.fine("Creating prepared statements");
-		selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
-		selectModelNameByModelIdPS = connection.prepareStatement(SELECT_MODEL_NAME_BY_MODEL_ID);
-		selectModelIdByModelNamePS = connection.prepareStatement(SELECT_MODEL_ID_BY_MODEL_NAME);
-		log.fine("Prepared statements created");
-		// try to pre-load the existing
-		if (preloadExistingModels) {
-			log.info("Pre-loading existing models");
-			preloadModelDetails();
-		} else {
-			log.info("Pre-loading existing models is disabled, they will be loaded on demand");
-		}
-		// try to pre-load the current instances data if we've been asked to
-		if (preloadExistingInstances) {
-			log.info("Pre-loading existing instances");
-			preloadExistingInstances();
-		} else {
-			log.info("Pre-loading existing instances is disabled, they will be loaded on demand");
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for DeviceModelInstancesCache");
+		try {
+			configure();
+		} catch (Exception e) {
+			log.severe("Problem configuring the DeviceModelInstancesCache, " + e.getLocalizedMessage());
+			return;
 		}
 		log.info(getConfig());
+	}
+
+	@EventListener
+	public void onShutdown(ShutdownEvent event) {
+		log.info("Shutdown event received for DeviceModelInstancesCache");
+		try {
+			unconfigure();
+		} catch (Exception e) {
+			log.severe("Problem unconfiguring the DeviceModelInstancesCache, " + e.getLocalizedMessage());
+			return;
+		}
+		log.info("Unconfiguered");
+	}
+
+	public void configure() throws Exception {
+		synchronized (this) {
+			if (configured) {
+				log.info("Already configured");
+				return;
+			}
+			log.fine("Getting connection");
+			connection = dbConnectionSupplier.getNewConnection(schemaName);
+
+			// set this up so we can re-use it later if we need to query for an instance we
+			// didn't know about
+			log.fine("Creating prepared statements");
+			selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
+			selectModelNameByModelIdPS = connection.prepareStatement(SELECT_MODEL_NAME_BY_MODEL_ID);
+			selectModelIdByModelNamePS = connection.prepareStatement(SELECT_MODEL_ID_BY_MODEL_NAME);
+			log.fine("Prepared statements created");
+			// try to pre-load the existing
+			if (preloadExistingModels) {
+				log.info("Pre-loading existing models");
+				preloadModelDetails();
+			} else {
+				log.info("Pre-loading existing models is disabled, they will be loaded on demand");
+			}
+			// try to pre-load the current instances data if we've been asked to
+			if (preloadExistingInstances) {
+				log.info("Pre-loading existing instances");
+				preloadExistingInstances();
+			} else {
+				log.info("Pre-loading existing instances is disabled, they will be loaded on demand");
+			}
+			configured = true;
+			log.info(getConfig());
+		}
 	}
 
 	private void preloadModelDetails() throws SQLException {
@@ -472,7 +508,7 @@ public class DeviceModelInstancesCache {
 	 */
 	private InstanceKeyInfo loadInstanceByInstanceId(@NotNull @NotEmpty String instanceId)
 			throws SQLException, MissingInstanceException {
-		synchronized (selectModelIdByModelNamePS) {
+		synchronized (selectModelIdByInstanceIdPS) {
 			selectModelIdByInstanceIdPS.setString(1, instanceId);
 			// get all of the results
 			try (ResultSet rs = selectModelIdByInstanceIdPS.executeQuery()) {
@@ -504,26 +540,29 @@ public class DeviceModelInstancesCache {
 	}
 
 	public void unconfigure() throws Exception {
-		// this will close all prepared statements, result sets etc. that originated
-		// from it
-		if (connection != null) {
-			if (!connection.isClosed()) {
-				log.info("Closing connection");
-				connection.close();
+		synchronized (this) {
+			// this will close all prepared statements, result sets etc. that originated
+			// from it
+			if (connection != null) {
+				if (!connection.isClosed()) {
+					log.info("Closing connection");
+					connection.close();
+				}
+				connection = null;
 			}
-			connection = null;
+			log.info("Clearing old cached results");
+			// just in case we are called multiple times reset the sets
+			instanceIdToModelId.clear();
+			instanceIdToModelName.clear();
+			instanceIdToExternalKey.clear();
+			modelIdToModelName.clear();
+			modelNameToModelId.clear();
+			foundMissingModelIds.clear();
+			foundMissingModelNames.clear();
+			foundMissingInstanceIds.clear();
+			foundMissingExternalKeys.clear();
+			configured = false;
 		}
-		log.info("Clearing old cached results");
-		// just in case we are called multiple times reset the sets
-		instanceIdToModelId.clear();
-		instanceIdToModelName.clear();
-		instanceIdToExternalKey.clear();
-		modelIdToModelName.clear();
-		modelNameToModelId.clear();
-		foundMissingModelIds.clear();
-		foundMissingModelNames.clear();
-		foundMissingInstanceIds.clear();
-		foundMissingExternalKeys.clear();
 	}
 
 	public String getName() {
