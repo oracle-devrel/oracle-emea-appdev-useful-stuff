@@ -169,12 +169,8 @@ public class NormalizedDataMetricsDataBuilder {
 		dataPoint.setTimeUnixNano(OtlpTimeUtils.unixNano(normalizedData.getTimeObserved()));
 		dataPoint.setAsDouble(metricValue(content, jsonValue, jsonType).doubleValue());
 		dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.path", contentPath));
-		dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.type", normalizedData.getContentType()));
-		dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.value",
-				OtlpAttributeUtils.contentValue(content)));
-		if (jsonType != null) {
-			dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.json_type", jsonType.toString()));
-		}
+		dataPoint.getAttributes()
+				.add(OtlpAttributeUtils.attribute("iot.content.type", normalizedData.getContentType()));
 		return dataPoint;
 	}
 
@@ -240,14 +236,15 @@ public class NormalizedDataMetricsDataBuilder {
 	}
 
 	private static boolean isNumeric(OracleJsonType jsonType) {
-		return jsonType == OracleJsonType.DECIMAL || jsonType == OracleJsonType.DOUBLE || jsonType == OracleJsonType.FLOAT;
+		return jsonType == OracleJsonType.DECIMAL || jsonType == OracleJsonType.DOUBLE
+				|| jsonType == OracleJsonType.FLOAT;
 	}
 
 	private ResourceMetrics resourceMetrics(NormalizedData normalizedData) {
 		Resource resource = new Resource();
 		resource.getAttributes().add(OtlpAttributeUtils.attribute("service.name", serviceName));
-		resource.getAttributes()
-				.add(OtlpAttributeUtils.attribute("iot.digital_twin.instance_id", normalizedData.getDigitalTwinInstanceId()));
+		resource.getAttributes().add(OtlpAttributeUtils.attribute("iot.digital_twin.instance_id",
+				normalizedData.getDigitalTwinInstanceId()));
 		resource.getAttributes().addAll(resourceAttributes);
 
 		ResourceMetrics resourceMetrics = new ResourceMetrics();
