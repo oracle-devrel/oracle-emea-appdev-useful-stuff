@@ -166,7 +166,7 @@ public class NormalizedDataMetricsDataBuilder {
 	private NumberDataPoint dataPoint(NormalizedData normalizedData, String contentPath, String content,
 			OracleJsonValue jsonValue, OracleJsonType jsonType) {
 		NumberDataPoint dataPoint = new NumberDataPoint();
-		dataPoint.setTimeUnixNano(OtlpTimeUtils.unixNano(normalizedData.getTimeObserved()));
+		dataPoint.setTimeUnixNano(OtlpTimeUtils.unixNanoAsString(normalizedData.getTimeObserved()));
 		dataPoint.setAsDouble(metricValue(content, jsonValue, jsonType).doubleValue());
 		dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.path", contentPath));
 		dataPoint.getAttributes()

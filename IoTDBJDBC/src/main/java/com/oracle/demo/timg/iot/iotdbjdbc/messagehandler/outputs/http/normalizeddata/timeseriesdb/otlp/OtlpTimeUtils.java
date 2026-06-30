@@ -15,4 +15,12 @@ public final class OtlpTimeUtils {
 	public static long unixNano(Instant instant) {
 		return Math.addExact(Math.multiplyExact(instant.getEpochSecond(), NANOS_PER_SECOND), instant.getNano());
 	}
+
+	public static String unixNanoAsString(String iso8601ZuluTimestamp) {
+		return "" + unixNano(iso8601ZuluTimestamp);
+	}
+
+	public static String unixNanoAsString(Instant instant) {
+		return "" + unixNano(instant);
+	}
 }

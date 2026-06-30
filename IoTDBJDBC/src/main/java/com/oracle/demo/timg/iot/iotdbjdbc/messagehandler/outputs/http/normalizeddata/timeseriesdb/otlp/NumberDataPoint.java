@@ -19,19 +19,4 @@ public class NumberDataPoint {
 	private List<Exemplar> exemplars = new ArrayList<>();
 	private Integer flags;
 
-	public void setStartTimeUnixNano(Long startTimeUnixNano) {
-		if (startTimeUnixNano == null) {
-			this.startTimeUnixNano = null;
-		} else {
-			this.startTimeUnixNano = "" + startTimeUnixNano;
-		}
-	}
-
-	public void setTimeUnixNano(Long timeUnixNano) {
-		if (timeUnixNano == null) {
-			this.timeUnixNano = null;
-		} else {
-			this.timeUnixNano = "" + timeUnixNano;
-		}
-	}
 }
