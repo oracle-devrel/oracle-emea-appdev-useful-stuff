@@ -40,6 +40,8 @@ public class OtlpMetricsRequestFilter {
 			request.getHeaders().add(AUTHORIZATION, (tokenType == null ? "Bearer" : tokenType) + " " + token);
 			request.getHeaders().add(TimeSeriesDBOAuthTokenRequestFilter.HEADER_REQUEST_ID,
 					UUID.randomUUID().toString());
+			String queryParams = request.getParameters().asMap().toString();
+			log.info("Query params are " + queryParams + " headers are " + request.getHeaders());
 		} catch (OAuthTokenRetrievalException e) {
 			throw new IllegalStateException("Unable to retrieve an OAuth token for OTLP metrics upload", e);
 		}
