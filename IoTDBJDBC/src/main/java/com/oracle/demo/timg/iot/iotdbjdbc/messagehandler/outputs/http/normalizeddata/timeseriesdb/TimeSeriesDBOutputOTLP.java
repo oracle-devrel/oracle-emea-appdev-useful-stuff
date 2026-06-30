@@ -126,10 +126,11 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		MetricsData metricsData = builder.build();
 
 		String metricsDataString = mapper.writeValueAsString(metricsData);
-		log.info("About to upload to time series db " + metricsDataString);
+		log.info(() -> "About to upload to time series db " + metricsDataString);
+		log.info(() -> "Uploading url=" + metricsClientUrl + ", path=" + metricsPath + ", queryX=" + queryX
+				+ ", queryY=" + queryY);
 
 		if (doUpload) {
-			log.info("Uploading to " + metricsClientUrl + " with path " + metricsPath);
 			metricsClient.uploadMetrics(queryX, queryY, metricsData);
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
