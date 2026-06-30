@@ -30,7 +30,7 @@ You can now re-run the get workspaces  to make sure it's been added (the output 
 SELECT dbms_cloud_telemetry_admin.get_workspaces() from dual ;
 [{"workspace_name":"IOTWORKSPACE","cloud_database_name":"OCID1.AUTONOMOUSDATABASE.OC1.UK-LONDON-1.ANWGILJSUEVFTMQAAQRDUC2A.....","ingest_enabled":false},{"workspace_name":"TELEMETRY_DEFAULT_WORKSPACE","cloud_database_name":"OCID1.AUTONOMOUSDATABASE.OC1.UK-LONDON-1.ANWGILJSUEVFTMQ.....","ingest_enabled":false}]
 
-For the instrcutions I'm assumign that the created user is called iotingestuser
+For the instrcutions I'm assuming that the created user is called iotingestuser
 Use the ADB admin console to add a user for ingest at least (and maybe others for query), in the DB console go to the users / user management page, click on create user
 In the form set the user name and passwordm make sure password expired is turned off
 IMPORTANT, make sure to enable the REST, GraphQL, MongoDB, and Web access option then click on the create user button
