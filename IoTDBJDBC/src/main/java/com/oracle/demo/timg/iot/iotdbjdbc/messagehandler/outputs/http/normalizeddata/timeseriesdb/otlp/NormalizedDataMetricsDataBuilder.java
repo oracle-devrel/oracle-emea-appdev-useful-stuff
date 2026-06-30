@@ -27,6 +27,7 @@ public class NormalizedDataMetricsDataBuilder {
 	private String metricUnit = DEFAULT_METRIC_UNIT;
 	private String metricDescription = DEFAULT_METRIC_DESCRIPTION;
 	private final List<KeyValue> resourceAttributes = new ArrayList<>();
+	private final List<KeyValue> scopeAttributes = new ArrayList<>();
 	private final MetricsData metricsData = new MetricsData();
 
 	public NormalizedDataMetricsDataBuilder serviceName(String serviceName) {
@@ -76,6 +77,27 @@ public class NormalizedDataMetricsDataBuilder {
 	public NormalizedDataMetricsDataBuilder resourceAttributes(List<KeyValue> attributes) {
 		if (attributes != null) {
 			resourceAttributes.addAll(attributes);
+		}
+		return this;
+	}
+
+	public NormalizedDataMetricsDataBuilder scopeAttribute(String key, String value) {
+		if (hasText(key)) {
+			scopeAttributes.add(OtlpAttributeUtils.attribute(key, value));
+		}
+		return this;
+	}
+
+	public NormalizedDataMetricsDataBuilder scopeAttribute(String key, AnyValue value) {
+		if (hasText(key) && value != null) {
+			scopeAttributes.add(OtlpAttributeUtils.attribute(key, value));
+		}
+		return this;
+	}
+
+	public NormalizedDataMetricsDataBuilder scopeAttributes(List<KeyValue> attributes) {
+		if (attributes != null) {
+			scopeAttributes.addAll(attributes);
 		}
 		return this;
 	}
@@ -256,6 +278,7 @@ public class NormalizedDataMetricsDataBuilder {
 		InstrumentationScope scope = new InstrumentationScope();
 		scope.setName(scopeName);
 		scope.setVersion(scopeVersion);
+		scope.getAttributes().addAll(scopeAttributes);
 
 		ScopeMetrics scopeMetrics = new ScopeMetrics();
 		scopeMetrics.setScope(scope);
