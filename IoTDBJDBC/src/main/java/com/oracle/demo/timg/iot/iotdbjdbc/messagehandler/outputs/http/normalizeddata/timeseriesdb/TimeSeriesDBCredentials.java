@@ -67,4 +67,14 @@ public class TimeSeriesDBCredentials {
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
 	@JsonProperty(value = "database_name")
 	private String database_name;
+
+	/**
+	 * a to string that does not display confidential info
+	 * 
+	 * @return
+	 */
+	public String safeToString() {
+		return "TimeSeriesDBCredentials[username" + username + ", password=XXXXX, tennant_name=XXXXX, database_name="
+				+ database_name + "]";
+	}
 }

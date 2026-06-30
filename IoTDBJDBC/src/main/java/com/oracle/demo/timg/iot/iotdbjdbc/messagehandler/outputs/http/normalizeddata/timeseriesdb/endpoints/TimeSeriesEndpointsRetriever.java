@@ -132,7 +132,7 @@ public class TimeSeriesEndpointsRetriever {
 						"No rows in the result set, has the DB been configured for the telemetry ?");
 			}
 		}
-		log.info("Build endpoints info is " + endpointsResponse);
+		log.finer("Build endpoints info is " + endpointsResponse);
 		// let's try and get the params from these
 		endpointsQueryParams = TimeSeriesEndpointsQueryParams.builder()
 				.metricsQueryX(endpointsResponse.getOtlp().getQueryParam("x"))

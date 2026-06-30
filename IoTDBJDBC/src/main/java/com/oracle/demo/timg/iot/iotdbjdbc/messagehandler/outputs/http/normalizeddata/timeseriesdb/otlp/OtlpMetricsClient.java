@@ -22,7 +22,7 @@ import io.micronaut.http.client.annotation.Client;
 public interface OtlpMetricsClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + "}")
+	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}")
 	HttpResponse<String> uploadMetrics(@QueryValue("x") String queryParamX, @QueryValue("y") String queryParamY,
 			@Body String metricsDataString);
 }

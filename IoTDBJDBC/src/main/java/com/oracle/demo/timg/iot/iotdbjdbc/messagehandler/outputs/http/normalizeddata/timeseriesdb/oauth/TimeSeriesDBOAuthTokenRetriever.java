@@ -113,10 +113,10 @@ public class TimeSeriesDBOAuthTokenRetriever {
 		if ((currentToken == null) || (currentTokenRenewTime == null)
 				|| LocalDateTime.now().isAfter(currentTokenRenewTime)) {
 			OAuthTokenResponse atr;
-			log.info("Retrieveing token from DB");
+			log.info("Retrieveing oauth token from time series DB");
 			try {
 				String credentials = mapper.writeValueAsString(tsDBuserCredentials);
-				log.info("Setting body to " + credentials);
+				log.fine("Setting body to " + credentials);
 				atr = authClient.getOAuthToken(queryX, queryY, credentials);
 			} catch (HttpClientException e) {
 				throw new OAuthTokenRetrievalException("Problem getting the OAuth token " + e.getLocalizedMessage(), e);
@@ -130,7 +130,8 @@ public class TimeSeriesDBOAuthTokenRetriever {
 			// need to, yes we should probably allow for better control or retrieval times
 			// but this is a demo, and not supposed to be production.
 			this.currentTokenRenewTime = LocalDateTime.now().plusSeconds(atr.getExpiresIn()).minus(renewalPreempt);
-			log.info("Got token details " + atr);
+			log.info("Got token details with type " + atr.getTokenType() + " and expiring in " + atr.getExpiresIn()
+					+ " seconds");
 		} else {
 			log.info("Using existing token");
 		}
@@ -140,7 +141,7 @@ public class TimeSeriesDBOAuthTokenRetriever {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for TimeSeriesDBOAuthTokenRetriever tsDBuserCredentials=" + tsDBuserCredentials
-				+ ", queryX=" + queryX + ", queryY=" + queryY);
+		log.info("Startup event received for TimeSeriesDBOAuthTokenRetriever tsDBuserCredentials="
+				+ tsDBuserCredentials.safeToString() + ", queryX=" + queryX + ", queryY=" + queryY);
 	}
 }

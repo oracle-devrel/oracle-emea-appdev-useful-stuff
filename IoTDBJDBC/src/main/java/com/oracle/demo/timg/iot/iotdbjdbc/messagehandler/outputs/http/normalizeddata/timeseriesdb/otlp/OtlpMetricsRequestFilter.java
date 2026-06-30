@@ -49,24 +49,23 @@ public class OtlpMetricsRequestFilter {
 
 	@RequestFilter
 	public void doFilter(MutableHttpRequest<?> request) {
-		log.info("Running metrics OTLP filtering");
+		log.fine("Running metrics OTLP filtering");
 		try {
 			String token = tokenRetriever.get().getToken();
 			String tokenType = tokenRetriever.get().getTokenType();
-			log.info("Got the token and tokenType");
 			request.getHeaders().add(AUTHORIZATION, (tokenType == null ? "Bearer" : tokenType) + " " + token);
 			request.getHeaders().add(TimeSeriesDBOAuthTokenRequestFilter.HEADER_REQUEST_ID,
 					UUID.randomUUID().toString());
-			log.info("request uri " + request.getUri().toASCIIString());
-			log.info("request path " + request.getPath());
-			log.info("request params = " + request.getParameters().asMap().toString());
-			log.info("request headers = " + request.getHeaders().asMap().toString());
-			log.info("Request body " + request.getBody(String.class).orElse("No body set"));
+			log.finer("request uri " + request.getUri().toASCIIString());
+			log.finer("request path " + request.getPath());
+			log.finer("request params = " + request.getParameters().asMap().toString());
+			log.finer("request headers = " + request.getHeaders().asMap().toString());
+			log.finer("Request body " + request.getBody(String.class).orElse("No body set"));
 
 		} catch (OAuthTokenRetrievalException e) {
 			throw new IllegalStateException("Unable to retrieve an OAuth token for OTLP metrics upload", e);
 		}
-		log.info("Added OAuth authorization headers and uuid for OTLP metrics upload");
+		log.fine("Added OAuth authorization headers and uuid for OTLP metrics upload");
 	}
 
 	@EventListener

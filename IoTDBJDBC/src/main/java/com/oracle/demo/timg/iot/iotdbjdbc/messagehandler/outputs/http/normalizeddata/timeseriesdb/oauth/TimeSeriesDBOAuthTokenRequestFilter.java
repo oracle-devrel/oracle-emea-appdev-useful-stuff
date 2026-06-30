@@ -74,12 +74,12 @@ public class TimeSeriesDBOAuthTokenRequestFilter {
 		// need to add a request id, apparently this should be unique
 		String randomUUID = UUID.randomUUID().toString();
 		request.getHeaders().add(HEADER_REQUEST_ID, randomUUID);
-		log.info("Added header " + HEADER_REQUEST_ID + " with id " + randomUUID);
-		log.info("request uri " + request.getUri().toASCIIString());
-		log.info("request path " + request.getPath());
-		log.info("request params = " + request.getParameters().asMap().toString());
-		log.info("request headers = " + request.getHeaders().asMap().toString());
-		log.info("Request body " + request.getBody(String.class).orElse("No body set"));
+		log.finer("Added header " + HEADER_REQUEST_ID + " with id " + randomUUID);
+		log.finer("request uri " + request.getUri().toASCIIString());
+		log.finer("request path " + request.getPath());
+		log.finer("request params = " + request.getParameters().asMap().toString());
+		log.finer("request headers = " + request.getHeaders().asMap().toString());
+		log.finer("Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
 	@EventListener

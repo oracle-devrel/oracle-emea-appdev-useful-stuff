@@ -97,9 +97,6 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		this.sentDataIsCompleted = sentDataIsCompleted;
 	}
 
-	@Property(name = "messagehandler.output.normalizeddata.timeseries.doupload", defaultValue = "true")
-	private boolean doUpload;
-
 	@Override
 	public int getOrder() {
 		return order;
@@ -133,15 +130,15 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		log.info(() -> "Uploading url=" + metricsClientUrl + ", path=" + metricsPath + ", queryX=" + queryX
 				+ ", queryY=" + queryY);
 
-		if (doUpload) {
-			HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
-			log.info("Upload response is " + resp.getBody().orElse("No response data"));
-		}
+		HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
+		log.info("Upload to time series DB response is " + resp.getStatus().getCode() + "("
+				+ resp.getStatus().toString() + ") with body " + resp.getBody().orElse("No response data"));
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
 	}
 
 	private void addScopeAttributes(NormalizedDataMetricsDataBuilder builder) {
-		builder.scopeAttribute("my.scope.attribute", "some scope attribute");
+		// for now this does nothing
+		// builder.scopeAttribute("my.scope.attribute", "some scope attribute");
 	}
 
 	private void addResourceAttributes(NormalizedDataMetricsDataBuilder builder, NormalizedData normalizedData) {

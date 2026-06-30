@@ -57,7 +57,7 @@ import io.micronaut.http.client.exceptions.HttpClientException;
 public interface TimeSeriesDBOAuthClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}")
+	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + ":/tel/token}")
 	public OAuthTokenResponse getOAuthToken(@QueryValue("x") String queryParamX, @QueryValue("y") String queryParamY,
 			@Body String timeSeriesDBCredentials) throws HttpClientException;
 
