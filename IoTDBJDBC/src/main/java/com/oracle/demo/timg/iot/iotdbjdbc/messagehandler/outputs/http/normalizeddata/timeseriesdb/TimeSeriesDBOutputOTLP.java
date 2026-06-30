@@ -53,6 +53,7 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalized
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
@@ -133,7 +134,8 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 				+ ", queryY=" + queryY);
 
 		if (doUpload) {
-			metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
+			HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
+			log.info("Upload response is " + resp.getBody().orElse("No response data"));
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
 	}
