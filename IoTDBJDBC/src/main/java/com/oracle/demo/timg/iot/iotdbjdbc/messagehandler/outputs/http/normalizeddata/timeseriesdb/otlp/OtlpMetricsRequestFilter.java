@@ -18,8 +18,10 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
-@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}",
-		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}/**" })
+//@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}",
+//		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}/**" })
+//@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + "}" })
+@ClientFilter(patterns = "/tel/v1/metrics")
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Log
 public class OtlpMetricsRequestFilter {
@@ -27,6 +29,7 @@ public class OtlpMetricsRequestFilter {
 
 	@Inject
 	public OtlpMetricsRequestFilter(TimeSeriesDBOAuthTokenRetriever tokenRetriever) {
+		log.info("OtlpMetricsRequestFilter constructor");
 		this.tokenRetriever = tokenRetriever;
 	}
 
@@ -40,10 +43,11 @@ public class OtlpMetricsRequestFilter {
 			request.getHeaders().add(AUTHORIZATION, (tokenType == null ? "Bearer" : tokenType) + " " + token);
 			request.getHeaders().add(TimeSeriesDBOAuthTokenRequestFilter.HEADER_REQUEST_ID,
 					UUID.randomUUID().toString());
-			String queryParams = request.getParameters().asMap().toString();
-			log.info("Query params are " + queryParams + " headers are " + request.getHeaders());
-			String bodyString = request.getBody(String.class).orElse("No body found");
-			log.info("OTLP body is :" + bodyString);
+			log.info("request uri " + request.getUri().toASCIIString());
+			log.info("request path " + request.getPath());
+			log.info("request params = " + request.getParameters().asMap().toString());
+			log.info("request headers = " + request.getHeaders().asMap().toString());
+			log.info("Request body " + request.getBody(String.class).orElse("No body set"));
 
 		} catch (OAuthTokenRetrievalException e) {
 			throw new IllegalStateException("Unable to retrieve an OAuth token for OTLP metrics upload", e);

@@ -53,10 +53,10 @@ import lombok.extern.java.Log;
 /*
  * 
  */
-@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}" })
+// @ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PATH + "}" })
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
+@ClientFilter(patterns = "/tel/token")
+
 @Log
 public class TimeSeriesDBOAuthTokenRequestFilter {
 	public final static String HEADER_REQUEST_ID = "Request-Id";
@@ -65,6 +65,7 @@ public class TimeSeriesDBOAuthTokenRequestFilter {
 
 	@Inject
 	public TimeSeriesDBOAuthTokenRequestFilter(TimeSeriesDBCredentials credentials) {
+		log.info("In TimeSeriesDBOAuthTokenRequestFilter constructor");
 		this.username = credentials.getUsername();
 		this.password = credentials.getPassword();
 	}
@@ -81,6 +82,7 @@ public class TimeSeriesDBOAuthTokenRequestFilter {
 		log.info("request uri " + request.getUri().toASCIIString());
 		log.info("request path " + request.getPath());
 		log.info("request params = " + request.getParameters().asMap().toString());
+		log.info("request headers = " + request.getHeaders().asMap().toString());
 		log.info("Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
