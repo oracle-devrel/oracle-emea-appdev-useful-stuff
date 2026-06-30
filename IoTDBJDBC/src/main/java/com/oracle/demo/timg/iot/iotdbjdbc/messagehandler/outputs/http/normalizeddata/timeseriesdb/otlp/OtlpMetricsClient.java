@@ -22,7 +22,7 @@ import jakarta.ws.rs.QueryParam;
 public interface OtlpMetricsClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Post(value = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}")
+	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + "}")
 	HttpResponse<String> uploadMetrics(@QueryParam("x") String queryParamX, @QueryParam("y") String queryParamY,
-			@Body MetricsData metricsData);
+			@Body String metricsDataString);
 }

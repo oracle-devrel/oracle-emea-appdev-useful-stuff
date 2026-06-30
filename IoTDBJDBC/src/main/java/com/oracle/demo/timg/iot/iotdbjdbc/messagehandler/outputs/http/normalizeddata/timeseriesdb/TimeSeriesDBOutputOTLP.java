@@ -88,6 +88,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		this.deviceModelInstancesCache = deviceModelInstancesCache;
 		this.metricsClient = metricsClient;
 		TimeSeriesEndpointsQueryParams queryParams = timeSeriesEndpointsRetriever.getQueryParams();
+		log.info("Query params data is " + queryParams);
 		this.queryX = queryParams.getMetricsQueryX();
 		this.queryY = queryParams.getMetricsQueryY();
 		this.mapper = mapper;
@@ -132,7 +133,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 				+ ", queryY=" + queryY);
 
 		if (doUpload) {
-			metricsClient.uploadMetrics(queryX, queryY, metricsData);
+			metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
 	}
