@@ -121,6 +121,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
 		// we want to have a few "standard" attributes (modelId and name) added beyond
 		// it's default setup
+		addScopeAttributes(builder);
 		addResourceAttributes(builder, normalizedData);
 
 		MetricsData metricsData = builder.build();
@@ -134,6 +135,10 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 			metricsClient.uploadMetrics(queryX, queryY, metricsData);
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
+	}
+
+	private void addScopeAttributes(NormalizedDataMetricsDataBuilder builder) {
+		builder.scopeAttribute("my.scope.attribute", "some scope attribute");
 	}
 
 	private void addResourceAttributes(NormalizedDataMetricsDataBuilder builder, NormalizedData normalizedData) {
