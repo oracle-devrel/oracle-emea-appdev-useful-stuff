@@ -20,7 +20,7 @@ import lombok.extern.java.Log;
 
 //@ClientFilter(patterns = { "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}",
 //		"${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + ":/tel/v1/metrics}/**" })
-@ClientFilter("/tel/v1/metrics")
+@ClientFilter(patterns = "/tel/v1/metrics")
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Log
 public class OtlpMetricsRequestFilter {
