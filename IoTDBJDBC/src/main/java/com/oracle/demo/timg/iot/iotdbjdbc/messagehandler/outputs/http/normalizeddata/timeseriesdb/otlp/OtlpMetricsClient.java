@@ -12,8 +12,8 @@ import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
-import jakarta.ws.rs.QueryParam;
 
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Requires(property = "micronaut.http.services." + OtlpProperties.METRICS_CLIENT_ID + ".url")
@@ -23,6 +23,6 @@ public interface OtlpMetricsClient {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Post("${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH + "}")
-	HttpResponse<String> uploadMetrics(@QueryParam("x") String queryParamX, @QueryParam("y") String queryParamY,
+	HttpResponse<String> uploadMetrics(@QueryValue("x") String queryParamX, @QueryValue("y") String queryParamY,
 			@Body String metricsDataString);
 }
