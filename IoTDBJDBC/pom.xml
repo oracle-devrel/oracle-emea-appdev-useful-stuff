@@ -52,7 +52,7 @@ SOFTWARE. -->
 	<properties>
 		<packaging>jar</packaging>
 		<jdk.version>21</jdk.version>
-		<release.version>17</release.version>
+		<release.version>21</release.version>
 		<version.ocisdk>3.74.2</version.ocisdk>
 		<version.lombok>1.18.46</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
@@ -180,11 +180,6 @@ SOFTWARE. -->
 			<version>5.3.7</version>
 			<!--<version>5.4.21</version>-->
 		</dependency>
-		<dependency>
-			<groupId>io.micronaut</groupId>
-			<artifactId>micronaut-http-client</artifactId>
-			<scope>compile</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>io.micronaut.test</groupId>
@@ -252,18 +247,6 @@ SOFTWARE. -->
 							<artifactId>micronaut-inject-java</artifactId>
 							<version>${micronaut.core.version}</version>
 						</path>
-						<!--						<path>-->
-						<!--							<groupId>io.micronaut.data</groupId>-->
-						<!--
-						<artifactId>micronaut-data-processor</artifactId>-->
-						<!--							<version>${micronaut.data.version}</version>-->
-						<!--							<exclusions>-->
-						<!--								<exclusion>-->
-						<!--									<groupId>io.micronaut</groupId>-->
-						<!--									<artifactId>micronaut-inject</artifactId>-->
-						<!--								</exclusion>-->
-						<!--							</exclusions>-->
-						<!--						</path>-->
 						<path>
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-graal</artifactId>
