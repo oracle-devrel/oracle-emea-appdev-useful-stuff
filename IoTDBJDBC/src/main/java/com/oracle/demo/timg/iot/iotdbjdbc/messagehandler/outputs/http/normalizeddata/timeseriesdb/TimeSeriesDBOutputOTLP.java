@@ -48,6 +48,7 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalized
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.MetricsData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.NormalizedDataMetricsDataBuilder;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsClient;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpProperties;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -72,6 +73,12 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	private final String queryX;
 	private final String queryY;
 	private final ObjectMapper mapper;
+
+	@Property(name = "micronaut.http.services." + OtlpProperties.METRICS_CLIENT_ID
+			+ ".url", defaultValue = "URL NOT SET")
+	private String metricsClientUrl;
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH, defaultValue = "/tel/v1/metrics")
+	private String metricsPath;
 
 	@Inject
 	public TimeSeriesDBOutputOTLP(DeviceModelInstancesCache deviceModelInstancesCache, OtlpMetricsClient metricsClient,
@@ -122,6 +129,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		log.info("About to upload to time series db " + metricsDataString);
 
 		if (doUpload) {
+			log.info("Uploading to " + metricsClientUrl + " with path " + metricsPath);
 			metricsClient.uploadMetrics(queryX, queryY, metricsData);
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
@@ -151,6 +159,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for TimeSeriesDBOutputOTLP, queryX=" + queryX + ", queryY=" + queryY);
+		log.info("Startup event received for TimeSeriesDBOutputOTLP, queryX=" + queryX + ", queryY=" + queryY
+				+ ", Uploading to " + metricsClientUrl + " with path " + metricsPath);
 	}
 }
