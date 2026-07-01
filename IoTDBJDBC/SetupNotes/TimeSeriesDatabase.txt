@@ -1,4 +1,10 @@
-THIS SECTION IS FOR SETTING THINGS UP, it cam be done manually in advance and is a one-off process.
+THIS SECTION IS FOR SETTING UP THE TIME SERIES DB itself, it can be done manually in advance 
+and is a one-off process.
+To control the upload process (and filter the normalized data before uploading) you will need
+to setup the IoTDBJDBC filters, see the TimeSeriesMessageHandlersSetup.txt for details of
+how to do that
+
+You could follow the time series DB documentation for the detailed operation of the DB
 For OCI ADB's
 Create the ADB instance as usual, 
 Make sure that the display name and DB name are the same, use the transaction type - ATP DB
