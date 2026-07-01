@@ -1,0 +1,41 @@
+This document is to help you setup the IoTDBJDBC so upload to the time series DB, you will 
+need to have already setup the time series DB and enable the users, look at the document
+TimeSeriesDatabase.txt for instructions on that.
+
+Note, look at the sample config.properties file for the details of the various properties supported.
+
+You will need to get the Time Series DB wallet onto the system youre running the JDBC/AQ code 
+on. This is used to get some requried params for the Time Series DB option (those params can 
+sometimes change, esp if the DB is stopped and then restarted)
+The command to do that is below (you need your .oci/config etc setup) and of course you need 
+to have setup the database previously, and have the right policies in place to let you access
+and download the wallet file
+oci db autonomous-database generate-wallet \
+  --autonomous-database-id <autonomous_database_ocid> \
+  --password '<wallet_password>' \
+  --generate-type SINGLE \
+  --file wallet.zip
+  
+unzip the file into a folder that the JDBC code can access, check the tns_names.ora file in 
+there to get the connection name this is usually the DB name followed by _high (e.g. telemetry_high)
+though as this is only used once any of the connections would probabaly work fine
+
+Update the config properties for the timeseries DB to use these
+timeseriesdb.jdbc.connectionname=<connection name>
+timeseriesdb.jdbc.walletpath=<unzipped wallet directory path - e.g. ./configsecure/timeseriesdb>
+timeseriesdb.jdbc.username=<uname of ingest user>
+timeseriesdb.jdbc.password=<pw of ingest user>
+
+You will also need to setup some other filters in the normalized data message handler chain to be 
+called BEFORE (i.e. with a lower order) the timeseriesdb output module as the Oracle Time Series DB 
+functionality can't currently handle non numeric data. I recommend enabling the 
+NormalizedDataContentJsonTypeMessageFilter and setting it to only pass on data that is of type DECIMAL, 
+DOUBLE, FLOAT. If you want boolean data that is mapped to 1 / 0 so to include that you need to 
+also have TRUE and FALSE in the json type filters list (note that both are required as JSON seems to 
+treat them as distinct data types)
+
+If you wish you can also limit the data uploaded by adding additional filters in advance of the TS DB 
+output module, the NormalizedDataDeviceModelsMessageFilter can be used to limit to specified device 
+model names (it allows all content for that model), and the NormalizedDataContentPathsMessageFilter 
+filter can be used to limit to specific content paths (allowing all entries with that contentPath
+across multiple models). You can combine the two along wiht other filters of course.

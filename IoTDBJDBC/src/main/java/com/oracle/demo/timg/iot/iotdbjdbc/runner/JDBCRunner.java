@@ -74,10 +74,10 @@ public class JDBCRunner {
 
 	private final List<IoTDBClient> configuredClients;
 
-	public JDBCRunner(List<IoTDBClient> ioTDBClients, @Property(name = "datasources.default.url") String url,
+	public JDBCRunner(List<IoTDBClient> ioTDBClients, @Property(name = "iotdatacache.url") String url,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
-			@Property(name = "datasources.default.username", defaultValue = "") String username,
-			@Property(name = "datasources.default.password", defaultValue = "") String password,
+			@Property(name = "iotdatacache.username", defaultValue = "") String username,
+			@Property(name = "iotdatacache.password", defaultValue = "") String password,
 			@Property(name = "iotdatacache.aqruntime", defaultValue = "0") int aqRuntime) {
 		log.info("Using URL " + url);
 		log.info("Will use IOT Schema named " + schemaName);

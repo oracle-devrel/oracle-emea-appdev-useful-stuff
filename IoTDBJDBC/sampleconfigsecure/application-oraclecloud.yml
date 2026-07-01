@@ -1,0 +1,3 @@
+oci:
+  config:
+    profile: DEFAULT

@@ -57,10 +57,9 @@ import oracle.jdbc.pool.OracleDataSource;
 
 @Singleton
 @Log
-@Requires(property = "datasources.default.url")
+@Requires(property = "iotdatacache.url")
 @Requires(property = "iotdatacache.schemaname")
 public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
-
 	private final DBTokenRetriever dbTokenRetriever;
 
 	public final static String DRIVER_URL_SEP = "@";
@@ -72,10 +71,10 @@ public class DBConnectionSupplierAccessToken implements DBConnectionSupplier {
 
 	@Inject
 	public DBConnectionSupplierAccessToken(DBTokenRetriever dbTokenRetriever,
-			@Property(name = "datasources.default.url") String url,
-			@Property(name = "datasources.default.driver", defaultValue = "jdbc:oracle:thin:") String driver,
-			@Property(name = "datasources.default.username", defaultValue = "") String username,
-			@Property(name = "datasources.default.password", defaultValue = "") String password) throws SQLException {
+			@Property(name = "iotdatacache.url") String url,
+			@Property(name = "iotdatacache.driver", defaultValue = "jdbc:oracle:thin:") String driver,
+			@Property(name = "iotdatacache.username", defaultValue = "") String username,
+			@Property(name = "iotdatacache.password", defaultValue = "") String password) throws SQLException {
 
 		this.dbTokenRetriever = dbTokenRetriever;
 		this.url = url;

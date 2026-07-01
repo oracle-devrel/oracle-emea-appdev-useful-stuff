@@ -36,8 +36,11 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotsonnenuploader.incommingdata;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -48,10 +51,14 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SonnenConfiguration {
+	// get the UTC TZ once to speed things later
+	@JsonIgnore
+	private final static ZoneId utcTz = ZoneId.of("UTC");
 	public static String PLACE_HOLDER_VALUE = "CommandTestPlaceholder";
 	// store this in two formats as the IoT service uses the Unix time, but we might
-	// want to process it based on time zone data
-	public ZonedDateTime timestamp = ZonedDateTime.now();
+	// want to process it based on time zone data, however force the zone to be GMT
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	public ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
 	public long time = System.currentTimeMillis();
 
 	@JsonProperty("EM_ToU_Schedule")

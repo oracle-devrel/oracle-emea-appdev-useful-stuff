@@ -61,7 +61,7 @@ echo "OCI Command to get the DB token (on the VM only)"
 echo oci iam db-token get --scope \"$DB_TOKEN_SCOPE\" --auth instance_principal
 
 echo "SQL CLI command (on vm) to access database"
-echo sql /@\"jdbc:oracle:thin:@$DB_CONNECTION_STRING\&TOKEN_AUTH=OCI_TOKEN\"
+echo sqlcl/bin/sql /@\"jdbc:oracle:thin:@$DB_CONNECTION_STRING\&TOKEN_AUTH=OCI_TOKEN\"
 
 echo "SQL (on VM) to set the current scheme to the IOT schema"
 echo alter session set current_schema="$IOT_DOMAIN_SHORT_ID"__iot \;

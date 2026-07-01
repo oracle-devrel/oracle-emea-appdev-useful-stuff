@@ -123,7 +123,7 @@ public class IoTAQRawDataIndividualReader extends IoTAQRawDataCore implements Io
 			// processing so let's use a loop.
 			try {
 				RawData rawData = convertToRawData(message.getStructPayload().getAttributes());
-				log.info("Processing raw data " + rawData);
+				log.fine("Processing raw data " + rawData);
 				rawDataMessageHandlerService.handle(rawData);
 			} catch (SQLException e) {
 				log.warning("SQLException processing message block " + readCounter);

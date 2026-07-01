@@ -42,6 +42,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
+import oracle.sql.json.OracleJsonValue;
+import oracle.sql.json.OracleJsonValue.OracleJsonType;
 
 @Log
 @Data
@@ -53,4 +55,6 @@ public class NormalizedData extends IoTDataCore {
 	private String timeObserved;
 	private String contentType;
 	private String content;
+	private OracleJsonValue contentJsonValue;
+	private OracleJsonType contentJsonType;
 }

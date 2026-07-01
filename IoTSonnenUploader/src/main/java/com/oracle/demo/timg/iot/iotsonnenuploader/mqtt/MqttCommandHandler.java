@@ -71,6 +71,10 @@ import lombok.extern.java.Log;
 public class MqttCommandHandler {
 	@Inject
 	public MqttCommandResponsePublisher responsePublisher;
+	// this example doesn't use the mapper, but in reality most commands will have a
+	// data structure, probably in JSON that will need to be unpacked, so will need
+	// this
+	@SuppressWarnings("unused")
 	@Inject
 	private ObjectMapper mapper;
 

@@ -52,7 +52,7 @@ SOFTWARE. -->
 	<properties>
 		<packaging>jar</packaging>
 		<jdk.version>21</jdk.version>
-		<release.version>17</release.version>
+		<release.version>21</release.version>
 		<version.ocisdk>3.74.2</version.ocisdk>
 		<version.lombok>1.18.46</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
@@ -78,6 +78,17 @@ SOFTWARE. -->
 	<dependencies>
 
 		<dependency>
+			<groupId>io.micronaut</groupId>
+			<artifactId>micronaut-http-client</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micronaut.jsonschema</groupId>
+			<artifactId>micronaut-json-schema-annotations</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.micronaut.serde</groupId>
 			<artifactId>micronaut-serde-jackson</artifactId>
 			<scope>compile</scope>
@@ -99,7 +110,7 @@ SOFTWARE. -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${version.lombok}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>	<!-- SLF4J is a logging
 		facade that let's us change the actual logger
 		used 
@@ -112,6 +123,11 @@ SOFTWARE. -->
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>${version.slf4j}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.micronaut.jsonschema</groupId>
+			<artifactId>micronaut-json-schema-validation</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<!-- OCI SDK: common utilities (HTTP client, auth plumbing, etc.) -->
 		<dependency>
@@ -138,21 +154,31 @@ SOFTWARE. -->
 			<artifactId>ojdbc11</artifactId>
 			<version>${version.ojdbc}</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>com.oracle.oci.sdk</groupId>
-			<artifactId>oci-java-sdk-nosql</artifactId>
-			<version>${version.nosql}</version>
-		</dependency>-->
+		<!-- For Oracle Wallet, get the oraclepki, osdt_core and osdt_cert
+		artifacts -->
 		<dependency>
-  <groupId>com.oracle.nosql.sdk</groupId>
-  <artifactId>nosqldriver</artifactId>
-  <version>5.3.7</version>
-  <!--<version>5.4.21</version>-->
-</dependency>
+			<groupId>com.oracle.database.security</groupId>
+			<artifactId>oraclepki</artifactId>
+			<version>${version.ojdbc}</version>
+		</dependency>
+
 		<dependency>
-			<groupId>io.micronaut</groupId>
-			<artifactId>micronaut-http-client</artifactId>
-			<scope>compile</scope>
+			<groupId>com.oracle.database.security</groupId>
+			<artifactId>osdt_core</artifactId>
+			<version>21.21.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle.database.security</groupId>
+			<artifactId>osdt_cert</artifactId>
+			<version>21.21.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle.nosql.sdk</groupId>
+			<artifactId>nosqldriver</artifactId>
+			<version>5.3.7</version>
+			<!--<version>5.4.21</version>-->
 		</dependency>
 
 		<dependency>
@@ -172,11 +198,11 @@ SOFTWARE. -->
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>
+		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<scope>runtime</scope>
-		</dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>io.micronaut.validation</groupId>
 			<artifactId>micronaut-validation</artifactId>
@@ -226,11 +252,15 @@ SOFTWARE. -->
 							<artifactId>micronaut-graal</artifactId>
 							<version>${micronaut.core.version}</version>
 						</path>
-						<!--<path>
+						<path>
 							<groupId>io.micronaut</groupId>
 							<artifactId>micronaut-http-validation</artifactId>
 							<version>${micronaut.core.version}</version>
-						</path>-->
+						</path>
+						<path>
+							<groupId>io.micronaut.jsonschema</groupId>
+							<artifactId>micronaut-json-schema-processor</artifactId>
+						</path>
 						<path>
 							<groupId>io.micronaut.serde</groupId>
 							<artifactId>micronaut-serde-processor</artifactId>
@@ -242,17 +272,6 @@ SOFTWARE. -->
 								</exclusion>
 							</exclusions>
 						</path>
-						<!--<path>
-							<groupId>io.micronaut.validation</groupId>
-							<artifactId>micronaut-validation-processor</artifactId>
-							<version>${micronaut.validation.version}</version>
-							<exclusions>
-								<exclusion>
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject</artifactId>
-								</exclusion>
-							</exclusions>
-						</path>-->
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<arg>

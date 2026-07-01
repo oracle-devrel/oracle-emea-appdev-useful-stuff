@@ -147,19 +147,6 @@ public class IoTAQNormalizedDataBatchReader extends IoTAQNormalizedDataCore impl
 				log.warning(() -> "SQLException processing message block " + readCounter + ", message" + i);
 			}
 		});
-		// ultimately this could be a stream, but we want to track the number when
-		// processing so let's use a loop.
-//		for (int i = 0; i < messages.length; i++) {
-//			try {
-//				NormalizedData normalizedData = convertToNormalizedData(messages[i].getJSONPayload());
-//				// can't use a lambda here as readCounter AND i are both being updated so can't
-//				// use an int stream.
-//				log.finer("Received message block " + readCounter + ", message no " + i + ", " + normalizedData);
-//				normalizedDataMessageHandlerService.handle(normalizedData);
-//			} catch (SQLException e) {
-//				log.warning(() -> "SQLException processing message block " + readCounter + ", message" + i);
-//			}
-//		}
 	}
 
 	@Override

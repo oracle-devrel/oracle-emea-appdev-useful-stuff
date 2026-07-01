@@ -47,12 +47,12 @@ import jakarta.inject.Singleton;
 
 @Singleton
 // don't use a default value here to ensure error if it's not been set
-@Requires(property = "oci.auth.type", value = "ConfigFile")
+@Requires(property = "iotdatacache.oci.auth.type", value = "ConfigFile")
 public class OCIConfigFileAuthProvider implements OCIAuthProvider {
 	private final BasicAuthenticationDetailsProvider basicAuthenticationDetailsProvider;
 
 	public OCIConfigFileAuthProvider(
-			@Property(name = "oci.auth.config.section", defaultValue = "DEFAULT") String configSectionName)
+			@Property(name = "iotdatacache.oci.auth.config.section", defaultValue = "DEFAULT") String configSectionName)
 			throws IOException {
 		ConfigFileAuthenticationDetailsProvider configFileProvider = new ConfigFileAuthenticationDetailsProvider(
 				configSectionName);
