@@ -98,42 +98,42 @@ public class NormalizedDataMetricsDataBuilder {
 
 	public NormalizedDataMetricsDataBuilder resourceAttribute(String key, String value) {
 		if (hasText(key)) {
-			resourceAttributes.add(OtlpAttributeUtils.attribute(key, value));
+			resourceAttributes.add(attribute(key, value));
 		}
 		return this;
 	}
 
 	public NormalizedDataMetricsDataBuilder resourceAttribute(String key, AnyValue value) {
 		if (hasText(key) && value != null) {
-			resourceAttributes.add(OtlpAttributeUtils.attribute(key, value));
+			resourceAttributes.add(attribute(key, value));
 		}
 		return this;
 	}
 
 	public NormalizedDataMetricsDataBuilder resourceAttributes(List<KeyValue> attributes) {
 		if (attributes != null) {
-			resourceAttributes.addAll(attributes);
+			resourceAttributes.addAll(normalizeAttributeKeys(attributes));
 		}
 		return this;
 	}
 
 	public NormalizedDataMetricsDataBuilder scopeAttribute(String key, String value) {
 		if (hasText(key)) {
-			scopeAttributes.add(OtlpAttributeUtils.attribute(key, value));
+			scopeAttributes.add(attribute(key, value));
 		}
 		return this;
 	}
 
 	public NormalizedDataMetricsDataBuilder scopeAttribute(String key, AnyValue value) {
 		if (hasText(key) && value != null) {
-			scopeAttributes.add(OtlpAttributeUtils.attribute(key, value));
+			scopeAttributes.add(attribute(key, value));
 		}
 		return this;
 	}
 
 	public NormalizedDataMetricsDataBuilder scopeAttributes(List<KeyValue> attributes) {
 		if (attributes != null) {
-			scopeAttributes.addAll(attributes);
+			scopeAttributes.addAll(normalizeAttributeKeys(attributes));
 		}
 		return this;
 	}
@@ -236,9 +236,9 @@ public class NormalizedDataMetricsDataBuilder {
 		NumberDataPoint dataPoint = new NumberDataPoint();
 		dataPoint.setTimeUnixNano(OtlpTimeUtils.unixNanoAsString(normalizedData.getTimeObserved()));
 		dataPoint.setAsDouble(metricValue(content, jsonValue, jsonType).doubleValue());
-		dataPoint.getAttributes().add(OtlpAttributeUtils.attribute("iot.content.path", contentPath));
+		dataPoint.getAttributes().add(attribute("iot.content.path", contentPath));
 		dataPoint.getAttributes()
-				.add(OtlpAttributeUtils.attribute("iot.content.type", normalizedData.getContentType()));
+				.add(attribute("iot.content.type", normalizedData.getContentType()));
 		return dataPoint;
 	}
 
@@ -248,14 +248,25 @@ public class NormalizedDataMetricsDataBuilder {
 
 	public String metricName(String contentPath) {
 		if (!hasText(contentPath)) {
-			return metricPrefix + ".value";
+			return toDotSeparatedSnakeCase(metricPrefix) + ".value";
 		}
-		String sanitizedPath = contentPath.strip().replace('\\', '/').replaceAll("^/+", "").replace('/', '.')
-				.replaceAll("[^A-Za-z0-9_.-]+", "_").replaceAll("\\.+", ".");
+		String sanitizedPath = toDotSeparatedSnakeCase(contentPath.strip().replace('\\', '/').replaceAll("^/+", "")
+				.replace('/', '.').replaceAll("[^A-Za-z0-9_.-]+", "_").replaceAll("\\.+", "."));
 		if (!hasText(sanitizedPath)) {
 			sanitizedPath = "value";
 		}
-		return metricPrefix + "." + sanitizedPath;
+		return toDotSeparatedSnakeCase(metricPrefix) + "." + sanitizedPath;
+	}
+
+	public static String toDotSeparatedSnakeCase(String input) {
+		if (!hasText(input)) {
+			return input;
+		}
+		String[] parts = input.strip().replace('\\', '/').replace('/', '.').split("\\.");
+		for (int i = 0; i < parts.length; i++) {
+			parts[i] = toSnakeCase(parts[i]);
+		}
+		return String.join(".", parts).replaceAll("\\.+", ".");
 	}
 
 	public BigDecimal metricValue(NormalizedData normalizedData) {
@@ -293,6 +304,19 @@ public class NormalizedDataMetricsDataBuilder {
 		}
 	}
 
+	private static String toSnakeCase(String value) {
+		if (!hasText(value)) {
+			return value;
+		}
+		return value.strip()
+				.replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
+				.replaceAll("([a-z0-9])([A-Z])", "$1_$2")
+				.replaceAll("[^A-Za-z0-9]+", "_")
+				.replaceAll("_+", "_")
+				.replaceAll("^_|_$", "")
+				.toLowerCase(java.util.Locale.ROOT);
+	}
+
 	private static String appendPath(String contentPath, String fieldName) {
 		if (!hasText(contentPath)) {
 			return fieldName;
@@ -310,9 +334,8 @@ public class NormalizedDataMetricsDataBuilder {
 
 	private ResourceMetrics resourceMetrics(NormalizedData normalizedData) {
 		Resource resource = new Resource();
-		resource.getAttributes().add(OtlpAttributeUtils.attribute("service.name", serviceName));
-		resource.getAttributes().add(OtlpAttributeUtils.attribute("iot.digital_twin.instance_id",
-				normalizedData.getDigitalTwinInstanceId()));
+		resource.getAttributes().add(attribute("service.name", serviceName));
+		resource.getAttributes().add(attribute("iot.digital_twin.instance_id", normalizedData.getDigitalTwinInstanceId()));
 
 		ResourceMetrics resourceMetrics = new ResourceMetrics();
 		resourceMetrics.setResource(resource);
@@ -321,7 +344,7 @@ public class NormalizedDataMetricsDataBuilder {
 
 	private ScopeMetrics scopeMetrics() {
 		InstrumentationScope scope = new InstrumentationScope();
-		scope.setName(scopeName);
+		scope.setName(toDotSeparatedSnakeCase(scopeName));
 		scope.setVersion(scopeVersion);
 
 		ScopeMetrics scopeMetrics = new ScopeMetrics();
@@ -335,6 +358,24 @@ public class NormalizedDataMetricsDataBuilder {
 				target.add(attribute);
 			}
 		}
+	}
+
+	private static List<KeyValue> normalizeAttributeKeys(List<KeyValue> attributes) {
+		List<KeyValue> normalizedAttributes = new ArrayList<>();
+		for (KeyValue attribute : attributes) {
+			if (attribute != null) {
+				normalizedAttributes.add(attribute(attribute.getKey(), attribute.getValue()));
+			}
+		}
+		return normalizedAttributes;
+	}
+
+	private static KeyValue attribute(String key, String value) {
+		return OtlpAttributeUtils.attribute(toDotSeparatedSnakeCase(key), value);
+	}
+
+	private static KeyValue attribute(String key, AnyValue value) {
+		return OtlpAttributeUtils.attribute(toDotSeparatedSnakeCase(key), value);
 	}
 
 	private static boolean hasText(String value) {

@@ -137,8 +137,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	}
 
 	private void addScopeAttributes(NormalizedDataMetricsDataBuilder builder) {
-		// include this to figure out what it does
-		builder.scopeAttribute("my.scope.attribute", "some scope attribute");
+		// for now none to add
 	}
 
 	private void addResourceAttributes(NormalizedDataMetricsDataBuilder builder, NormalizedData normalizedData) {
