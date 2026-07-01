@@ -148,6 +148,16 @@ public class NormalizedDataMetricsDataBuilder {
 	}
 
 	public MetricsData build() {
+		for (ResourceMetrics resourceMetrics : metricsData.getResourceMetrics()) {
+			if (resourceMetrics.getResource() != null) {
+				addMissingAttributes(resourceMetrics.getResource().getAttributes(), resourceAttributes);
+			}
+			for (ScopeMetrics scopeMetrics : resourceMetrics.getScopeMetrics()) {
+				if (scopeMetrics.getScope() != null) {
+					addMissingAttributes(scopeMetrics.getScope().getAttributes(), scopeAttributes);
+				}
+			}
+		}
 		return metricsData;
 	}
 
@@ -303,7 +313,6 @@ public class NormalizedDataMetricsDataBuilder {
 		resource.getAttributes().add(OtlpAttributeUtils.attribute("service.name", serviceName));
 		resource.getAttributes().add(OtlpAttributeUtils.attribute("iot.digital_twin.instance_id",
 				normalizedData.getDigitalTwinInstanceId()));
-		resource.getAttributes().addAll(resourceAttributes);
 
 		ResourceMetrics resourceMetrics = new ResourceMetrics();
 		resourceMetrics.setResource(resource);
@@ -314,11 +323,18 @@ public class NormalizedDataMetricsDataBuilder {
 		InstrumentationScope scope = new InstrumentationScope();
 		scope.setName(scopeName);
 		scope.setVersion(scopeVersion);
-		scope.getAttributes().addAll(scopeAttributes);
 
 		ScopeMetrics scopeMetrics = new ScopeMetrics();
 		scopeMetrics.setScope(scope);
 		return scopeMetrics;
+	}
+
+	private static void addMissingAttributes(List<KeyValue> target, List<KeyValue> attributes) {
+		for (KeyValue attribute : attributes) {
+			if (!target.contains(attribute)) {
+				target.add(attribute);
+			}
+		}
 	}
 
 	private static boolean hasText(String value) {

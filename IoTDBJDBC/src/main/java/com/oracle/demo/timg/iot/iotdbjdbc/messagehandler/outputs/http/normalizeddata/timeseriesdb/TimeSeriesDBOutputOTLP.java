@@ -137,8 +137,8 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	}
 
 	private void addScopeAttributes(NormalizedDataMetricsDataBuilder builder) {
-		// for now this does nothing
-		// builder.scopeAttribute("my.scope.attribute", "some scope attribute");
+		// include this to figure out what it does
+		builder.scopeAttribute("my.scope.attribute", "some scope attribute");
 	}
 
 	private void addResourceAttributes(NormalizedDataMetricsDataBuilder builder, NormalizedData normalizedData) {
@@ -147,10 +147,12 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		try {
 			String modelId = deviceModelInstancesCache.getModelIdByInstanceId(instanceId, true);
 			builder.resourceAttribute("iot.digital_twin.model_id", modelId);
+			log.info("Added model ID resource attribute of " + modelId);
 			String modelName;
 			try {
 				modelName = deviceModelInstancesCache.getModelNameByModelId(modelId, true);
 				builder.resourceAttribute("iot.digital_twin.model_name", modelName);
+				log.info("Added model name resource attribute of " + modelName);
 			} catch (MissingModelException e) {
 				log.severe("No model name found for modelid " + modelId);
 			} catch (SQLException e) {
