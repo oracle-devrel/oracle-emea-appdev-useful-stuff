@@ -54,7 +54,10 @@ import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
-@ClientFilter(patterns = "/tel/v1/metrics", serviceId = OtlpProperties.METRICS_CLIENT_ID)
+
+@ClientFilter(patterns = "${" + TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH
+		+ ":/tel/v1/metrics}", serviceId = OtlpProperties.METRICS_CLIENT_ID)
+//@ClientFilter(patterns = "/tel/v1/metrics", serviceId = OtlpProperties.METRICS_CLIENT_ID)
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
 @Requires(property = "micronaut.http.services.timeseriesmetrics.url")
 @Requires(property = "micronaut.http.services.timeseriesoauth.url")
