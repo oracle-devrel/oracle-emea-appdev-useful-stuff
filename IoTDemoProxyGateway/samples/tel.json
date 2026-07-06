@@ -1,0 +1,71 @@
+{
+	"resourceMetrics": [
+		{
+			"resource": {
+				"attributes": [
+					{
+						"key": "service.name",
+						"value": {
+							"stringValue": "IoTDBJDBC"
+						}
+					},
+					{
+						"key": "iot.digital_twin.instance_id",
+						"value": {
+							"stringValue": "ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7h6t75eifevhfihvbwazwi43ndgrauaawue22d6svdpna"
+						}
+					},
+					{
+						"key": "iot.digital_twin.model_id",
+						"value": {
+							"stringValue": "ocid1.iotdigitaltwinmodel.oc1.uk-london-1.amaaaaaauevftmr7wuslrtqim6zflcxhqaprmzib74p76ev64g4zqy7edbva"
+						}
+					},
+					{
+						"key": "iot.digital_twin.model_name",
+						"value": {
+							"stringValue": "homebattery"
+						}
+					}
+				]
+			},
+			"scopeMetrics": [
+				{
+					"scope": {
+						"name": "com.oracle.demo.timg.iot.iotdbjdbc",
+						"version": "1.0.0"
+					},
+					"metrics": [
+						{
+							"name": "iot.normalized.solar_generation",
+							"description": "IoT normalized data value",
+							"unit": "1",
+							"gauge": {
+								"dataPoints": [
+									{
+										"attributes": [
+											{
+												"key": "iot.content.path",
+												"value": {
+													"stringValue": "SolarGeneration"
+												}
+											},
+											{
+												"key": "iot.content.type",
+												"value": {
+													"stringValue": "DECIMAL"
+												}
+											}
+										],
+										"timeUnixNano": "1783071513549000000",
+										"asDouble": 495.0
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

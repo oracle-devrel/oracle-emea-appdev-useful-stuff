@@ -1,0 +1,18 @@
+{
+	"entity_id": "sensor.utility_room_myggspray_utility_illuminance",
+	"state": "222.0",
+	"attributes": {
+		"state_class": "measurement",
+		"unit_of_measurement": "lx",
+		"device_class": "illuminance",
+		"friendly_name": "MYGGSPRAY utility Illuminance"
+	},
+	"last_changed": "2026-07-02T10:44:40.613085+00:00",
+	"last_reported": "2026-07-02T10:44:40.613085+00:00",
+	"last_updated": "2026-07-02T10:44:40.613085+00:00",
+	"context": {
+		"id": "01KWH6WJ153ND7JR8HKZHJWDJQ",
+		"parent_id": null,
+		"user_id": null
+	}
+}
