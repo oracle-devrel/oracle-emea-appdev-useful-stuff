@@ -1,0 +1,2 @@
+The development team are building a grafana plugin that can be used to connect to the time series DB
+this is available at https://github.com/oracle-samples/oracle-telemetry-streaming
