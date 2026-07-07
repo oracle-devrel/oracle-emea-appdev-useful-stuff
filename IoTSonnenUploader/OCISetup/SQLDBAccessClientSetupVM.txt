@@ -1,13 +1,13 @@
-Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to enable the basion agent)
+#Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to enable the basion agent)
 
-once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
-install java and maven to allow for compilation as well as the sqlcl command
-we also need git to get the code itself
+#once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
+#€install java and maven to allow for compilation as well as the sqlcl command
+#we also need git to get the code itself
 # install the java version
 sudo dnf install java-25-openjdk-devel --assumeyes
 # this insista on installing jdk 17 with maven, so don't do that
 #sudo dnf install maven --assumeyes
-# get maven
+# get maven, the dnf install method insiste oon installing jdk 17 and that's not what we want so we have to do it manually
 cd /tmp
 curl -LO https://dlcdn.apache.org/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
 

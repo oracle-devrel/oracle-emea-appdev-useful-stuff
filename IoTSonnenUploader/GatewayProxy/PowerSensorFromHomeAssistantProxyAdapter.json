@@ -1,0 +1,16 @@
+[
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"power\"}",
+		"description": "Power adapter",
+		"payload-mapping": {
+			"$.watts": "$.watts"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"watts": 2913.6,
+				"timestamp": 1763981430779
+			}
+		}
+	}
+]

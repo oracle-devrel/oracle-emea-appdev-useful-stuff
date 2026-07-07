@@ -1,0 +1,26 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homeassistant:luminance;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Illuminance",
+				"Validated"
+			],
+			"displayName": "Illuminance",
+			"name": "lux",
+			"schema": "double",
+			"unit": "lux",
+			"minimum": 0,
+			"maximum": 1000000
+		}
+	]
+}

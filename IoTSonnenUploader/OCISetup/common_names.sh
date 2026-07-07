@@ -37,8 +37,11 @@ export DIGITAL_TWIN_MODEL_NAME=homebattery
 export DIGITAL_TWIN_MODEL_FILE_NAME=HomeBatteryDTMI.json
 # note that this is a relative path
 export DIGITAL_TWIN_MODEL_FILE=file://$DIGITAL_TWIN_MODEL_FILE_NAME
-# the models name we extract from the model file
-export DIGITAL_TWIN_MODEL_IDENTIFIER=`cat $DIGITAL_TWIN_MODEL_FILE_NAME | jq -r '.["@id"]'`
+# the models name we extract from the model file, 
+# As the common_names.sh script is used all over in different directories
+# that has been disbaled for now due to directory locations, but if needed use the following in your script
+# (adjusting for directories of course !)
+# export DIGITAL_TWIN_MODEL_IDENTIFIER=`cat $DIGITAL_TWIN_MODEL_FILE_NAME | jq -r '.["@id"]'`
 # values for the adapters
 export DIGITAL_TWIN_ADAPTOR_ROUTE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-multiple-routes.json
 export DIGITAL_TWIN_ADAPTOR_ENVELOPE_MAPPINGS_FILE=file://sonnen-to-generic-mapping-envelope.json
@@ -55,6 +58,10 @@ export SSH_PUBLIC_KEY_PATH="$HOME/.ssh/id_rsa.pub"
 export VCN_NAME="iotdemosvcn"
 export VCN_CIDR="10.0.0.0/16"
 export SUBNET_CIDR="10.0.1.0/24"
+export IOT_APPS_SUBNET="iotclientapps"
+export IOT_APPS_SUBNET_CIDR="$SUBNET_CIDR"
+export IOT_CLIENT_VM_SUBNET="iotclientvms"
+export IOT_CLIENT_VM_SUBNET_CIDR="10.0.2.0/24"
 
 # the name of the IDCS instance for the dynamic group of the compute VMs - can differ from the ORDS OAUTH IDCS instance name
 export IOT_CLIENT_VM_DYNAMIC_GROUP_IDCS_NAME=OracleIdentityCloudService
@@ -64,8 +71,10 @@ export IOT_CLIENT_VM_DYNAMIC_GROUP_NAME=TGIoTDBAccessDG
 # Virtual machine access to the IOT Instance
 export VM_NAME="iotdbaccess"
 export VM_USER_NAME="opc"
+export DB_CLIENT_VM_CLOUD_INIT_FILE=../OCISetup/DBClientVMCloudInit.sh
 
 # allows us to connect to it
 export BASTION_NAME=IoTDBAccessBastion
+export BASTION_CLIENT_CIDR_LIST='["0.0.0.0/0"]'
 export BASTION_PRIV_KEY_PATH="$HOME/.ssh/id_rsa"
 export BASTION_PUB_KEY_PATH="$BASTION_PRIV_KEY_PATH"".pub"

@@ -1,0 +1,19 @@
+{
+	"reference-endpoint": "house/homeassistant/gateway/*",
+	"reference-payload": {
+		"data": {
+			"timestamp": 1783449620042,
+			"payload": {
+				"hasuccess": 54.5,
+				"hafail": 0.5
+			},
+			"devicekey": "abc"
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "$.timestamp",
+		"target": "${if has(\"devicekey\") then .devicekey else null end}",
+		"contentRoot": "$.payload"
+	}
+}

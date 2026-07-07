@@ -1,0 +1,32 @@
+[
+	{
+		"condition": "${endpoint(3) == \"gateway\" and endpoint(4) == \"stats\"}",
+		"description": "Home Assistant gateway statistics",
+		"payload-mapping": {
+			"$.hasuccess": "$.hasuccess",
+			"$.hafail": "$.hafail"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"hasuccess": 54.5,
+				"hafail": 0.5
+			}
+		}
+	},
+	{
+		"condition": "${endpoint(3) == \"gateway\" and endpoint(4) == \"config\"}",
+		"description": "Home Assistant gateway configuration",
+		"payload-mapping": {
+			"$.successtimewindow": "$.successtimewindow",
+			"$.failtimewindow": "$.failtimewindow"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"successtimewindow": 10,
+				"failtimewindow": 10
+			}
+		}
+	}
+]
