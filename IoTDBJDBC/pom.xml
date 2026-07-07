@@ -53,7 +53,7 @@ SOFTWARE. -->
 		<packaging>jar</packaging>
 		<jdk.version>21</jdk.version>
 		<release.version>21</release.version>
-		<version.ocisdk>3.74.2</version.ocisdk>
+		<version.ocisdk>3.91.0</version.ocisdk>
 		<version.lombok>1.18.46</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
 		<!-- Oracle JDBC 23ai line (set to the latest approved version) -->
