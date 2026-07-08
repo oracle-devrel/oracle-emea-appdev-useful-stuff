@@ -1,6 +1,6 @@
 [
 	{
-		"condition": "${endpoint(3) == \"gateway\" and endpoint(4) == \"stats\"}",
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"stats\"}",
 		"description": "Home Assistant gateway statistics",
 		"payload-mapping": {
 			"$.hasuccess": "$.hasuccess",
@@ -15,7 +15,7 @@
 		}
 	},
 	{
-		"condition": "${endpoint(3) == \"gateway\" and endpoint(4) == \"config\"}",
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"config\"}",
 		"description": "Home Assistant gateway configuration",
 		"payload-mapping": {
 			"$.successtimewindow": "$.successtimewindow",
