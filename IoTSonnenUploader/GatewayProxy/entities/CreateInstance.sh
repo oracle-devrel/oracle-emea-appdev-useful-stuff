@@ -50,12 +50,12 @@ fi
 ENDPOINT=$ENDPOINT_MAIN/$ENTITY_ENDPOINT_NAME
 echo
 echo "To send the instance test data using https for device $INSTANCE_DISPLAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 #echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$ENDPOINT\" -H \'Content-Type: application/json\' -d \"{\\\"payload\\\": $ENTITY_SAMPLE_DATA, \\\"devicekey\\\":\\\"$INSTANCE_KEY\\\"}\"
 echo
 echo "To send instance test data using mqttx for device $INSTANCE_DISPLAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 #echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo mqttx pub -t $ENDPOINT -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"payload\\\": $ENTITY_SAMPLE_DATA, \\\"devicekey\\\":\\\"$INSTANCE_KEY\\\"}\"
 echo
@@ -70,11 +70,11 @@ echo >> $ENTITY_TEST_DATA_FILE
 echo "Testing commands for instance $INSTANCE_DISPLAY_NAME of model $ENTITY_MODEL_NAME" >> $ENTITY_TEST_DATA_FILE
 echo >> $ENTITY_TEST_DATA_FILE
 echo "To send the instance test data using https for device $INSTANCE_DISPLAY_NAME" >> $ENTITY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $ENTITY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $ENTITY_TEST_DATA_FILE
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$ENDPOINT\" -H \'Content-Type: application/json\' -d \"{\\\"payload\\\": $ENTITY_SAMPLE_DATA, \\\"devicekey\\\":\\\"$INSTANCE_KEY\\\"}\" >> $ENTITY_TEST_DATA_FILE
 echo >> $ENTITY_TEST_DATA_FILE
 echo "To send instance test data using mqttx for device $INSTANCE_DISPLAY_NAME" >> $ENTITY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $ENTITY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $ENTITY_TEST_DATA_FILE
 echo mqttx pub -t $ENDPOINT -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"payload\\\": $ENTITY_SAMPLE_DATA, \\\"devicekey\\\":\\\"$INSTANCE_KEY\\\"}\" >> $ENTITY_TEST_DATA_FILE
 echo >> $ENTITY_TEST_DATA_FILE
 echo "To get the most recent normalized data for instance $INSTANCE_DISPLAY_NAME" >> $ENTITY_TEST_DATA_FILE

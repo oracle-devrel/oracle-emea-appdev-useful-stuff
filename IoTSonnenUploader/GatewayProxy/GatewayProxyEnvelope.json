@@ -2,7 +2,7 @@
 	"reference-endpoint": "house/homeassistant/gateway/*",
 	"reference-payload": {
 		"data": {
-			"timestamp": 1783449620042,
+			"timestamp": "2026-07-10T16:09:18.934Z",
 			"payload": {
 				"haretrievesuccess": 54.5,
 				"haretrievefail": 0.5,

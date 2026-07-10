@@ -1,15 +1,18 @@
 [
 	{
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"illuminance\"}",
-		"description": "Luminance adapter",
+		"description": "Illuminance adapter",
 		"payload-mapping": {
-			"$.lux": "$.lux"
+			"$.lux": "$.payload.lux"
 		},
 		"reference-payload": {
 			"dataFormat": "JSON",
 			"data": {
-				"lux": 213.8,
-				"timestamp": 1763981430279
+				"payload": {
+					"timestamp": "2026-07-10T16:09:18.934123Z",
+					"lux": 216.1
+				},
+				"devicekey": "abc"
 			}
 		}
 	}

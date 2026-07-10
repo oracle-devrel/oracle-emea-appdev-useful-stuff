@@ -24,6 +24,6 @@ public class IoTCoreEvent {
 	// payload sub object as the current configuration of the gateway envelope means
 	// that's all that's passed on to the indirectly connected devices
 	@Builder.Default
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	private ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
 }

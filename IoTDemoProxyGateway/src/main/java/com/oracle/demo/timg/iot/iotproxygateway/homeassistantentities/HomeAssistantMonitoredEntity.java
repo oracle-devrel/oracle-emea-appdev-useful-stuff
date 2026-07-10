@@ -29,9 +29,9 @@ import lombok.extern.java.Log;
 public class HomeAssistantMonitoredEntity implements Runnable {
 	private String name;
 	private Boolean doupload;
-	private String entityid;
 	private Duration initaldelay = Duration.ofSeconds(5);
 	private Duration retrievalrate = Duration.ofSeconds(10);
+	private String entityid;
 	private IoTType iottype;
 	private String devicekey;
 	private String endpoint;
@@ -107,7 +107,7 @@ public class HomeAssistantMonitoredEntity implements Runnable {
 			// convert it into the object we need
 			IoTCoreEvent ioTCoreEvent = iottype.createEventFrom(state);
 			log.info("converted HA state to core is " + ioTCoreEvent);
-			mqttUploadHandler.upload(ioTCoreEvent);
+			mqttUploadHandler.upload(ioTCoreEvent, this);
 		} catch (Exception e) {
 			log.info("Exception testing timestamps or other actions " + e.getLocalizedMessage());
 		}

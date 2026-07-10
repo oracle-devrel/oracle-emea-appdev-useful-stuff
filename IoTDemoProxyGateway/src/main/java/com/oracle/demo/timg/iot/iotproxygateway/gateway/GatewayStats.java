@@ -13,36 +13,36 @@ import lombok.extern.java.Log;
 @Log
 @Singleton
 public class GatewayStats {
-	private GatewayCallTracker sucessfullRetrieveCalls;
-	private GatewayCallTracker failedRetrieveCalls;
+	private GatewayCallTracker sucessfullHARetrieveCalls;
+	private GatewayCallTracker failedHARetrieveCalls;
 	private GatewayCallTracker sucessfullUploadCalls;
 	private GatewayCallTracker failedUploadCalls;
-	private long sucessfullRetrieveWindowSeconds;
-	private long failedRetrieveWindowSeconds;
+	private long sucessfullHARetrieveWindowSeconds;
+	private long failedHARetrieveWindowSeconds;
 	private long sucessfullUploadWindowSeconds;
 	private long failedUploadWindowSeconds;
 
 	public GatewayStats(
-			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration sucessfullRetrieveWindow,
-			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration failedRetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration sucessfullHARetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration failedHARetrieveWindow,
 			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_UPLOAD_WINDOW, defaultValue = "PT10m") Duration sucessfullUploadWindow,
 			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_UPLOAD_WINDOW, defaultValue = "PT10m") Duration failedUploadWindow) {
-		this.sucessfullRetrieveCalls = new GatewayCallTracker(sucessfullRetrieveWindow);
-		this.failedRetrieveCalls = new GatewayCallTracker(failedRetrieveWindow);
+		this.sucessfullHARetrieveCalls = new GatewayCallTracker(sucessfullHARetrieveWindow);
+		this.failedHARetrieveCalls = new GatewayCallTracker(failedHARetrieveWindow);
 		this.sucessfullUploadCalls = new GatewayCallTracker(sucessfullUploadWindow);
 		this.failedUploadCalls = new GatewayCallTracker(failedUploadWindow);
-		this.sucessfullRetrieveWindowSeconds = sucessfullRetrieveWindow.getSeconds();
-		this.failedRetrieveWindowSeconds = failedRetrieveWindow.getSeconds();
+		this.sucessfullHARetrieveWindowSeconds = sucessfullHARetrieveWindow.getSeconds();
+		this.failedHARetrieveWindowSeconds = failedHARetrieveWindow.getSeconds();
 		this.sucessfullUploadWindowSeconds = sucessfullUploadWindow.getSeconds();
 		this.failedUploadWindowSeconds = failedUploadWindow.getSeconds();
 	}
 
-	public void trackSucessfullRetrieveCall() {
-		sucessfullRetrieveCalls.trackCalls();
+	public void trackSucessfullHARetrieveCall() {
+		sucessfullHARetrieveCalls.trackCalls();
 	}
 
-	public void trackFailedRetrieveCall() {
-		failedRetrieveCalls.trackCalls();
+	public void trackFailedHARetrieveCall() {
+		failedHARetrieveCalls.trackCalls();
 	}
 
 	public void trackSucessfullUploadCall() {
@@ -55,15 +55,15 @@ public class GatewayStats {
 
 	public GatewayStatsData getGatewayStatsData() {
 		return GatewayStatsData.builder()
-				.haretrievesuccess(sucessfullRetrieveCalls.averageCalls(sucessfullRetrieveWindowSeconds))
-				.haretrievefail(failedRetrieveCalls.averageCalls(failedRetrieveWindowSeconds))
+				.haretrievesuccess(sucessfullHARetrieveCalls.averageCalls(sucessfullHARetrieveWindowSeconds))
+				.haretrievefail(failedHARetrieveCalls.averageCalls(failedHARetrieveWindowSeconds))
 				.uploadsuccess(sucessfullUploadCalls.averageCalls(sucessfullUploadWindowSeconds))
 				.uploadfail(failedUploadCalls.averageCalls(failedUploadWindowSeconds)).build();
 	}
 
 	public GatewayConfigData getGatewayConfigData() {
-		return GatewayConfigData.builder().successfullharetrievetimewindow(sucessfullRetrieveWindowSeconds)
-				.failedharetrievetimewindow(failedRetrieveWindowSeconds)
+		return GatewayConfigData.builder().successfullharetrievetimewindow(sucessfullHARetrieveWindowSeconds)
+				.failedharetrievetimewindow(failedHARetrieveWindowSeconds)
 				.successfulluploadtimewindow(sucessfullUploadWindowSeconds)
 				.faileduploadtimewindow(failedUploadWindowSeconds).build();
 	}

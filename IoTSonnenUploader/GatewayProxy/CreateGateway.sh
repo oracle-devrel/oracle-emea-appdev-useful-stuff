@@ -104,43 +104,44 @@ export GATEWAY_CREDENTIALS="$GATEWAY_EXTERNAL_KEY":"$GATEWAY_INSTANCE_SECRET"
 echo "GATEWAY credentials $GATEWAY_CREDENTIALS"
 echo
 echo "To send the gateway stats test data using https for device $GATEWAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 #echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`'
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$GATEWAY_ENDPOINT_GATEWAY_STATS_PATH\" -H \'Content-Type: application/json\' -d \"{\\\"payload\\\": {\\\"haretrievesuccess\\\": 24.6,\\\"haretrievefail\\\": 1.4,\\\"uploadsuccess\\\": 24.6,\\\"uploadfail\\\": 1.4}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\"
 echo
 echo "To send the gateway config test data using https for device $GATEWAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$GATEWAY_ENDPOINT_GATEWAY_CONFIG_PATH\" -H \'Content-Type: application/json\' -d \"{\\\"payload\\\": {\\\"successfullharetrievetimewindow\\\": 14,\\\"failedharetrievetimewindow\\\": 1, \\\"successfulluploadtimewindow\\\": 12,\\\"faileduploadtimewindow\\\": 2}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\"
 echo
 echo "To send gateway stats test data for the configuration using mqttx for device $GATEWAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 echo mqttx pub -t $GATEWAY_ENDPOINT_GATEWAY_STATS_PATH -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m   \"{\\\"payload\\\": {\\\"haretrievesuccess\\\": 24.6,\\\"haretrievefail\\\": 1.4,\\\"uploadsuccess\\\": 24.6,\\\"uploadfail\\\": 1.4}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\"
 echo
 echo "To send gateway config test data for the configuration using mqttx for device $GATEWAY_NAME"
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z'
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z'
 echo mqttx pub -t $GATEWAY_ENDPOINT_GATEWAY_CONFIG_PATH -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"payload\\\": {\\\"successfullharetrievetimewindow\\\": 14,\\\"failedharetrievetimewindow\\\": 1, \\\"successfulluploadtimewindow\\\": 12,\\\"faileduploadtimewindow\\\": 2}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\"
 echo
 echo "To get the most recent normalized data for gateway $GATEWAY_NAME"
 echo "oci iot digital-twin-instance get-content --digital-twin-instance-id  $GATEWAY_OCID"
 # not generate a file containing the test data commands
+echo -n > $GATEWAY_TEST_DATA_FILE
 echo "Gateway test data" >> $GATEWAY_TEST_DATA_FILE
 echo "GATEWAY credentials $GATEWAY_CREDENTIALS" >> $GATEWAY_TEST_DATA_FILE
 echo >> $GATEWAY_TEST_DATA_FILE
 echo "To send the gateway stats test data using https for device $GATEWAY_NAME" >> $GATEWAY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $GATEWAY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $GATEWAY_TEST_DATA_FILE
 #echo 'export CURRENT_TS=`date +%s%N | cut -b1-13`' >> $GATEWAY_TEST_DATA_FILE
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$GATEWAY_ENDPOINT_GATEWAY_STATS_PATH\" -H \'Content-Type: application/json\' -d  \"{\\\"payload\\\": {\\\"haretrievesuccess\\\": 24.6,\\\"haretrievefail\\\": 1.4,\\\"uploadsuccess\\\": 24.6,\\\"uploadfail\\\": 1.4}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\" >> $GATEWAY_TEST_DATA_FILE
 echo >> $GATEWAY_TEST_DATA_FILE
 echo "To send the gateway config test data using https for device $GATEWAY_NAME" >> $GATEWAY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $GATEWAY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $GATEWAY_TEST_DATA_FILE
 echo curl -u \"$GATEWAY_CREDENTIALS\" \"https://$IOT_DOMAIN_HOST/$GATEWAY_ENDPOINT_GATEWAY_CONFIG_PATH\" -H \'Content-Type: application/json\' -d \"{\\\"payload\\\": {\\\"successfullharetrievetimewindow\\\": 14,\\\"failedharetrievetimewindow\\\": 1, \\\"successfulluploadtimewindow\\\": 12,\\\"faileduploadtimewindow\\\": 2}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\" >> $GATEWAY_TEST_DATA_FILE
 echo >> $GATEWAY_TEST_DATA_FILE
 echo "To send gateway stats test data for the configuration using mqttx for device $GATEWAY_NAME" >> $GATEWAY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $GATEWAY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $GATEWAY_TEST_DATA_FILE
 echo mqttx pub -t $GATEWAY_ENDPOINT_GATEWAY_STATS_PATH -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m   \"{\\\"payload\\\": {\\\"haretrievesuccess\\\": 24.6,\\\"haretrievefail\\\": 1.4,\\\"uploadsuccess\\\": 24.6,\\\"uploadfail\\\": 1.4}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\" >> $GATEWAY_TEST_DATA_FILE
 echo >> $GATEWAY_TEST_DATA_FILE
 echo "To send gateway config test data for the configuration using mqttx for device $GATEWAY_NAME" >> $GATEWAY_TEST_DATA_FILE
-echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-3`Z' >> $GATEWAY_TEST_DATA_FILE
+echo 'export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z' >> $GATEWAY_TEST_DATA_FILE
 echo mqttx pub -t $GATEWAY_ENDPOINT_GATEWAY_CONFIG_PATH -ct application/json  -u $GATEWAY_EXTERNAL_KEY -P $GATEWAY_INSTANCE_SECRET  -h $IOT_DOMAIN_HOST -p 8883  -m  \"{\\\"payload\\\": {\\\"successfullharetrievetimewindow\\\": 14,\\\"failedharetrievetimewindow\\\": 1, \\\"successfulluploadtimewindow\\\": 12,\\\"faileduploadtimewindow\\\": 2}, \\\"timestamp\\\": \\\"\$CURRENT_TS\\\"}\" >> $GATEWAY_TEST_DATA_FILE
 echo >> $GATEWAY_TEST_DATA_FILE
 echo "To get the most recent normalized data for gateway $GATEWAY_NAME" >> $GATEWAY_TEST_DATA_FILE

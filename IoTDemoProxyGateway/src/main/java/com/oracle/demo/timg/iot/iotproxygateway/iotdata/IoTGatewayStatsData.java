@@ -28,7 +28,7 @@ public class IoTGatewayStatsData {
 	// so we can if we want we can have the timestamp at the outer (envelope) level
 	// or within the payload,
 	@Builder.Default
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSXXX")
 	private ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
 	private final String devicekey = null;
 	private GatewayStatsData payload;

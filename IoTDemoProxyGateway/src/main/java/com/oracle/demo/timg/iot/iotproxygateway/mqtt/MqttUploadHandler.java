@@ -2,10 +2,15 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 
 import java.io.IOException;
 
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTCoreEvent;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
+import io.micronaut.context.annotation.Property;
 import io.micronaut.serde.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.ToString;
@@ -16,6 +21,8 @@ import lombok.extern.java.Log;
 public class MqttUploadHandler {
 	@Inject
 	private GatewayStats gatewayStats;
+	@Property(name = PropertyNames.GATEWAY_ENTITIES_ENDPOINT)
+	private String topicPrefix;
 	@ToString.Exclude
 	private final MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher;
 	@ToString.Exclude
@@ -28,15 +35,35 @@ public class MqttUploadHandler {
 		this.mapper = mapper;
 	}
 
-	public void upload(IoTCoreEvent ioTCoreEvent) {
+	@PostConstruct
+	void postConstruct() {
+		log.info("mqtt entity uploader configued with property " + topicPrefix);
+	}
+
+	public void upload(IoTCoreEvent ioTCoreEvent, HomeAssistantMonitoredEntity entity) {
+		IoTEntityData ioTEntityData = IoTEntityData.builder().devicekey(entity.getDevicekey()).payload(ioTCoreEvent)
+				.build();
 		String mappedToJson;
 		try {
-			mappedToJson = mapper.writeValueAsString(ioTCoreEvent);
+			mappedToJson = mapper.writeValueAsString(ioTEntityData);
 		} catch (IOException e) {
 			log.severe("Error converting to Json, this should not have happened, " + e.getLocalizedMessage());
 			return;
 		}
 		log.info("Mapped event as json is " + mappedToJson);
 		// need to get the right topic details to match against the expected IoT topic
+		String topic = topicPrefix + "/" + entity.getEndpoint();
+		// try and sent it
+		if (entity.getDoupload()) {
+			try {
+				mqttHomeAssistantEntityPublisher.publishHomeAssistantData(topic, ioTEntityData);
+				gatewayStats.trackSucessfullUploadCall();
+			} catch (Exception e) {
+				log.severe("Exception uploading event (" + mappedToJson + ") to Iot, " + e.getLocalizedMessage());
+				gatewayStats.trackFailedUploadCall();
+			}
+		} else {
+			log.info("Uploads disabled for entity " + entity.getName() + " for data " + mappedToJson);
+		}
 	}
 }

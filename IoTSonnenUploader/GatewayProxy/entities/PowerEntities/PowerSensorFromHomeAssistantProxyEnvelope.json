@@ -2,12 +2,15 @@
 	"reference-endpoint": "house/homeassistant/illuminance",
 	"reference-payload": {
 		"data": {
-			"timestamp": 1783449620042,
-			"watts": 2813.1
+		"payload": {
+			"timestamp": "2026-07-10T16:09:18.934123Z",
+			"watts": 2327
+		},
+		"devicekey": "def"
 		},
 		"data-format": "JSON"
 	},
 	"envelope-mapping": {
-		"timeObserved": "$.timestamp"
+		"timeObserved": "$.payload.timestamp"
 	}
 }

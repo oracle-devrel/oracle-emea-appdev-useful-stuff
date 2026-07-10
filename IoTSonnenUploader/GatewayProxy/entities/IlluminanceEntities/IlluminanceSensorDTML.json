@@ -19,7 +19,7 @@
 			"name": "lux",
 			"schema": "double",
 			"unit": "lux",
-			"minimum": 0,
+			"minimum": -1,
 			"maximum": 1000000
 		}
 	]

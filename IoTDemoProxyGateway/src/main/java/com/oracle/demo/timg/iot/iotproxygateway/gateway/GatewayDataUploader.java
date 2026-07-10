@@ -38,8 +38,10 @@ public class GatewayDataUploader {
 		log.info("Publishing gateway config " + ioTGatewayConfigData);
 		try {
 			gatewayEventPublisher.publishGatewayConfig(ioTGatewayConfigData);
+			gatewayStats.trackSucessfullUploadCall();
 		} catch (Exception e) {
 			log.warning("Exception uploading gateway config " + ioTGatewayConfigData + ", " + e.getLocalizedMessage());
+			gatewayStats.trackFailedUploadCall();
 		}
 	}
 
@@ -55,8 +57,10 @@ public class GatewayDataUploader {
 		log.info("Publishing gateway stats " + ioTGatewayStatsData);
 		try {
 			gatewayEventPublisher.publishGatewayStats(ioTGatewayStatsData);
+			gatewayStats.trackSucessfullUploadCall();
 		} catch (Exception e) {
 			log.warning("Exception uploading gateway stats " + ioTGatewayStatsData + ", " + e.getLocalizedMessage());
+			gatewayStats.trackFailedUploadCall();
 		}
 	}
 

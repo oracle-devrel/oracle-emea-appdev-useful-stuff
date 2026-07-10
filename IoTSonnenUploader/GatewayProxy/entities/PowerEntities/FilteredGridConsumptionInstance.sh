@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=FilteredGridConsumption
+export INSTANCE_KEY=FiltGridCons

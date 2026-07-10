@@ -29,13 +29,13 @@ public class HomeAssistantState {
 	private String state;
 	private Map<String, String> attributes;
 
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
 	private ZonedDateTime last_changed = ZonedDateTime.now(utcTz);
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
 	private ZonedDateTime last_reported = ZonedDateTime.now(utcTz);
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
 	private ZonedDateTime last_updated = ZonedDateTime.now(utcTz);
 
