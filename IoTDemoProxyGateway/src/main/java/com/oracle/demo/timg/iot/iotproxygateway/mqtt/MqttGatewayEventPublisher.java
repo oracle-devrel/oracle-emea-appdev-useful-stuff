@@ -57,13 +57,13 @@ import jakarta.inject.Singleton;
 @Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
 @Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
 public interface MqttGatewayEventPublisher {
-	@Topic("${" + PropertyNames.GATEWAY_GATEWAY_ENDPOINT_BASE + ":house/homeassistant}" + "/" + "${"
+	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
 			+ PropertyNames.GATEWAY_STATS_ENDPOINT + ":gateway/stats}")
 	// @Topic("house/homeassistant/gateway/stats")
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data);
 
-	@Topic("${" + PropertyNames.GATEWAY_GATEWAY_ENDPOINT_BASE + ":house/homeassistant}" + "/" + "${"
+	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
 			+ PropertyNames.GATEWAY_CONFIG_ENDPOINT + ":gateway/config}")
 	// @Topic("house/homeassistant/gateway/config")
 	@ExecuteOn(TaskExecutors.IO)

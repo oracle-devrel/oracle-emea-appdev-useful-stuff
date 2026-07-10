@@ -1,11 +1,11 @@
 package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTCoreEvent;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Property;
@@ -21,26 +21,28 @@ import lombok.extern.java.Log;
 public class MqttUploadHandler {
 	@Inject
 	private GatewayStats gatewayStats;
-	@Property(name = PropertyNames.GATEWAY_ENTITIES_ENDPOINT)
-	private String topicPrefix;
+	private final String topicBase;
 	@ToString.Exclude
 	private final MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher;
 	@ToString.Exclude
 	private final ObjectMapper mapper;
 
 	@Inject
-	public MqttUploadHandler(MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher, ObjectMapper mapper) {
+	public MqttUploadHandler(MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher, ObjectMapper mapper,
+			@Property(name = PropertyNames.GATEWAY_BASE_ENDPOINT, defaultValue = "house/homeassistant") String endpointBase,
+			@Property(name = PropertyNames.GATEWAY_ENTITIES_ENDPOINT, defaultValue = "entities") String endpointEntities) {
 		log.info("in MqttUploadHandler");
 		this.mqttHomeAssistantEntityPublisher = mqttHomeAssistantEntityPublisher;
 		this.mapper = mapper;
+		this.topicBase = endpointBase + "/" + endpointEntities;
 	}
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("mqtt entity uploader configued with property " + topicPrefix);
+		log.info("mqtt entity uploader configued with topic prefix " + topicBase);
 	}
 
-	public void upload(IoTCoreEvent ioTCoreEvent, HomeAssistantMonitoredEntity entity) {
+	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntity entity) {
 		IoTEntityData ioTEntityData = IoTEntityData.builder().devicekey(entity.getDevicekey()).payload(ioTCoreEvent)
 				.build();
 		String mappedToJson;
@@ -50,13 +52,14 @@ public class MqttUploadHandler {
 			log.severe("Error converting to Json, this should not have happened, " + e.getLocalizedMessage());
 			return;
 		}
-		log.info("Mapped event as json is " + mappedToJson);
+		String topic = topicBase + "/" + entity.getEndpoint();
+		log.info("Sending to topic " + topic + ", mapped event as json is " + mappedToJson);
 		// need to get the right topic details to match against the expected IoT topic
-		String topic = topicPrefix + "/" + entity.getEndpoint();
+
 		// try and sent it
 		if (entity.getDoupload()) {
 			try {
-				mqttHomeAssistantEntityPublisher.publishHomeAssistantData(topic, ioTEntityData);
+				mqttHomeAssistantEntityPublisher.publishHomeAssistantData(topic, mappedToJson);
 				gatewayStats.trackSucessfullUploadCall();
 			} catch (Exception e) {
 				log.severe("Exception uploading event (" + mappedToJson + ") to Iot, " + e.getLocalizedMessage());

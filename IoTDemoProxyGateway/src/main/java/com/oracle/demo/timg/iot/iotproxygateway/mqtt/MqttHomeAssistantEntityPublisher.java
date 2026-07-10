@@ -39,7 +39,6 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.Topic;
@@ -58,5 +57,5 @@ import jakarta.inject.Singleton;
 public interface MqttHomeAssistantEntityPublisher {
 	// @Topic("house/homeassistant/entities")
 	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishHomeAssistantData(@Topic String topic, IoTEntityData data);
+	public CompletableFuture<Void> publishHomeAssistantData(@Topic String topic, String data);
 }

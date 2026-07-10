@@ -11,7 +11,7 @@ public class PropertyNames {
 	public final static String GATEWAY_DEVICE_NAME = GATEWAY_IDENTITY + ".name";
 	public final static String GATEWAY_DEVICE_KEY = GATEWAY_IDENTITY + ".devicekey";
 	public final static String GATEWAY_ENDPOINT = GATEWAY + ".endpoint";
-	public final static String GATEWAY_GATEWAY_ENDPOINT_BASE = GATEWAY_ENDPOINT + ".base";
+	public final static String GATEWAY_BASE_ENDPOINT = GATEWAY_ENDPOINT + ".base";
 	public final static String GATEWAY_STATS_ENDPOINT = GATEWAY_ENDPOINT + ".gatewaystats";
 	public final static String GATEWAY_CONFIG_ENDPOINT = GATEWAY_ENDPOINT + ".gatewayconfig";
 	public final static String GATEWAY_ENTITIES_ENDPOINT = GATEWAY_ENDPOINT + ".entities";

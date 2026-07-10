@@ -2,6 +2,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -11,20 +12,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 @Serdeable
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HomeAssistantState {
-	@ToString.Exclude
 	@JsonIgnore
 	public final static String STATE_UNAVAILABLE = "unavailable";
 	// get the UTC TZ once to speed things later
-	@ToString.Exclude
 	@JsonIgnore
 	private final static ZoneId utcTz = ZoneId.of("UTC");
+	@JsonIgnore
+	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+
 	private String entity_id;
 	private String state;
 	private Map<String, String> attributes;
@@ -41,16 +42,16 @@ public class HomeAssistantState {
 
 	private Map<String, String> context;
 
-	public Long getLastChangedAsLong() {
-		return last_changed.toInstant().toEpochMilli();
+	public String getLastChangedAsString() {
+		return last_changed.format(formatter);
 	}
 
-	public Long getLastReportedAsLong() {
-		return last_reported.toInstant().toEpochMilli();
+	public String getLastReportedAsString() {
+		return last_reported.format(formatter);
 	}
 
-	public Long getLastUpdatedAsLong() {
-		return last_updated.toInstant().toEpochMilli();
+	public String getLastUpdatedAsString() {
+		return last_updated.format(formatter);
 	}
 
 	public Double getStateAsDouble(String defaultValue) {
