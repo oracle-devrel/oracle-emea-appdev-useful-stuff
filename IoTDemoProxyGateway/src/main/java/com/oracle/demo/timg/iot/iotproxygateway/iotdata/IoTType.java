@@ -7,20 +7,28 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum IoTType {
-	LUMINANCE("luminance"), POWER_WATTS("power_watts"), POWER_KILO_WATTS("power_watts");
+	LUMINANCE("-1"), POWER_WATTS("-999999"), POWER_KILO_WATTS("-999999");
 
 	@Getter
-	private String iotUploadPath;
+	private String unavailableDefault;
 
 	public IoTCoreEvent createEventFrom(HomeAssistantState hastate) {
-		return switch (this) {
-		case LUMINANCE ->
-			IoTLuminanceEvent.builder().lux(hastate.getStateAsDouble()).timestamp(hastate.getLast_updated()).build();
-		case POWER_WATTS ->
-			IoTPowerWattsEvent.builder().watts(hastate.getStateAsDouble()).timestamp(hastate.getLast_updated()).build();
-		case POWER_KILO_WATTS -> IoTPowerKiloWattsEvent.builder().kiloWatts(hastate.getStateAsDouble())
-				.timestamp(hastate.getLast_updated()).build();
-		default -> throw new UnsupportedOperationException("Support for IoT type " + this + " is not yet implemented");
-		};
+		switch (this) {
+		case LUMINANCE: {
+			return IoTLuminanceEvent.builder().lux(hastate.getStateAsDouble(unavailableDefault))
+					.timestamp(hastate.getLast_updated()).build();
+		}
+		case POWER_WATTS: {
+			return IoTPowerWattsEvent.builder().watts(hastate.getStateAsDouble(unavailableDefault))
+					.timestamp(hastate.getLast_updated()).build();
+		}
+		case POWER_KILO_WATTS: {
+			return IoTPowerKiloWattsEvent.builder().kiloWatts(hastate.getStateAsDouble(unavailableDefault))
+					.timestamp(hastate.getLast_updated()).build();
+		}
+		default: {
+			throw new UnsupportedOperationException("Support for IoT type " + this + " is not yet implemented");
+		}
+		}
 	}
 }

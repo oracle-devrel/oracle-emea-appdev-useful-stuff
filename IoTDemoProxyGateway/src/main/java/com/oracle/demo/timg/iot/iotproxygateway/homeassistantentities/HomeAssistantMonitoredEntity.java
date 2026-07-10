@@ -30,9 +30,11 @@ public class HomeAssistantMonitoredEntity implements Runnable {
 	private String name;
 	private Boolean doupload;
 	private String entityid;
-	private Duration initaldelay; // = Duration.ofSeconds(5);
-	private Duration retrievalrate; // = Duration.ofSeconds(10);
+	private Duration initaldelay = Duration.ofSeconds(5);
+	private Duration retrievalrate = Duration.ofSeconds(10);
 	private IoTType iottype;
+	private String devicekey;
+	private String endpoint;
 	@ToString.Exclude
 	@JsonIgnore
 	private final static ZoneId utcTz = ZoneId.of("UTC");

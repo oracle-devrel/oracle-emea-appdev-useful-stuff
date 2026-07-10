@@ -39,6 +39,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.Topic;
@@ -50,12 +51,12 @@ import jakarta.inject.Singleton;
 @MqttPublisher
 @Singleton
 @Requires(property = PropertyNames.GATEWAY_DEVICE_NAME)
-@Requires(property = PropertyNames.GATEWAY_DEVICE_ID)
-@Requires(property = PropertyNames.GATEWAY_DEVICE_USERNAME)
-@Requires(property = PropertyNames.GATEWAY_DEVICE_PASSWORD)
-@Requires(property = PropertyNames.GATEWAY_DEVICE_SERVER_URI)
-public interface MqttEventPublisher {
-	// @Topic("house/sonnenconfiguration/${" + DeviceSettings.PREFIX + ".id}")
+@Requires(property = PropertyNames.MQTT_CLIENT_DEVICE_ID)
+@Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
+@Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
+@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
+public interface MqttHomeAssistantEntityPublisher {
+	// @Topic("house/homeassistant/entities")
 	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishHomeAssistantData(@Topic String topic, String data);
+	public CompletableFuture<Void> publishHomeAssistantData(@Topic String topic, IoTEntityData data);
 }

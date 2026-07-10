@@ -18,6 +18,9 @@ import lombok.ToString;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HomeAssistantState {
+	@ToString.Exclude
+	@JsonIgnore
+	public final static String STATE_UNAVAILABLE = "unavailable";
 	// get the UTC TZ once to speed things later
 	@ToString.Exclude
 	@JsonIgnore
@@ -38,8 +41,36 @@ public class HomeAssistantState {
 
 	private Map<String, String> context;
 
+	public Long getLastChangedAsLong() {
+		return last_changed.toInstant().toEpochMilli();
+	}
+
+	public Long getLastReportedAsLong() {
+		return last_reported.toInstant().toEpochMilli();
+	}
+
+	public Long getLastUpdatedAsLong() {
+		return last_updated.toInstant().toEpochMilli();
+	}
+
+	public Double getStateAsDouble(String defaultValue) {
+		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
+			return Double.valueOf(defaultValue);
+		} else {
+			return Double.valueOf(state);
+		}
+	}
+
 	public Double getStateAsDouble() {
 		return Double.valueOf(state);
+	}
+
+	public Integer getStateAsInteger(String defaultValue) {
+		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
+			return Integer.valueOf(defaultValue);
+		} else {
+			return Integer.valueOf(state);
+		}
 	}
 
 	public Integer getStateAsInteger() {
@@ -48,6 +79,14 @@ public class HomeAssistantState {
 
 	public String getStateAsString() {
 		return state;
+	}
+
+	public Boolean getStateAsBoolean(String defaultValue) {
+		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
+			return Boolean.valueOf(defaultValue);
+		} else {
+			return Boolean.valueOf(state);
+		}
 	}
 
 	public Boolean getStateAsBoolean() {

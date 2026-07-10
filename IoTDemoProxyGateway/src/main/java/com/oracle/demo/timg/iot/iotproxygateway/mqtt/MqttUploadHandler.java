@@ -2,6 +2,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 
 import java.io.IOException;
 
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTCoreEvent;
 
 import io.micronaut.serde.ObjectMapper;
@@ -13,15 +14,17 @@ import lombok.extern.java.Log;
 @Singleton
 @Log
 public class MqttUploadHandler {
+	@Inject
+	private GatewayStats gatewayStats;
 	@ToString.Exclude
-	private final MqttEventPublisher mqttEventPublisher;
+	private final MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher;
 	@ToString.Exclude
 	private final ObjectMapper mapper;
 
 	@Inject
-	public MqttUploadHandler(MqttEventPublisher mqttEventPublisher, ObjectMapper mapper) {
+	public MqttUploadHandler(MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher, ObjectMapper mapper) {
 		log.info("in MqttUploadHandler");
-		this.mqttEventPublisher = mqttEventPublisher;
+		this.mqttHomeAssistantEntityPublisher = mqttHomeAssistantEntityPublisher;
 		this.mapper = mapper;
 	}
 
