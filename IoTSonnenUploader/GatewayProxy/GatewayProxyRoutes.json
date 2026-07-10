@@ -3,14 +3,18 @@
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"stats\"}",
 		"description": "Home Assistant gateway statistics",
 		"payload-mapping": {
-			"$.hasuccess": "$.hasuccess",
-			"$.hafail": "$.hafail"
+			"$.haretrievesuccess": "$.haretrievesuccess",
+			"$.haretrievefail": "$.haretrievefail",
+			"$.uploadsuccess": "$.uploadsuccess",
+			"$.uploadfail": "$.uploadfail"
 		},
 		"reference-payload": {
 			"dataFormat": "JSON",
 			"data": {
-				"hasuccess": 54.5,
-				"hafail": 0.5
+				"haretrievesuccess": 54.5,
+				"haretrievefail": 0.5,
+				"uploadsuccess": 53.5,
+				"uploadfail": 1.5
 			}
 		}
 	},
@@ -18,14 +22,18 @@
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"config\"}",
 		"description": "Home Assistant gateway configuration",
 		"payload-mapping": {
-			"$.successtimewindow": "$.successtimewindow",
-			"$.failtimewindow": "$.failtimewindow"
+			"$.successfullharetrievetimewindow": "$.successfullharetrievetimewindow",
+			"$.failedharetrievetimewindow": "$.failedharetrievetimewindow",
+			"$.successfulluploadtimewindow": "$.successfulluploadtimewindow",
+			"$.faileduploadtimewindow": "$.faileduploadtimewindow"
 		},
 		"reference-payload": {
 			"dataFormat": "JSON",
 			"data": {
-				"successtimewindow": 10,
-				"failtimewindow": 10
+				"successfullharetrievetimewindow": 10,
+				"failedharetrievetimewindow": 11,
+				"successfulluploadtimewindow": 12,
+				"faileduploadtimewindow": 13
 			}
 		}
 	}

@@ -1,3 +1,4 @@
+#!/bin/bash -f
 source ../OCISetup/common_names.sh
 source ./gateway_names.sh
 echo "Using OCI config profile $OCI_CLI_PROFILE"
@@ -60,3 +61,6 @@ then
 else 
   echo "Can't locate digital twin gateway model $GATEWAY_MODEL_NAME"
 fi
+# make sure its there, then delete it
+touch $GATEWAY_TEST_DATA_FILE
+rm $GATEWAY_TEST_DATA_FILE

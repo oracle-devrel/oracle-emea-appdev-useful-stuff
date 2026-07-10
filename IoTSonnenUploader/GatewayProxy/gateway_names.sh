@@ -1,6 +1,7 @@
 # these define the various names for the gateway objects
+export GATEWAY_TEST_DATA_FILE=./GatewayTestData.txt
 export GATEWAY_MODEL_NAME=hagateway
-export GATEWAY_MODEL_FILE=file://GatewayDTMI.json
+export GATEWAY_MODEL_FILE=file://GatewayDTML.json
 export GATEWAY_ADAPTOR_ROUTE_MAPPINGS_FILE=file://GatewayProxyRoutes.json
 export GATEWAY_ADAPTOR_ENVELOPE_MAPPINGS_FILE=file://GatewayProxyEnvelope.json
 export GATEWAY_ADAPTER_NAME=gateway-adapter
@@ -12,3 +13,5 @@ export GATEWAY_ENDPOINT_GATEWAY_CONFIG_PATH=$GATEWAY_ENDPOINT_GATEWAY_PATH/confi
 export GATEWAY_ENDPOINT_ENTITIES_PATH=$GATEWAY_ENDPOINT_PREFIX/entities
 export GATEWAY_NAME=hagateway
 export GATEWAY_DISPLAY_NAME=HomeAssistantGateway
+
+export GATEWAY_ENTITIES_DIRECTORY=entities

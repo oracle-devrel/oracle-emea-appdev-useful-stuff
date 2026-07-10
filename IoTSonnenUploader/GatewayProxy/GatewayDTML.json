@@ -1,0 +1,84 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homeassistant:gateway;1",
+	"@type": "Interface",
+	"displayName": "HAGateway",
+	"description": "Digital twin model for the home assistant gateway",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "SucessfullHARetrievalsLastTenMins",
+			"name": "haretrievesuccess",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "FailedHARetrievalsLastTenMins",
+			"name": "haretrievefail",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "SucessfullUploadsLastTenMins",
+			"name": "uploadsuccess",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "FailedUploadsLastTenMins",
+			"name": "uploadfail",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "TimeWindowForHARetrieveSuccessStats",
+			"name": "successfullharetrievetimewindow",
+			"schema": "long"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "TimeWindowForFailStats",
+			"name": "failedharetrievetimewindow",
+			"schema": "long"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "TimeWindowForUploadSuccessStats",
+			"name": "successfulluploadtimewindow",
+			"schema": "long"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "TimeWindowForUploadFailedStats",
+			"name": "faileduploadtimewindow",
+			"schema": "long"
+		}
+	]
+}
