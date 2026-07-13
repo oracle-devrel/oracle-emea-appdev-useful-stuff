@@ -6,12 +6,15 @@ import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssist
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.java.Log;
 
 @AllArgsConstructor
+@Log
 public enum IoTType {
 	BOOLEAN("false", "boolean"), ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"),
-	ENERGY_WATT_HOURS("-999999", "watthours"), LUMINANCE("-1", "lux"), PERCENT("0", "percent"),
-	POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"), SWITCH("off", "switch");
+	ENERGY_WATT_HOURS("-999999", "watthours"), LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"),
+	MATTER_WINDOW("Closed", "window", "Open"), PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"),
+	POWER_KILO_WATTS("-999999", "kilowatts"), SWITCH("off", "switch", "On");
 
 	@Getter
 	@NonNull
@@ -20,6 +23,14 @@ public enum IoTType {
 	@Getter
 	@NonNull
 	private String defaultFieldName;
+
+	@Getter
+	private String valueToReturnTrue;
+
+	private IoTType(String unavailableDefault, String defaultFieldName) {
+		this.unavailableDefault = unavailableDefault;
+		this.defaultFieldName = defaultFieldName;
+	}
 
 	public String getFieldName(HomeAssistantMonitoredEntity entity) {
 		if (entity.getFieldname() == null) {
@@ -31,11 +42,13 @@ public enum IoTType {
 
 	public Object createObjectFrom(HomeAssistantState hastate) {
 		switch (this) {
+		case SWITCH:
+		case MATTER_DOOR:
+		case MATTER_WINDOW: {
+			return hastate.getStateStringMatchesValue(unavailableDefault, valueToReturnTrue);
+		}
 		case BOOLEAN: {
 			return hastate.getStateAsBoolean(unavailableDefault);
-		}
-		case SWITCH: {
-			return hastate.getStateAsSwitch(unavailableDefault);
 		}
 		case ENERGY_KILO_WATT_HOURS:
 		case ENERGY_WATT_HOURS:

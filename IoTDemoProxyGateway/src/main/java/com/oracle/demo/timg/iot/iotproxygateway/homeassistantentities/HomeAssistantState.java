@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 @Serdeable
@@ -88,12 +89,12 @@ public class HomeAssistantState {
 
 	public final static String SWITCH_ON = "on";
 
-	public Boolean getStateAsSwitch(String defaultValue) {
+	public Boolean getStateStringMatchesValue(@NonNull String defaultValue, @NonNull String valueToReturnTrue) {
 		String stateValue = state;
 		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
 			stateValue = defaultValue;
 		}
-		return stateValue.equalsIgnoreCase(SWITCH_ON);
+		return stateValue.equalsIgnoreCase(valueToReturnTrue);
 	}
 
 	public Boolean getStateAsBoolean(String defaultValue) {
@@ -107,4 +108,5 @@ public class HomeAssistantState {
 	public Boolean getStateAsBoolean() {
 		return Boolean.valueOf(state);
 	}
+
 }
