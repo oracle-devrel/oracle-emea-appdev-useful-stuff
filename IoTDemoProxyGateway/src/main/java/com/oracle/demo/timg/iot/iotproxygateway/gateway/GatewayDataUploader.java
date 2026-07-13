@@ -5,6 +5,7 @@ import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
 import com.oracle.demo.timg.iot.iotproxygateway.mqtt.MqttGatewayEventPublisher;
 
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.scheduling.annotation.Scheduled;
@@ -29,6 +30,7 @@ public class GatewayDataUploader {
 	/*
 	 * have this use the micronaut scheduler, it's easier
 	 */
+	@Requires(property = PropertyNames.GATEWAY_CONFIG_PUBLISH_ENABLED, value = "true", defaultValue = "true")
 	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_CONFIG + ":1200s}", initialDelay = "${"
 			+ PropertyNames.GATEWAY_CONFIG_INITIAL_DELAY + ":5s}")
 	@ExecuteOn(TaskExecutors.IO)
@@ -48,6 +50,7 @@ public class GatewayDataUploader {
 	/*
 	 * have this use the micronaut scheduler, it's easier
 	 */
+	@Requires(property = PropertyNames.GATEWAY_STATS_PUBLISH_ENABLED, value = "true", defaultValue = "true")
 	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_STATS_PUBLISH_RATE + ":120s}", initialDelay = "${"
 			+ PropertyNames.GATEWAY_STATS_INITIAL_DELAY + ":30s}")
 	@ExecuteOn(TaskExecutors.IO)
