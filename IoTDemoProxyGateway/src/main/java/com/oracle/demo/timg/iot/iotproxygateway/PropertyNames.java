@@ -1,6 +1,8 @@
 package com.oracle.demo.timg.iot.iotproxygateway;
 
 public class PropertyNames {
+
+	public final static String MQTT_CLIENT_ENABLED = "mqtt.enabled";
 	public final static String MQTT_CLIENT_DEVICE_ID = "mqtt.client.client-id";
 	public final static String MQTT_CLIENT_USERNAME = "mqtt.client.user-name";
 	public final static String MQTT_CLIENT_PASSWORD = "mqtt.client.password";
@@ -21,7 +23,7 @@ public class PropertyNames {
 	public final static String GATEWAY_CONFIG_PUBLISH_RATE = GATEWAY_CONFIG + ".publishrate";
 	public final static String GATEWAY_CONFIG_INITIAL_DELAY = GATEWAY_CONFIG + ".initialdelay";
 	public final static String GATEWAY_STATS = GATEWAY + ".stats";
-	public final static String GATEWAY_STATS_PUBLISH_ENABLED = GATEWAY_CONFIG + ".enabled";
+	public final static String GATEWAY_STATS_PUBLISH_ENABLED = GATEWAY_STATS + ".enabled";
 	public final static String GATEWAY_STATS_PUBLISH_RATE = GATEWAY_STATS + ".publishrate";
 	public final static String GATEWAY_STATS_INITIAL_DELAY = GATEWAY_STATS + ".initialdelay";
 	public final static String GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW = GATEWAY_STATS + ".sucessfullretrievewindow";

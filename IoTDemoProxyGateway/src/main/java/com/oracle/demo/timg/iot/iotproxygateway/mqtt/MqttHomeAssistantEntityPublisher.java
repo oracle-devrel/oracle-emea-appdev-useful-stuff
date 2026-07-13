@@ -54,6 +54,8 @@ import jakarta.inject.Singleton;
 @Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
 @Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
 @Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
+@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
+@Requires(property = PropertyNames.MQTT_CLIENT_ENABLED, value = "true", defaultValue = "true")
 public interface MqttHomeAssistantEntityPublisher {
 	// @Topic("house/homeassistant/entities")
 	@ExecuteOn(TaskExecutors.IO)

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
-import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Property;
@@ -42,7 +42,7 @@ public class MqttUploadHandler {
 		log.info("mqtt entity uploader configued with topic prefix " + topicBase);
 	}
 
-	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntity entity) {
+	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity) {
 		IoTEntityData ioTEntityData = IoTEntityData.builder().devicekey(entity.getDevicekey()).payload(ioTCoreEvent)
 				.build();
 		String mappedToJson;
