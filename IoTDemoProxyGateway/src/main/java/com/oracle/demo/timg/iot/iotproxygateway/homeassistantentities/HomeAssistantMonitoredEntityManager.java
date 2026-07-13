@@ -27,7 +27,7 @@ public class HomeAssistantMonitoredEntityManager {
 	@ToString.Exclude
 	private final TaskScheduler taskScheduler;
 	@Inject
-	private Collection<HomeAssistantMonitoredEntity> monitoredEntities;
+	private Collection<HomeAssistantMonitoredEntitySet> monitoredEntitySets;
 	@Inject
 	private GatewayStats gatewayStats;
 	private List<ScheduledFuture<?>> scheduledFutures;
@@ -39,14 +39,14 @@ public class HomeAssistantMonitoredEntityManager {
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("Startup has given us " + monitoredEntities.size() + " monitored entities which are "
-				+ monitoredEntities);
+		log.info("Startup has given us " + monitoredEntitySets.size() + " monitored entity sets which are "
+				+ monitoredEntitySets);
 	}
 
 	@EventListener
 	public void startup(StartupEvent event) {
-		log.info("Starting scheduling of HA entity monitoring");
-		scheduledFutures = monitoredEntities.stream().map(monitoredEntity -> {
+		log.info("Starting scheduling of HA entity set monitoring");
+		scheduledFutures = monitoredEntitySets.stream().map(monitoredEntity -> {
 			log.info("Starting monitored entity " + monitoredEntity);
 			ScheduledFuture<?> sf = taskScheduler.scheduleAtFixedRate(monitoredEntity.getInitaldelay(),
 					monitoredEntity.getRetrievalrate(), monitoredEntity);

@@ -22,7 +22,7 @@ public class HomeAssistantState {
 	public final static String STATE_UNAVAILABLE = "unavailable";
 	// get the UTC TZ once to speed things later
 	@JsonIgnore
-	private final static ZoneId utcTz = ZoneId.of("UTC");
+	private final static ZoneId UTCTZ = ZoneId.of("UTC");
 	@JsonIgnore
 	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
 
@@ -32,15 +32,19 @@ public class HomeAssistantState {
 
 	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
-	private ZonedDateTime last_changed = ZonedDateTime.now(utcTz);
+	private ZonedDateTime last_changed = ZonedDateTime.now(UTCTZ);
 	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
-	private ZonedDateTime last_reported = ZonedDateTime.now(utcTz);
+	private ZonedDateTime last_reported = ZonedDateTime.now(UTCTZ);
 	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
-	private ZonedDateTime last_updated = ZonedDateTime.now(utcTz);
+	private ZonedDateTime last_updated = ZonedDateTime.now(UTCTZ);
 
 	private Map<String, String> context;
+
+	public boolean isStateUnavailableOrMissing() {
+		return (state == null) || (state.equalsIgnoreCase(STATE_UNAVAILABLE));
+	}
 
 	public String getLastChangedAsString() {
 		return last_changed.format(formatter);

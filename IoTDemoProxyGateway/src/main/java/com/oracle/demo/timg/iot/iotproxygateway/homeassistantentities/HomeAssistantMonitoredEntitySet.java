@@ -2,15 +2,18 @@ package com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.LongStream;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTType;
 import com.oracle.demo.timg.iot.iotproxygateway.mqtt.MqttUploadHandler;
 
 import io.micronaut.context.annotation.EachProperty;
@@ -27,16 +30,21 @@ import lombok.extern.java.Log;
 @NoArgsConstructor
 @Log
 @EachProperty(value = PropertyNames.HOME_ASSISTANT_MONITORED_ENTITIES_LIST, primary = "name", list = true)
-public class HomeAssistantMonitoredEntity implements Runnable {
+public class HomeAssistantMonitoredEntitySet implements Runnable {
+	// get the UTC TZ once to speed things later
+	private final static ZoneId UTC_TZ = ZoneId.of("UTC");
+	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+	private final static ZonedDateTime EPOCH_TIME = Instant.EPOCH.atZone(UTC_TZ);
+	private final static HomeAssistantState EPOCH_HA_STATE = HomeAssistantState.builder().last_changed(EPOCH_TIME)
+			.last_reported(EPOCH_TIME).last_updated(EPOCH_TIME).build();
 	private String name;
 	private Boolean doupload;
 	private Duration initaldelay = Duration.ofSeconds(5);
 	private Duration retrievalrate = Duration.ofSeconds(10);
-	private String entityid;
-	private String fieldname;
-	private IoTType iottype;
 	private String devicekey;
 	private String endpoint;
+	private TimestampMode timestampMode = TimestampMode.EARLIEST;
+	private List<HomeAssistantMonitoredEntity> monitoredentities;
 	@ToString.Exclude
 	@Inject
 	private HomeAssistantHttpClient homeAssistantClient;
@@ -50,38 +58,95 @@ public class HomeAssistantMonitoredEntity implements Runnable {
 	@Inject
 	private GatewayStats gatewayStats;
 	@ToString.Exclude
-	private HomeAssistantState laststate;
+	private Map<String, HomeAssistantState> laststates = new HashMap<>();
 
 	@Inject
-	public HomeAssistantMonitoredEntity(@Parameter String name) {
+	public HomeAssistantMonitoredEntitySet(@Parameter String name) {
 		log.info("Monitored entity in constructor for " + name);
-		// we need a state to compare our updates to
-		ZonedDateTime initial = Instant.EPOCH.atZone(ZoneOffset.UTC);
-		this.laststate = HomeAssistantState.builder().last_updated(initial).last_changed(initial).last_reported(initial)
-				.build();
 	}
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("constructed monitoired entity " + this);
+		log.info("Configuring initial last states for monitored entity " + this.name);
+		// for all of the states we are monitoring setup a last state entry so we have a
+		// known good start
+		monitoredentities.stream().forEach(entity -> laststates.put(entity.getName(), EPOCH_HA_STATE));
+		log.info("constructed monitored entity " + this);
 	}
 
 	@Override
 	public void run() {
-		log.info("Running monitored entity " + name);
-//		HomeAssistantState state;
+		log.info("Running monitored entity set " + name);
+		Map<String, Object> payload = new HashMap<>();
+		ZonedDateTime observationTime = processEntities(payload);
+		if (payload.size() == 0) {
+			log.info("payload has no data to upload, returning");
+			return;
+		}
+		// it shouldn't happen but just in case the observation time is null while there
+		// are payload entries apply a suitable default
+		if (observationTime == null) {
+			observationTime = ZonedDateTime.now(UTC_TZ);
+		}
+		// add the timestamp
+		payload.put(IoTEntityData.TIMESTAMP_FIELD_NAME, observationTime.format(formatter));
+		try {
+			log.info("Uploading payload of HA state is " + payload);
+			mqttUploadHandler.upload(payload, this);
+		} catch (Exception e) {
+			log.info("Exception getting a state or other actions " + e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * @param payload
+	 */
+	private ZonedDateTime processEntities(Map<String, Object> payload) {
+		// for each of the entities we are monitoring process it
+		// build a stream comparison to work out what the timeObserved should be
+		// the processEntiry will provide the field we're looking at
+		LongStream entityTimeAsLong = monitoredentities.stream().map(entity -> processEntity(payload, entity))
+				.filter(zdt -> zdt != null).mapToLong(zdt -> {
+					Instant instant = zdt.toInstant();
+					return (Long) Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1_000_000L),
+							instant.getNano() / 1_000);
+				});
+		// based on our comparison type calculate the actual microseconds value
+		Long sortedTsOpt = switch (timestampMode) {
+		case AVERAGE -> Math.round(entityTimeAsLong.average().orElse(0));
+		case EARLIEST -> entityTimeAsLong.min().orElse(0);
+		case LATEST -> entityTimeAsLong.max().orElse(0);
+		};
+		// if there is nothing there then it's reasonable to assume nothing was added
+		if (sortedTsOpt == 0) {
+			return null;
+		}
+		// try to work out that that means
+		long seconds = Math.floorDiv(sortedTsOpt, 1_000_000L);
+		long remainingMicros = Math.floorMod(sortedTsOpt, 1_000_000L);
+
+		Instant instant = Instant.ofEpochSecond(seconds, remainingMicros * 1_000L);
+		return instant.atZone(UTC_TZ);
+	}
+
+	private ZonedDateTime processEntity(Map<String, Object> payload, HomeAssistantMonitoredEntity entity) {
+		// get the last state, we know it must be there, but just in case
+		HomeAssistantState laststate = laststates.get(entity.getName());
+		if (laststate == null) {
+			laststate = createCurrentState(entity);
+		}
 		String stateString;
 		try {
-			stateString = homeAssistantClient.getState(entityid);
+			stateString = homeAssistantClient.getState(entity.getEntityid());
 		} catch (Exception e) {
 			log.warning("Unable to get monitored entity " + this + " because " + e.getLocalizedMessage());
 			gatewayStats.trackFailedHARetrieveCall();
-			return;
+			return null;
 		}
 		if (stateString == null) {
 			log.warning("Returned state of monitored entity " + this + " is null");
 			gatewayStats.trackFailedHARetrieveCall();
-			return;
+			return null;
 		}
 		log.info("Returned state string is :" + stateString);
 		HomeAssistantState state;
@@ -90,45 +155,87 @@ public class HomeAssistantMonitoredEntity implements Runnable {
 		} catch (Exception e) {
 			log.warning("Unable to de-serialize the state because " + e.getLocalizedMessage());
 			gatewayStats.trackFailedHARetrieveCall();
-			return;
+			return null;
 		}
 		log.info("Extracted state is " + state);
 		gatewayStats.trackSucessfullHARetrieveCall();
-		// this section needs to be re-written to allow for multiple types of update
-		// reasons, always, when changed, when value retrieved
-		// has a new (or the same) value been retrieved for the entity ? HA docs
-		// indicate that we can only rely on last_changed
-		// but we actually want last updated as in many cases an update with the same
-		// value is valid
-		// the constructor forces the last_updated to be set, so we only need to think
-		// about ensuring that the
-		// incoming last updated is set (as the incoming one becomes the last state)
+		// make sure that we have the relevant times, even if we don't use them here
+		// they may be needed on another pass through
+		if (state.getLast_changed() == null) {
+			state.setLast_changed(ZonedDateTime.now(ZoneOffset.UTC));
+		}
 		if (state.getLast_reported() == null) {
 			state.setLast_reported(ZonedDateTime.now(ZoneOffset.UTC));
 		}
-		if (state.getLast_reported().isAfter(laststate.getLast_reported())) {
-			log.info("HA Stats have had been updated for " + name + " they are  " + state);
-		} else {
-			log.info("HA Stats have not been updated for " + name + " they are  " + state);
-			return;
+		if (state.getLast_updated() == null) {
+			state.setLast_updated(ZonedDateTime.now(ZoneOffset.UTC));
+		}
+		// do we flag to send the data or not ?
+		// for now default to false
+		boolean proceedToSend = false;
+		switch (entity.getSendmode()) {
+		case ALWAYS: {
+			// Send the update each time we get data from home assistant
+			proceedToSend = true;
+			break;
+		}
+		case ON_REPORT: {
+			log.info("Checking if there is a report, retrieved states last report time is "
+					+ state.getLastReportedAsString() + ", previous is " + laststate.getLastReportedAsString());
+			// send when home assistant updates itself, this is regardless of if HA data has
+			// actually changed
+			if (state.getLast_reported().isAfter(laststate.getLast_reported())) {
+				proceedToSend = true;
+			}
+			break;
+		}
+		case ON_CHANGE: {
+			log.info("Checking if there is a change, retrieved states last report time is "
+					+ state.getLastChangedAsString() + ", previous is " + laststate.getLastChangedAsString());
+			// send when home assistant updates itself, this is regardless of if HA data has
+			// actually changed
+			if (state.getLast_changed().isAfter(laststate.getLast_changed())) {
+				proceedToSend = true;
+			}
+			break;
+		}
+		default:
+			log.severe("Unsupported sendmode found for HomeAssistantMonitoredEntity " + entity
+					+ ", cannot process state " + stateString);
+			return null;
 		}
 		// switch the saved state so we have the current timestamp to compare to next
 		// time we get an new state from HomeAssistant
-		laststate = state;
-		try {
-			Map<String, Object> payload = new HashMap<>();
-			// add the timestamp
-			payload.put(IoTEntityData.TIMESTAMP_FIELD_NAME, state.getLastUpdatedAsString());
-			String fieldName = iottype.getFieldName(this);
-			Object fieldValue = iottype.createObjectFrom(state);
-			payload.put(fieldName, fieldValue);
-			// iottype.createEventFrom(state);
-			// convert it into the object we need
-			// IoTCoreEvent ioTCoreEvent = iottype.createEventFrom(state);
-			log.info("Generated payload of HA state is " + payload);
-			mqttUploadHandler.upload(payload, this);
-		} catch (Exception e) {
-			log.info("Exception testing timestamps or other actions " + e.getLocalizedMessage());
+		laststates.put(entity.getName(), state);
+		// are we adding this to the upload ?
+		if (proceedToSend) {
+			if (entity.isDontsendifunavailable() && state.isStateUnavailableOrMissing()) {
+				log.info("donttsendifunavailable is true and state is null or unavailable");
+				// the state is not set or unavailable, and we are not sending in this case so
+				// don't send it
+				return null;
+			} else {
+				String fieldName = entity.getIottype().getFieldName(entity);
+				Object fieldValue = entity.getIottype().createObjectFrom(state);
+				payload.put(fieldName, fieldValue);
+				// we're sending, so return the last reported time, this will always be the
+				// setting we want because it it's ALWAYS that's the best we have, if it's
+				// ON)CHANGE then that will have been updated at the last report, and if it's
+				// on_report that's theupdate time even if it's not chenaged
+				return state.getLast_reported();
+			}
+		} else {
+			// if the entity doesn't pass the comparisons then its time stamps should not be
+			// part of the returned data
+			return null;
 		}
+	}
+
+	private HomeAssistantState createCurrentState(HomeAssistantMonitoredEntity entity) {
+		ZonedDateTime currentTime = ZonedDateTime.now(UTC_TZ);
+		HomeAssistantState currentState = HomeAssistantState.builder().last_changed(currentTime)
+				.last_reported(currentTime).last_updated(currentTime).build();
+		laststates.put(entity.getName(), currentState);
+		return currentState;
 	}
 }

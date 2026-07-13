@@ -9,9 +9,9 @@ import lombok.NonNull;
 
 @AllArgsConstructor
 public enum IoTType {
-	BOOLEAN("false", "boolean"), ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"), LUMINANCE("-1", "lux"),
-	PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"),
-	SWITCH("off", "switch");
+	BOOLEAN("false", "boolean"), ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"),
+	ENERGY_WATT_HOURS("-999999", "watthours"), LUMINANCE("-1", "lux"), PERCENT("0", "percent"),
+	POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"), SWITCH("off", "switch");
 
 	@Getter
 	@NonNull
@@ -38,6 +38,7 @@ public enum IoTType {
 			return hastate.getStateAsSwitch(unavailableDefault);
 		}
 		case ENERGY_KILO_WATT_HOURS:
+		case ENERGY_WATT_HOURS:
 		case LUMINANCE:
 		case PERCENT:
 		case POWER_WATTS:
