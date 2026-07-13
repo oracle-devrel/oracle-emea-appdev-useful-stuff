@@ -1,0 +1,19 @@
+[
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"energy\"}",
+		"description": "Illuminance adapter",
+		"payload-mapping": {
+			"$.userchargepercent": "$.payload.userchargepercent"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"payload": {
+					"timestamp": "2026-07-10T16:09:18.934123Z",
+					"userchargepercent": 21.1
+				},
+				"devicekey": "abc"
+			}
+		}
+	}
+]
