@@ -9,7 +9,9 @@ import lombok.NonNull;
 
 @AllArgsConstructor
 public enum IoTType {
-	LUMINANCE("-1", "lux"), POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts");
+	BOOLEAN("false", "boolean"), ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"), LUMINANCE("-1", "lux"),
+	PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"),
+	SWITCH("off", "switch");
 
 	@Getter
 	@NonNull
@@ -29,12 +31,16 @@ public enum IoTType {
 
 	public Object createObjectFrom(HomeAssistantState hastate) {
 		switch (this) {
-		case LUMINANCE: {
-			return hastate.getStateAsDouble(unavailableDefault);
+		case BOOLEAN: {
+			return hastate.getStateAsBoolean(unavailableDefault);
 		}
-		case POWER_WATTS: {
-			return hastate.getStateAsDouble(unavailableDefault);
+		case SWITCH: {
+			return hastate.getStateAsSwitch(unavailableDefault);
 		}
+		case ENERGY_KILO_WATT_HOURS:
+		case LUMINANCE:
+		case PERCENT:
+		case POWER_WATTS:
 		case POWER_KILO_WATTS: {
 			return hastate.getStateAsDouble(unavailableDefault);
 		}

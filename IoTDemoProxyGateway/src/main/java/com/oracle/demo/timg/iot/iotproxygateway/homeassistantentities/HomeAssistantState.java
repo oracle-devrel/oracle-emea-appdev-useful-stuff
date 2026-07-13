@@ -82,6 +82,16 @@ public class HomeAssistantState {
 		return state;
 	}
 
+	public final static String SWITCH_ON = "on";
+
+	public Boolean getStateAsSwitch(String defaultValue) {
+		String stateValue = state;
+		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
+			stateValue = defaultValue;
+		}
+		return stateValue.equalsIgnoreCase(SWITCH_ON);
+	}
+
 	public Boolean getStateAsBoolean(String defaultValue) {
 		if (state.equalsIgnoreCase(STATE_UNAVAILABLE)) {
 			return Boolean.valueOf(defaultValue);
