@@ -2,6 +2,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
@@ -28,11 +29,17 @@ public class MqttUploadHandler {
 	private final ObjectMapper mapper;
 
 	@Inject
-	public MqttUploadHandler(MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher, ObjectMapper mapper,
+	public MqttUploadHandler(Optional<MqttHomeAssistantEntityPublisher> mqttHomeAssistantEntityPublisherOptional,
+			ObjectMapper mapper,
 			@Property(name = PropertyNames.GATEWAY_BASE_ENDPOINT, defaultValue = "house/homeassistant") String endpointBase,
 			@Property(name = PropertyNames.GATEWAY_ENTITIES_ENDPOINT, defaultValue = "entities") String endpointEntities) {
 		log.info("in MqttUploadHandler");
-		this.mqttHomeAssistantEntityPublisher = mqttHomeAssistantEntityPublisher;
+		if (mqttHomeAssistantEntityPublisherOptional.isEmpty()) {
+			log.info("Uploads to MQTT are turned off " + PropertyNames.MQTT_CLIENT_ENABLED);
+			mqttHomeAssistantEntityPublisher = null;
+		} else {
+			this.mqttHomeAssistantEntityPublisher = mqttHomeAssistantEntityPublisherOptional.get();
+		}
 		this.mapper = mapper;
 		this.topicBase = endpointBase + "/" + endpointEntities;
 	}
@@ -59,8 +66,12 @@ public class MqttUploadHandler {
 		// try and sent it
 		if (entity.getDoupload()) {
 			try {
-				mqttHomeAssistantEntityPublisher.publishHomeAssistantData(topic, mappedToJson);
-				gatewayStats.trackSucessfullUploadCall();
+				if (mqttHomeAssistantEntityPublisher != null) {
+					mqttHomeAssistantEntityPublisher.publishHomeAssistantData(topic, mappedToJson);
+					gatewayStats.trackSucessfullUploadCall();
+				} else {
+					log.info("No mqtt uploader set for entity " + entity.getName() + " for data " + mappedToJson);
+				}
 			} catch (Exception e) {
 				log.severe("Exception uploading event (" + mappedToJson + ") to Iot, " + e.getLocalizedMessage());
 				gatewayStats.trackFailedUploadCall();
