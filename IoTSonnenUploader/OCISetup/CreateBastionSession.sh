@@ -7,17 +7,20 @@ echo "Using OCI config profile $OCI_CLI_PROFILE"
 IOT_COMPARTMENT_OCID=`get_oci_compartment_ocid.sh $COMPARTMENT_PATH`
 
 
-BASTION_OCID=`oci bastion bastion list --compartment-id "$IOT_COMPARTMENT_OCID" --name "$BASTION_NAME" --all --query "data[0].id" --raw-output`
-
-
+BASTION_OCID=`oci bastion bastion list --compartment-id "$IOT_COMPARTMENT_OCID" --name "$BASTION_NAME" --all | jq -r '.data[]| select (."lifecycle-state" == "ACTIVE") | ."id"'`
+if [ -z "$BASTION_OCID" ] ; then
+    echo "Error: Could not find Bastion $BASTION_NAME."
+    exit 1
+fi
 echo "Bastion $BASTION_NAME in compartment $IOT_COMPARTMENT_OCID has $BASTION_OCID ocid"
-# Retrieve Target Instance OCID by Name
-VM_OCID=`oci compute instance list --compartment-id "$IOT_COMPARTMENT_OCID" --display-name "$VM_NAME" --query "data[0].id" --raw-output`
+# Retrieve Target Instance OCID by Name select(.lifecycleState | IN("STOPPED", "RUNNING", "STARTING", "STOPPING"))
+#VM_OCID=`oci compute instance list --compartment-id "$IOT_COMPARTMENT_OCID" --display-name "$VM_NAME" --query "data[0].id" --raw-output`
+VM_OCID=`oci compute instance list --compartment-id "$IOT_COMPARTMENT_OCID" --display-name "$VM_NAME" --all | jq -r '.data[]| select (."lifecycle-state" | IN("STOPPED", "RUNNING", "STARTING", "STOPPING")) | ."id"'`
 
 echo "Compute instance $VM_NAME in compartment $IOT_COMPARTMENT_OCID has $VM_OCID ocid"
 
-if [ -z "$BASTION_OCID" ] || [ -z "$VM_OCID" ]; then
-    echo "Error: Could not find Bastion or Target Instance."
+if [ -z "$VM_OCID" ]; then
+    echo "Error: Could not find Target Instance."
     exit 1
 fi
 
