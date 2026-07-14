@@ -81,5 +81,5 @@ echo "Config settings for the IoTDBJDBC"
 echo iotdatacache.schemaname="$IOT_DOMAIN_SHORT_ID"__iot
 echo iotdatacache.ociregion=$OCI_CONFIG_REGION
 echo iotdatacache.connectionname=$DB_CONNECTION_NAME
-echo oci.dbtoken.compartment=$DB_COMPARTMENT_NAME
-echo oci.auth.type=InstancePrinciple
+echo iotdatacache.oci.dbtoken.compartment=$DB_COMPARTMENT_NAME
+echo iotdatacache.oci.auth.type=InstancePrinciple
