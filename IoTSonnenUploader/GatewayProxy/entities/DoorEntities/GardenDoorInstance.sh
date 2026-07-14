@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=GardenDoor
+export INSTANCE_KEY=MyggbettGrdnDr

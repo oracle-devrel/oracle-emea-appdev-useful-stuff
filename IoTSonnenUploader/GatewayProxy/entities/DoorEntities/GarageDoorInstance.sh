@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=GarageDoor
+export INSTANCE_KEY=MyggbettGrgDr

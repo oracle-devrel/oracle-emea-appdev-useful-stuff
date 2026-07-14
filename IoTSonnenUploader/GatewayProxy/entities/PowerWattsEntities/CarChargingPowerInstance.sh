@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=CarChargerPower
+export INSTANCE_KEY=CrChrgrPwr

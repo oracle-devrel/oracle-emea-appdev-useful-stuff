@@ -1,0 +1,34 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homeassistant:dailygridenergyflows;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Energy"
+			],
+			"displayName": "Imported Energy",
+			"name": "importkwh",
+			"schema": "double",
+			"unit": "kilowattHour"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Energy"
+			],
+			"displayName": "Exported Energy",
+			"name": "exportkwh",
+			"schema": "double",
+			"unit": "kilowattHour"
+		}
+	]
+}

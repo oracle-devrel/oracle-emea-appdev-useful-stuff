@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=FrontDoor
+export INSTANCE_KEY=MyggbettFrntDr

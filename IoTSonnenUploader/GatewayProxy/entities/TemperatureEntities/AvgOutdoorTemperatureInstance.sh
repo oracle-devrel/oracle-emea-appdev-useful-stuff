@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=AverageOutdoorTemperature
+export INSTANCE_KEY=AvgOtdrTmp

@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=KitchenDoor
+export INSTANCE_KEY=MyggbettKtchnDr

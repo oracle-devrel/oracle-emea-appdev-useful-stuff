@@ -1,7 +1,7 @@
 [
 	{
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"homebatterymanualreservesettings\"}",
-		"description": "Illuminance adapter",
+		"description": "Battery Manual Reserve Controls adapter",
 		"payload-mapping": {
 			"$.repeatmanualreserveenabled": "$.payload.repeatmanualreserveenabled",
 			"$.manualreserveenabled": "$.payload.manualreserveenabled"

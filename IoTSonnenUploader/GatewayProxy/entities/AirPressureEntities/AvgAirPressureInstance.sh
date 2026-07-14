@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=AverageAirPressure
+export INSTANCE_KEY=AvgArPrssr

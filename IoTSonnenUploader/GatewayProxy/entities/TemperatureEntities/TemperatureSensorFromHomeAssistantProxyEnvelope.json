@@ -1,10 +1,10 @@
 {
-	"reference-endpoint": "house/homeassistant/entities/power",
+	"reference-endpoint": "house/homeassistant/entities/temperature",
 	"reference-payload": {
 		"data": {
 		"payload": {
 			"timestamp": "2026-07-10T16:09:18.934123Z",
-			"watts": 2327
+			"temperature": 22.1
 		},
 		"devicekey": "def"
 		},
