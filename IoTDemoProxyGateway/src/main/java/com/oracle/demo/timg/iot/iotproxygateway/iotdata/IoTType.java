@@ -11,10 +11,11 @@ import lombok.extern.java.Log;
 @AllArgsConstructor
 @Log
 public enum IoTType {
-	BOOLEAN("false", "boolean"), ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"),
-	ENERGY_WATT_HOURS("-999999", "watthours"), LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"),
+	BINARY_ON_OFF("off", "boolean", "on"), BOOLEAN("false", "boolean"),
+	ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"), ENERGY_WATT_HOURS("-999999", "watthours"),
+	RELATIVE_HUMIDITY("-1", "humidity"), LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"),
 	MATTER_WINDOW("Closed", "window", "Open"), PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"),
-	POWER_KILO_WATTS("-999999", "kilowatts"), SWITCH("off", "switch", "On");
+	POWER_KILO_WATTS("-999999", "kilowatts"), SWITCH("off", "switch", "On"), TEMPERATURE("-274", "temperature");
 
 	@Getter
 	@NonNull
@@ -42,9 +43,10 @@ public enum IoTType {
 
 	public Object createObjectFrom(HomeAssistantState hastate) {
 		switch (this) {
-		case SWITCH:
+		case BINARY_ON_OFF:
 		case MATTER_DOOR:
-		case MATTER_WINDOW: {
+		case MATTER_WINDOW:
+		case SWITCH: {
 			return hastate.getStateStringMatchesValue(unavailableDefault, valueToReturnTrue);
 		}
 		case BOOLEAN: {
@@ -55,7 +57,9 @@ public enum IoTType {
 		case LUMINANCE:
 		case PERCENT:
 		case POWER_WATTS:
-		case POWER_KILO_WATTS: {
+		case POWER_KILO_WATTS:
+		case RELATIVE_HUMIDITY:
+		case TEMPERATURE: {
 			return hastate.getStateAsDouble(unavailableDefault);
 		}
 		default: {
