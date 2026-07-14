@@ -11,7 +11,7 @@ import lombok.extern.java.Log;
 @AllArgsConstructor
 @Log
 public enum IoTType {
-	BINARY_ON_OFF("off", "boolean", "on"), BOOLEAN("false", "boolean"),
+	AIR_PRESSURE("-1", "airpressure"), BINARY_ON_OFF("off", "boolean", "on"), BOOLEAN("false", "boolean"),
 	ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"), ENERGY_WATT_HOURS("-999999", "watthours"),
 	RELATIVE_HUMIDITY("-1", "humidity"), LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"),
 	MATTER_WINDOW("Closed", "window", "Open"), PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"),
@@ -52,6 +52,7 @@ public enum IoTType {
 		case BOOLEAN: {
 			return hastate.getStateAsBoolean(unavailableDefault);
 		}
+		case AIR_PRESSURE:
 		case ENERGY_KILO_WATT_HOURS:
 		case ENERGY_WATT_HOURS:
 		case LUMINANCE:
