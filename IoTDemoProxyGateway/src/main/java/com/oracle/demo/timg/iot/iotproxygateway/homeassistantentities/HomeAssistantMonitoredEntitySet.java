@@ -1,3 +1,39 @@
+/*Copyright (c) 2026 Oracle and/or its affiliates.
+
+The Universal Permissive License (UPL), Version 1.0
+
+Subject to the condition set forth below, permission is hereby granted to any
+person obtaining a copy of this software, associated documentation and/or data
+(collectively the "Software"), free of charge and under any and all copyright
+rights in the Software, and any and all patent rights owned or freely
+licensable by each licensor hereunder covering either (i) the unmodified
+Software as contributed to or provided by such licensor, or (ii) the Larger
+Works (as defined below), to deal in both
+
+(a) the Software, and
+(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+one is included with the Software (each a "Larger Work" to which the Software
+is contributed by such licensors),
+
+without restriction, including without limitation the rights to copy, create
+derivative works of, display, perform, and distribute the Software and make,
+use, sell, offer for sale, import, export, have made, and have sold the
+Software and the Larger Work(s), and to sublicense the foregoing rights on
+either these or other terms.
+
+This license is subject to the following condition:
+The above copyright notice and either this complete permission notice or at
+a minimum a reference to the UPL must be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
 package com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities;
 
 import java.time.Duration;
@@ -68,7 +104,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("Configuring initial last states for monitored entity " + this.name);
+		log.fine("Configuring initial last states for monitored entity " + this.name);
 		// make sure that all of the entities are valid
 		String problemEntities = monitoredentities.stream().filter(entity -> entity.missingFields())
 				.map(entity -> this.name + "/" + entity.getName()).collect(Collectors.joining(","));
@@ -80,7 +116,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 		// for all of the states we are monitoring setup a last state entry so we have a
 		// known good start
 		monitoredentities.stream().forEach(entity -> laststates.put(entity.getName(), EPOCH_HA_STATE));
-		log.info("constructed monitored entity " + this);
+		log.fine("constructed monitored entity " + this);
 	}
 
 	@Override
@@ -89,11 +125,11 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			log.info("Monitored entity set " + name + " has no entities");
 			return;
 		}
-		log.info("Running monitored entity set " + name);
+		log.finer("Running monitored entity set " + name);
 		Map<String, Object> payload = new HashMap<>();
 		ZonedDateTime observationTime = processEntities(payload);
 		if (payload.size() == 0) {
-			log.info("payload has no data to upload, returning");
+			log.finer("Monitored entity set " + name + "payload has no data to upload, returning");
 			return;
 		}
 		// it shouldn't happen but just in case the observation time is null while there
@@ -104,10 +140,11 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 		// add the timestamp
 		payload.put(IoTEntityData.TIMESTAMP_FIELD_NAME, observationTime.format(formatter));
 		try {
-			log.info("Uploading payload of HA state is " + payload);
+			log.finer("Uploading payload of HA state is " + payload);
 			mqttUploadHandler.upload(payload, this);
 		} catch (Exception e) {
-			log.info("Exception getting a state or other actions " + e.getLocalizedMessage());
+			log.info("Monitored entity set " + name + "Exception getting a state or other actions "
+					+ e.getLocalizedMessage());
 		}
 	}
 
@@ -161,7 +198,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			gatewayStats.trackFailedHARetrieveCall();
 			return null;
 		}
-		log.info("Returned state string is :" + stateString);
+		log.finer("Returned state string is :" + stateString);
 		HomeAssistantState state;
 		try {
 			state = mapper.readValue(stateString, HomeAssistantState.class);
@@ -170,7 +207,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			gatewayStats.trackFailedHARetrieveCall();
 			return null;
 		}
-		log.info("Extracted state is " + state);
+		log.fine("Extracted state is " + state);
 		gatewayStats.trackSucessfullHARetrieveCall();
 		// make sure that we have the relevant times, even if we don't use them here
 		// they may be needed on another pass through
@@ -193,7 +230,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			break;
 		}
 		case ON_REPORT: {
-			log.info("Checking if there is a report, retrieved states last report time is "
+			log.finer("Checking if there is a report, retrieved states last report time is "
 					+ state.getLastReportedAsString() + ", previous is " + laststate.getLastReportedAsString());
 			// send when home assistant updates itself, this is regardless of if HA data has
 			// actually changed
@@ -203,7 +240,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			break;
 		}
 		case ON_CHANGE: {
-			log.info("Checking if there is a change, retrieved states last report time is "
+			log.finer("Checking if there is a change, retrieved states last report time is "
 					+ state.getLastChangedAsString() + ", previous is " + laststate.getLastChangedAsString());
 			// send when home assistant updates itself, this is regardless of if HA data has
 			// actually changed
@@ -223,7 +260,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 		// are we adding this to the upload ?
 		if (proceedToSend) {
 			if (entity.isDontsendifunavailable() && state.isStateUnavailableOrMissing()) {
-				log.info("donttsendifunavailable is true and state is null or unavailable");
+				log.finer("donttsendifunavailable is true and state is null or unavailable");
 				// the state is not set or unavailable, and we are not sending in this case so
 				// don't send it
 				return null;
