@@ -1,0 +1,275 @@
+gateway:
+  identity:
+    name: "HomeAssistantGateway1"
+    devicekey: "hagateway"
+  endpoint:
+    base: "house/homeassistant"
+    gatewaystatssubpath: "gateway/stats"
+    gatewayconfigsubpath: "gateway/config"
+    entitiessubpath: "entities"
+  config:
+    enabled: true
+    publishrate: "120s"
+    initialdelay: "10s"
+  stats:
+    enabled: true
+    publishrate: "30s"
+    initialdelay: "5s"
+
+home-assistant:
+  api:
+    port: 8123
+    host: <your HA IP / DNS address>
+    protocol: "http"
+    url: ${home-assistant.api.protocol}://${home-assistant.api.host}:${home-assistant.api.port}
+  monitored-entities:
+  - name: "HomeBatteryManualReserve"
+    doupload: true
+    initaldelay: "PT3s"
+    retrievalrate: "PT60s"
+    devicekey: "SnnManRsrvSttngs"
+    endpoint: "homebatterymanualreservesettings"
+    monitoredentities:
+    - name: "Repeat manual reserve daily"
+      entityid: "input_boolean.sonnenmanualreservewindowrepeatdaily"
+      iottype: "SWITCH"
+      fieldname: "repeatmanualreserveenabled"
+      sendmode: "ON_CHANGE"
+    - name: "Manual reserve enabled"
+      entityid: "input_boolean.sonnenmanualreservewindowenabled"
+      iottype: "SWITCH"
+      fieldname: "manualreserveenabled"
+      sendmode: "ON_CHANGE"
+  - name: "Sonnen charge level"
+    doupload: true
+    initaldelay: "PT2s"
+    retrievalrate: "PT30s"
+    devicekey: "SnnBatUsrChrg"
+    endpoint: "energy"
+    monitoredentities:
+    - name: "Sonnen user charge level"
+      entityid: "sensor.sonnenbatterie_200357_state_charge_user"
+      iottype: "PERCENT"
+      fieldname: "userchargepercent"
+      sendmode: "ON_REPORT"
+  - name: "UtilityLuminance"
+    doupload: true
+    initaldelay: "PT5s"
+    retrievalrate: "PT10s"
+    devicekey: "UtilIlluminance"
+    endpoint: "illuminance"
+    monitoredentities:
+    - name: "Utility Illuminance"
+      entityid: "sensor.utility_room_myggspray_utility_illuminance"
+      fieldname: "lux"
+      sendmode: "ON_CHANGE"
+      iottype: "LUMINANCE"
+  - name: "Kitchen Door"
+    doupload: true
+    initaldelay: "PT4s"
+    retrievalrate: "PT10s"
+    devicekey: "MyggbettKtchnDr"
+    endpoint: "door"
+    monitoredentities:
+    - name: "Kitchen door sensor"
+      entityid: "binary_sensor.myggbett_kitchen_door"
+      fieldname: "dooropen"
+      sendmode: "ON_CHANGE"
+      iottype: "BINARY_ON_OFF"
+  - name: "Garden Door"
+    doupload: true
+    initaldelay: "PT5s"
+    retrievalrate: "PT10s"
+    devicekey: "MyggbettGrdnDr"
+    endpoint: "door"
+    monitoredentities:
+    - name: "Garden door sensor"
+      entityid: "binary_sensor.myggbett_conservatory_door"
+      fieldname: "dooropen"
+      sendmode: "ON_CHANGE"
+      iottype: "BINARY_ON_OFF"
+  - name: "Front Door"
+    doupload: true
+    initaldelay: "PT5s"
+    retrievalrate: "PT10s"
+    devicekey: "MyggbettFrntDr"
+    endpoint: "door"
+    monitoredentities:
+    - name: "Front door sensor"
+      entityid: "binary_sensor.myggbett_front_door"
+      fieldname: "dooropen"
+      sendmode: "ON_CHANGE"
+      iottype: "BINARY_ON_OFF"
+  - name: "Garage Door"
+    doupload: true
+    initaldelay: "PT5s"
+    retrievalrate: "PT10s"
+    devicekey: "MyggbettGrgDr"
+    endpoint: "door"
+    monitoredentities:
+    - name: "Garage door sensor"
+      entityid: "binary_sensor.myggbett_garage_door"
+      fieldname: "dooropen"
+      sendmode: "ON_CHANGE"
+      iottype: "BINARY_ON_OFF"
+  - name: "Filtered Grid Consumption"
+    doupload: true
+    initaldelay: "PT7s"
+    retrievalrate: "PT10s"
+    devicekey: "FiltGridCons"
+    endpoint: "power"
+    monitoredentities:
+    - name: "Filtered grid"
+      entityid: "sensor.filtered_grid_consumption"
+      fieldname: "watts"
+      sendmode: "ALWAYS"
+      iottype: "POWER_WATTS"
+  - name: "Solar Generation"
+    doupload: true
+    initaldelay: "PT8s"
+    retrievalrate: "PT10s"
+    devicekey: "SolGenTotal"
+    endpoint: "power"
+    monitoredentities:
+    - name: "Solar Generation Combined"
+      entityid: "input_number.solargenerationcombinedcurrent"
+      fieldname: "watts"
+      sendmode: "ALWAYS"
+      iottype: "POWER_WATTS"
+  - name: "Car Charger Power"
+    doupload: true
+    initaldelay: "PT8s"
+    retrievalrate: "PT10s"
+    devicekey: "CrChrgrPwr"
+    endpoint: "power"
+    monitoredentities:
+    - name: "Car charging rate"
+      entityid: "sensor.myenergi_zappi_20758989_power_ct_internal_load"
+      fieldname: "watts"
+      sendmode: "ALWAYS"
+      iottype: "POWER_WATTS"
+  - name: "Indoor Temperature"
+    doupload: true
+    initaldelay: "PT3s"
+    retrievalrate: "PT60s"
+    devicekey: "AvgIndrTmp"
+    endpoint: "temperature"
+    monitoredentities:
+    - name: "Average Indoor Temperature"
+      entityid: "sensor.avgindoortemperature"
+      fieldname: "temperature"
+      sendmode: "ALWAYS"
+      iottype: "TEMPERATURE"
+  - name: "Outdoor Temperature"
+    doupload: true
+    initaldelay: "PT3s"
+    retrievalrate: "PT60s"
+    devicekey: "AvgOtdrTmp"
+    endpoint: "temperature"
+    monitoredentities:
+    - name: "Average Outdoor Temperature"
+      entityid: "sensor.avgoutdoortemperature"
+      fieldname: "temperature"
+      sendmode: "ALWAYS"
+      iottype: "TEMPERATURE"
+  - name: "Indoor Relative Humidity"
+    doupload: true
+    initaldelay: "PT2s"
+    retrievalrate: "PT60s"
+    devicekey: "AvgIndrRltvHmdty"
+    endpoint: "relativehumidity"
+    monitoredentities:
+    - name: "Average Indoor Relative Humidity"
+      entityid: "sensor.avgindoorhumidity"
+      fieldname: "relativehumidity"
+      sendmode: "ALWAYS"
+      iottype: "RELATIVE_HUMIDITY"
+  - name: "Outdoor Relative Humidity"
+    doupload: true
+    initaldelay: "PT2s"
+    retrievalrate: "PT60s"
+    devicekey: "AvgOtdrRltvHmdty"
+    endpoint: "relativehumidity"
+    monitoredentities:
+    - name: "Average Outdoor Relative Humidity"
+      entityid: "sensor.avgoutdoorhumidity"
+      fieldname: "relativehumidity"
+      sendmode: "ALWAYS"
+      iottype: "RELATIVE_HUMIDITY"
+  - name: "Air Pressure"
+    doupload: true
+    initaldelay: "PT6s"
+    retrievalrate: "PT60s"
+    devicekey: "AvgArPrssr"
+    endpoint: "airpressure"
+    monitoredentities:
+    - name: "Average Air Pressure"
+      entityid: "sensor.avgairpressure"
+      fieldname: "airpressure"
+      sendmode: "ALWAYS"
+      iottype: "AIR_PRESSURE"
+  - name: "Car Charger Energy"
+    doupload: true
+    initaldelay: "PT7s"
+    retrievalrate: "PT60s"
+    devicekey: "CrChrgTdy"
+    endpoint: "kilowatthours"
+    monitoredentities:
+    - name: "Energy to car today"
+      entityid: "sensor.myenergi_zappi_20758989_energy_used_today"
+      fieldname: "kilowatthours"
+      sendmode: "ALWAYS"
+      iottype: "ENERGY_KILO_WATT_HOURS"
+  - name: "Daily groid energy flows"
+    doupload: true
+    initaldelay: "PT1s"
+    retrievalrate: "PT60s"
+    devicekey: "DlyGrdFlws"
+    endpoint: "dailygridenergyflows"
+    monitoredentities:
+    - name: "Imported from grid today"
+      entityid: "sensor.myenergi_hub_20758989_grid_import_today_2"
+      fieldname: "importkwh"
+      sendmode: "ALWAYS"
+      iottype: "ENERGY_KILO_WATT_HOURS"
+    - name: "Exported to grid today"
+      entityid: "sensor.myenergi_hub_20758989_grid_export_today_2"
+      fieldname: "exportkwh"
+      sendmode: "ALWAYS"
+      iottype: "ENERGY_KILO_WATT_HOURS"
+
+mqtt:
+  enabled: true
+  broker:
+    #host: localhost
+    host: ${private.devicehost}
+    # 8883 for iot service, 1883 for local mosquito
+    #port: 1883
+    port: 8883
+    # mqtt protocol - either tcp for local or ssl for remote
+    #protocol: tcp
+    protocol: ssl
+  client:
+    # Unique identifier for this MQTT client
+    # The gateway name, not any device name
+    client-id: ${gateway.identity.name}
+
+    # MQTT broker connection
+    server-uri: ${mqtt.broker.protocol}://${mqtt.broker.host}:${mqtt.broker.port}
+
+    # **GATEWAY** Authentication id (external key as assigned or auto generated at creation)
+    user-name: ${gateway.identity.devicekey}
+    # **GATEWAY** Authentication password
+    password: ${private.mqtt.client.passwordoracle}
+
+    # Optional connection settings
+    clean-session: false
+    automatic-reconnect: true
+    connection-timeout: "PT30s"
+    keep-alive-interval: 60
+
+    will-message:
+      topic: home/homeassistantproxygateway/${gateway.identity.name}
+      payload: Device ${gateway.identity.name} is unavailable
+      qos: 0
+      retained: true
