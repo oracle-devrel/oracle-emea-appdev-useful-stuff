@@ -29,7 +29,7 @@ public class HomeAssistantState {
 
 	private String entity_id;
 	private String state;
-	private Map<String, String> attributes;
+	private Map<String, Object> attributes;
 
 	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
@@ -41,7 +41,7 @@ public class HomeAssistantState {
 	@Builder.Default
 	private ZonedDateTime last_updated = ZonedDateTime.now(UTCTZ);
 
-	private Map<String, String> context;
+	private Map<String, Object> context;
 
 	public boolean isStateUnavailableOrMissing() {
 		return (state == null) || (state.equalsIgnoreCase(STATE_UNAVAILABLE));

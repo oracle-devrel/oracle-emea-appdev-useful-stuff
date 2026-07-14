@@ -18,4 +18,8 @@ public class HomeAssistantMonitoredEntity {
 	private String fieldname;
 	private SendMode sendmode = SendMode.ALWAYS; // default to always as it's the broadest option
 	private boolean dontsendifunavailable = true;
+
+	public boolean missingFields() {
+		return (name == null) || (entityid == null) || (iottype == null);
+	}
 }

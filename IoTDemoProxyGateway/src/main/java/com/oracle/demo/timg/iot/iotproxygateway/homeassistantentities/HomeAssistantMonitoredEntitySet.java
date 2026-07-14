@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
@@ -68,6 +69,14 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 	@PostConstruct
 	void postConstruct() {
 		log.info("Configuring initial last states for monitored entity " + this.name);
+		// make sure that all of the entities are valid
+		String problemEntities = monitoredentities.stream().filter(entity -> entity.missingFields())
+				.map(entity -> this.name + "/" + entity.getName()).collect(Collectors.joining(","));
+		if ((problemEntities != null) && (problemEntities.length() > 0)) {
+			log.warning("Entity set " + this.getName() + " has incomplete entities " + problemEntities
+					+ ". They will be removed from processing");
+			monitoredentities = monitoredentities.stream().filter(entity -> !entity.missingFields()).toList();
+		}
 		// for all of the states we are monitoring setup a last state entry so we have a
 		// known good start
 		monitoredentities.stream().forEach(entity -> laststates.put(entity.getName(), EPOCH_HA_STATE));
@@ -76,6 +85,10 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 
 	@Override
 	public void run() {
+		if (monitoredentities.isEmpty()) {
+			log.info("Monitored entity set " + name + " has no entities");
+			return;
+		}
 		log.info("Running monitored entity set " + name);
 		Map<String, Object> payload = new HashMap<>();
 		ZonedDateTime observationTime = processEntities(payload);
