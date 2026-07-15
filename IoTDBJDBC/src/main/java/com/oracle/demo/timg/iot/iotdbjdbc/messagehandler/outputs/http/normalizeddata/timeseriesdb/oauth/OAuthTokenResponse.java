@@ -49,7 +49,11 @@ public class OAuthTokenResponse {
 	@JsonProperty(value = "refresh_token")
 	private String refreshToken;
 	@JsonProperty(value = "expires_in")
-	private int expiresIn;
+	private Integer expiresIn;
 	@JsonProperty(value = "token_type")
 	private String tokenType;
+
+	public boolean checkInvalid() {
+		return ((accessToken == null) || (expiresIn == null) || (tokenType == null));
+	}
 }

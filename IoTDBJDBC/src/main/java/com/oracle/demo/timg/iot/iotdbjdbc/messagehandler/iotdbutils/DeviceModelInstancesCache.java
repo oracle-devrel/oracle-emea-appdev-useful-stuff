@@ -65,16 +65,17 @@ import lombok.extern.java.Log;
 @Singleton
 public class DeviceModelInstancesCache {
 	private static final String INSTANCE_ID_COLUMN_NAME = "instanceid";
+	private static final String INSTANCE_ID_COLUMN_DISPLAY_NAME = "displayname";
 	private static final String EXTERNAL_KEY_COLUMN_NAME = "externalkey";
 	private static final String MODEL_ID_COLUMN_NAME = "modelid";
 	private static final String MODEL_NAME_COLUMN_NAME = "modelname";
 	// these are used for bulk pre-loading of entries
 	public final static String SELECT_MODEL_IDS_AND_MODEL_NAMES = "SELECT JSON_VALUE (dtm.data, '$._id' ) AS modelid, JSON_VALUE(dtm.data, '$.displayName' ) AS modelname FROM digital_twin_models dtm";
-	public final static String SELECT_MODEL_ID_EXTERNAL_KEY_AND_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$._id' ) AS instanceid, JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid, JSON_VALUE (dti.data, '$.externalKey' ) AS externalkey FROM digital_twin_instances dti";
+	public final static String SELECT_MODEL_ID_EXTERNAL_KEY_DISPLAY_NAME_AND_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$._id' ) AS instanceid, JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid, JSON_VALUE (dti.data, '$.externalKey' ) AS externalkey, JSON_VALUE(dti.data, '$.displayName' ) AS displayname FROM digital_twin_instances dti";
 	// we we don't know about this then we will try an individual load
 	public final static String SELECT_MODEL_NAME_BY_MODEL_ID = "SELECT JSON_VALUE(dtm.data, '$.displayName' ) AS modelname FROM digital_twin_models dtm WHERE JSON_VALUE (dtm.data, '$._id' ) = ? ";
 	public final static String SELECT_MODEL_ID_BY_MODEL_NAME = "SELECT  JSON_VALUE (dtm.data, '$._id' )  AS modelid FROM digital_twin_models dtm WHERE JSON_VALUE(dtm.data, '$.displayName' ) = ? ";
-	public final static String SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid, JSON_VALUE (dti.data, '$.externalKey' ) AS externalkey FROM digital_twin_instances dti WHERE JSON_VALUE(dti.data,  '$._id'  ) = ?";
+	public final static String SELECT_MODEL_ID_DISPLAY_NAME_AND_EXTERNAL_KEY_BY_INSTANCE_ID = "SELECT JSON_VALUE (dti.data, '$.digitalTwinModelId' ) AS modelid, JSON_VALUE (dti.data, '$.externalKey' ) AS externalkey, JSON_VALUE(dti.data, '$.displayName' ) FROM digital_twin_instances dti WHERE JSON_VALUE(dti.data,  '$._id'  ) = ?";
 
 	private final String schemaName;
 	private final DBConnectionSupplier dbConnectionSupplier;
@@ -82,6 +83,7 @@ public class DeviceModelInstancesCache {
 
 	private final Map<String, String> instanceIdToModelId = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> instanceIdToExternalKey = Collections.synchronizedMap(new HashMap<>());
+	private final Map<String, String> instanceIdToInstanceName = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> instanceIdToModelName = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> externalKeyToInstanceId = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> modelIdToModelName = Collections.synchronizedMap(new HashMap<>());
@@ -147,7 +149,8 @@ public class DeviceModelInstancesCache {
 			// set this up so we can re-use it later if we need to query for an instance we
 			// didn't know about
 			log.fine("Creating prepared statements");
-			selectModelIdByInstanceIdPS = connection.prepareStatement(SELECT_MODEL_ID_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
+			selectModelIdByInstanceIdPS = connection
+					.prepareStatement(SELECT_MODEL_ID_DISPLAY_NAME_AND_EXTERNAL_KEY_BY_INSTANCE_ID);
 			selectModelNameByModelIdPS = connection.prepareStatement(SELECT_MODEL_NAME_BY_MODEL_ID);
 			selectModelIdByModelNamePS = connection.prepareStatement(SELECT_MODEL_ID_BY_MODEL_NAME);
 			log.fine("Prepared statements created");
@@ -349,15 +352,17 @@ public class DeviceModelInstancesCache {
 	private void preloadExistingInstances() throws SQLException {
 		// get all of the results
 		try (Statement s = connection.createStatement();
-				ResultSet rs = s.executeQuery(SELECT_MODEL_ID_EXTERNAL_KEY_AND_INSTANCE_ID)) {
+				ResultSet rs = s.executeQuery(SELECT_MODEL_ID_EXTERNAL_KEY_DISPLAY_NAME_AND_INSTANCE_ID)) {
 			while (rs.next()) {
 				String modelIdExistingInstance = rs.getString(MODEL_ID_COLUMN_NAME);
 				String instanceIdExistingInstance = rs.getString(INSTANCE_ID_COLUMN_NAME);
 				String externalKeyExistingInstance = rs.getString(EXTERNAL_KEY_COLUMN_NAME);
+				String instanceDisplayName = rs.getString(INSTANCE_ID_COLUMN_DISPLAY_NAME);
 				String modelName = modelIdToModelName.get(modelIdExistingInstance);
 				instanceIdToModelId.put(instanceIdExistingInstance, modelIdExistingInstance);
-				log.info("Added instance id " + instanceIdExistingInstance + " to modelId " + modelIdExistingInstance
-						+ " mapping");
+				instanceIdToInstanceName.put(instanceIdExistingInstance, instanceDisplayName);
+				log.info("Added instance id " + instanceIdExistingInstance + " named " + instanceDisplayName
+						+ " to modelId " + modelIdExistingInstance + " mapping");
 				instanceIdToModelName.put(instanceIdExistingInstance, modelName);
 				log.info("Added instance id " + instanceIdExistingInstance + " to modelName " + modelName + " mapping");
 				instanceIdToExternalKey.put(instanceIdExistingInstance, externalKeyExistingInstance);
@@ -413,6 +418,54 @@ public class DeviceModelInstancesCache {
 				foundMissingInstanceIds.remove(instanceId);
 			}
 			return ike.getModelId();
+		} catch (MissingInstanceException e) {
+			// cache the missing result for later use
+			foundMissingInstanceIds.add(instanceId);
+			// then throw the exception
+			throw e;
+		}
+	}
+
+	/**
+	 * try to get the modelId from the cache or if there is no cachedata
+	 * 
+	 * @param instanceId          the instance to locate
+	 * @param cacheMissingResults if true and we already have looked but not found
+	 *                            this then don't look again
+	 * @return the instance display name is there is one
+	 * @throws MissingInstanceException throws an exception if we can't locate the
+	 *                                  instance (either in the known missing cache
+	 *                                  if cacheMissingResults is true, or in the
+	 *                                  IoT service otherwise)
+	 * @throws SQLException             if there was a problem querying the iot
+	 *                                  service
+	 */
+	public String getInstanceDisplayNameByInstanceId(@NotNull @NotEmpty String instanceId, boolean cacheMissingResults)
+			throws MissingInstanceException, SQLException {
+		boolean knownMissing = foundMissingInstanceIds.contains(instanceId);
+		// are we looking at the cache ?
+		if (cacheMissingResults && knownMissing) {
+			// we know it's missing, and we are not checking an other time
+			throw new MissingInstanceException(
+					"No instance found in cache and not checking again for instanceid" + instanceId);
+		}
+		// do we already have the info ? note that empty string and null are valid
+		// responses here.
+		if (instanceIdToExternalKey.containsKey(instanceId)) {
+			// we have the key, the model could be a string, null blank etc if one hasn't
+			// been set, but that's still valid.
+			return instanceIdToExternalKey.get(instanceId);
+		}
+		// we don't have a cached version
+		// let's try and locate it
+		try {
+			InstanceKeyInfo ike = loadInstanceByInstanceId(instanceId);
+			// OK we have something, was it previously tagged as knownMissing ? if so remove
+			// the id
+			if (knownMissing) {
+				foundMissingInstanceIds.remove(instanceId);
+			}
+			return ike.getInstanceDisplayName();
 		} catch (MissingInstanceException e) {
 			// cache the missing result for later use
 			foundMissingInstanceIds.add(instanceId);
@@ -522,12 +575,14 @@ public class DeviceModelInstancesCache {
 				if (rs.next()) {
 					String modelId = rs.getString(MODEL_ID_COLUMN_NAME);
 					String externalKey = rs.getString(EXTERNAL_KEY_COLUMN_NAME);
+					String instanceDisplayName = rs.getString(INSTANCE_ID_COLUMN_DISPLAY_NAME);
 					String modelName = modelIdToModelName.get(modelId);
 					instanceIdToModelId.put(instanceId, modelId);
 					instanceIdToModelName.put(instanceId, modelName);
 					instanceIdToExternalKey.put(instanceId, externalKey);
+					instanceIdToInstanceName.put(instanceId, instanceDisplayName);
 					externalKeyToInstanceId.put(externalKey, instanceId);
-					return new InstanceKeyInfo(instanceId, modelId, externalKey);
+					return new InstanceKeyInfo(instanceId, modelId, externalKey, instanceDisplayName);
 				} else {
 					throw new MissingInstanceException("No instance found for instance id " + instanceId);
 				}
@@ -544,6 +599,7 @@ public class DeviceModelInstancesCache {
 		String instanceId;
 		String modelId;
 		String externalKey;
+		String instanceDisplayName;
 	}
 
 	public void unconfigure() throws Exception {

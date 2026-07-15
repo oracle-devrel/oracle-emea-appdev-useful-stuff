@@ -64,4 +64,8 @@ public class TimeSeriesDBProperties {
 	public static final String TIME_SERIES_PROPERTY_METRICS_QUERY_PARAMS_Y = TIME_SERIES_PROPERTY_METRICS_QUERY_PARAMS
 			+ ".y";
 	public static final String TIME_SERIES_PROPERTY_METRICS_PATH = TIME_SERIES_PROPERTY_METRICS + ".path";
+
+	public static final String TIME_SERIES_PROPERTY_DEBUG = TIME_SERIES_PROPERTY_PREFIX + ".debug";
+	public static final String TIME_SERIES_PROPERTY_DEBUG_OAUTH = TIME_SERIES_PROPERTY_DEBUG + ".oauth";
+	public static final String TIME_SERIES_PROPERTY_DEBUG_NO_UPLOAD = TIME_SERIES_PROPERTY_DEBUG + ".noupload";
 }
