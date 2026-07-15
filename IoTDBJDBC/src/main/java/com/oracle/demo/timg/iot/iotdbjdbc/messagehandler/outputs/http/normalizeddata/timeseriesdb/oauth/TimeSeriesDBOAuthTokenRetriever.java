@@ -129,6 +129,12 @@ public class TimeSeriesDBOAuthTokenRetriever {
 				throw new OAuthTokenRetrievalException(
 						"IOException in mapping, this should not happen " + e.getLocalizedMessage(), e);
 			}
+			// make sure that the fields we need have been set
+			if (atr.checkInvalid()) {
+				throw new OAuthTokenRetrievalException("Returned token details have null or missing values " + atr
+						+ ", maybe an authentication issue. Check the properties username, password, tenancyocid and databasename under "
+						+ TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH);
+			}
 			this.currentToken = atr.getAccessToken();
 			this.tokenType = atr.getTokenType();
 			// get a new renewal time, allow 60 seconds for processing the renewal if we
@@ -148,5 +154,8 @@ public class TimeSeriesDBOAuthTokenRetriever {
 	public void onStartup(StartupEvent event) {
 		log.info("Startup event received for TimeSeriesDBOAuthTokenRetriever tsDBuserCredentials="
 				+ tsDBuserCredentials.safeToString() + ", queryX=" + queryX + ", queryY=" + queryY);
+		if (debugOauth) {
+			log.info("Full credentials are " + tsDBuserCredentials.toString());
+		}
 	}
 }
