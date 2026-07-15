@@ -163,6 +163,13 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 			String modelId = deviceModelInstancesCache.getModelIdByInstanceId(instanceId, true);
 			builder.resourceAttribute("iot.digital_twin.model_id", modelId);
 			log.info("Added model ID resource attribute of " + modelId);
+			String instanceDisplayName = deviceModelInstancesCache.getInstanceDisplayNameByInstanceId(instanceId, true);
+			if (instanceDisplayName != null) {
+				builder.resourceAttribute("iot.digital_twin.display_name", instanceDisplayName);
+				log.info("Added instance display name of " + instanceDisplayName);
+			} else {
+				log.info("Can't locate instance display name for instance " + instanceId);
+			}
 			String modelName;
 			try {
 				modelName = deviceModelInstancesCache.getModelNameByModelId(modelId, true);
