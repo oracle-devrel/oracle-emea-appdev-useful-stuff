@@ -58,21 +58,14 @@ import lombok.extern.java.Log;
 
 @Singleton
 @Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-//@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
-//@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 @Log
 public class TimeSeriesDBOAuthTokenRetriever {
 	@Inject
 	private ObjectMapper mapper;
-	@Inject
-	private TimeSeriesDBCredentials tsDBuserCredentials;
+	private final TimeSeriesDBCredentials tsDBuserCredentials;
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_RENEWAL_PREEMPT, defaultValue = "PT60S")
 	private Duration renewalPreempt;
-	// @Property(name =
-	// TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_X)
 	private final String queryX;
-	// @Property(name =
-	// TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_QUERY_PARAMS_Y)
 	private final String queryY;
 	@Getter
 	private LocalDateTime currentTokenRenewTime = null;
@@ -80,12 +73,20 @@ public class TimeSeriesDBOAuthTokenRetriever {
 	private String currentToken = null;
 	@Getter
 	private String tokenType;
+	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_DEBUG_OAUTH, defaultValue = "false")
+	boolean debugOauth = false;
 
 	@Inject
-	public TimeSeriesDBOAuthTokenRetriever(TimeSeriesEndpointsRetriever endpointsRetriever) {
+	public TimeSeriesDBOAuthTokenRetriever(TimeSeriesEndpointsRetriever endpointsRetriever,
+			TimeSeriesDBCredentials tsDBuserCredentials) {
 		TimeSeriesEndpointsQueryParams endpointsQueryParams = endpointsRetriever.getQueryParams();
 		this.queryX = endpointsQueryParams.getOauthQueryX();
 		this.queryY = endpointsQueryParams.getOauthQueryY();
+		log.info("Constructor params for OAUTH queryX=" + queryX + ", queryY=" + queryY);
+		this.tsDBuserCredentials = tsDBuserCredentials;
+		if (debugOauth) {
+			log.info("Oauth retrieve credentials are " + tsDBuserCredentials);
+		}
 	}
 
 	@Inject
@@ -116,13 +117,17 @@ public class TimeSeriesDBOAuthTokenRetriever {
 			log.info("Retrieveing oauth token from time series DB");
 			try {
 				String credentials = mapper.writeValueAsString(tsDBuserCredentials);
-				log.fine("Setting body to " + credentials);
-				atr = authClient.getOAuthToken(queryX, queryY, credentials);
+				log.fine(() -> "Setting body to " + credentials);
+				String oauthRespStr = authClient.getOAuthToken(queryX, queryY, credentials);
+				log.fine(() -> "OAuth response is " + oauthRespStr);
+				atr = mapper.readValue(oauthRespStr, OAuthTokenResponse.class);
 			} catch (HttpClientException e) {
+				log.warning("Problem getting the OAuth token " + e.getLocalizedMessage());
 				throw new OAuthTokenRetrievalException("Problem getting the OAuth token " + e.getLocalizedMessage(), e);
 			} catch (IOException e) {
+				log.warning("IOException in mapping, this should not happen " + e.getLocalizedMessage());
 				throw new OAuthTokenRetrievalException(
-						"IOException building mapping, this should not happen " + e.getLocalizedMessage(), e);
+						"IOException in mapping, this should not happen " + e.getLocalizedMessage(), e);
 			}
 			this.currentToken = atr.getAccessToken();
 			this.tokenType = atr.getTokenType();

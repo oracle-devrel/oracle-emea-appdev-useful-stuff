@@ -37,6 +37,7 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
@@ -45,11 +46,14 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.MissingInsta
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.MissingModelException;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsQueryParams;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.endpoints.TimeSeriesEndpointsRetriever;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.OAuthTokenRetrievalException;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.oauth.TimeSeriesDBOAuthTokenRetriever;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.MetricsData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.NormalizedDataMetricsDataBuilder;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpMetricsClient;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb.otlp.OtlpProperties;
 
+import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
@@ -81,11 +85,18 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_METRICS_PATH, defaultValue = "/tel/v1/metrics")
 	private String metricsPath;
 
+	// for debugging if we're not uploading we can still trigger a oauth check, that
+	// way any oauth debugging will happen
+	@Inject
+	private BeanProvider<TimeSeriesDBOAuthTokenRetriever> tokenRetriever;
+	private final boolean noUpload;
+
 	@Inject
 	public TimeSeriesDBOutputOTLP(DeviceModelInstancesCache deviceModelInstancesCache, OtlpMetricsClient metricsClient,
 			TimeSeriesEndpointsRetriever timeSeriesEndpointsRetriever, ObjectMapper mapper,
 			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER) int order,
-			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SENT_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted) {
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_SENT_DATA_IS_COMPLETED, defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_DEBUG_NO_UPLOAD, defaultValue = "false") boolean noUpload) {
 		this.deviceModelInstancesCache = deviceModelInstancesCache;
 		this.metricsClient = metricsClient;
 		TimeSeriesEndpointsQueryParams queryParams = timeSeriesEndpointsRetriever.getQueryParams();
@@ -95,6 +106,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		this.mapper = mapper;
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;
+		this.noUpload = noUpload;
 	}
 
 	@Override
@@ -129,10 +141,14 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		log.info(() -> "About to upload to time series db " + metricsDataString);
 		log.info(() -> "Uploading url=" + metricsClientUrl + ", path=" + metricsPath + ", queryX=" + queryX
 				+ ", queryY=" + queryY);
+		if (noUpload) {
+			log.info("noUpload is true, skipping upload");
 
-		HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
-		log.info("Upload to time series DB response is " + resp.getStatus().getCode() + "("
-				+ resp.getStatus().toString() + ") with body " + resp.getBody().orElse("No response data"));
+		} else {
+			HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
+			log.info("Upload to time series DB response is " + resp.getStatus().getCode() + "("
+					+ resp.getStatus().toString() + ") with body " + resp.getBody().orElse("No response data"));
+		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
 	}
 
@@ -168,5 +184,18 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	public void onStartup(StartupEvent event) {
 		log.info("Startup event received for TimeSeriesDBOutputOTLP, queryX=" + queryX + ", queryY=" + queryY
 				+ ", Uploading to " + metricsClientUrl + " with path " + metricsPath);
+		if (noUpload) {
+			// trigger the oauth provider to do it's stuff
+			try {
+				log.info("noUpload set, forcing an OAuth operation");
+				String token = tokenRetriever.get().getToken();
+				String tokenType = tokenRetriever.get().getTokenType();
+				LocalDateTime tokenExpire = tokenRetriever.get().getCurrentTokenRenewTime();
+				log.info("Token type=" + tokenType + ", token expiry=" + tokenExpire + ", token=" + token);
+			} catch (OAuthTokenRetrievalException e) {
+				// TODO Auto-generated catch block
+				log.severe("noUpload set, Problem getting the OAuth token " + e.getLocalizedMessage());
+			}
+		}
 	}
 }
