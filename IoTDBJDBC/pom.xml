@@ -46,18 +46,18 @@ SOFTWARE. -->
 	<parent>
 		<groupId>io.micronaut.platform</groupId>
 		<artifactId>micronaut-parent</artifactId>
-		<version>4.10.14</version>
+		<version>4.10.17</version>
 	</parent>
 
 	<properties>
 		<packaging>jar</packaging>
 		<jdk.version>21</jdk.version>
 		<release.version>21</release.version>
-		<version.ocisdk>3.91.0</version.ocisdk>
+		<version.ocisdk>3.92.0</version.ocisdk>
 		<version.lombok>1.18.46</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
 		<!-- Oracle JDBC 23ai line (set to the latest approved version) -->
-		<version.ojdbc>23.8.0.25.04</version.ojdbc>
+		<version.ojdbc>23.26.2.0.0</version.ojdbc>
 		<version.nosql>3.85.0</version.nosql>
 		<!--<micronaut.version>4.10.25</micronaut.version>-->
 		<micronaut.runtime>netty</micronaut.runtime>
@@ -118,12 +118,12 @@ SOFTWARE. -->
 			the standard Java logging utilities. By making the dependency declaration 
 			below Maven will bring in the core SLF4J jar files, and also the SLJ4J to 
 			java.util.logging binding -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>${version.slf4j}</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>io.micronaut.jsonschema</groupId>
 			<artifactId>micronaut-json-schema-validation</artifactId>
@@ -177,7 +177,7 @@ SOFTWARE. -->
 		<dependency>
 			<groupId>com.oracle.nosql.sdk</groupId>
 			<artifactId>nosqldriver</artifactId>
-			<version>5.3.7</version>
+			<version>5.4.23</version>
 			<!--<version>5.4.21</version>-->
 		</dependency>
 
