@@ -114,7 +114,7 @@ public class TimeSeriesDBOAuthTokenRetriever {
 		if ((currentToken == null) || (currentTokenRenewTime == null)
 				|| LocalDateTime.now().isAfter(currentTokenRenewTime)) {
 			OAuthTokenResponse atr;
-			log.info("Retrieveing oauth token from time series DB");
+			log.info("Retrieveing new oauth token from time series DB");
 			try {
 				String credentials = mapper.writeValueAsString(tsDBuserCredentials);
 				log.fine(() -> "Setting body to " + credentials);
@@ -144,7 +144,7 @@ public class TimeSeriesDBOAuthTokenRetriever {
 			log.info("Got token details with type " + atr.getTokenType() + " and expiring in " + atr.getExpiresIn()
 					+ " seconds");
 		} else {
-			log.info("Using existing token");
+			log.finer("Using existing token");
 		}
 		// we have a current token and it is still valid
 		return currentToken;

@@ -70,7 +70,15 @@ import lombok.extern.java.Log;
 @Log
 public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
-	private static final long NANOS_PER_SECOND = 1_000_000_000L;
+	private static final String OTLP_SERVICE_NAME = "IoTDBJDBC";
+	private static final String OTLP_SCOPE_NAME = "com.oracle.demo.timg.iot.iotdbjdbc";
+	private static final String OTLP_SCOPE_VERSION = "1.0.0";
+	private static final String OTLP_METRIC_DESCRIPTION = "IoT normalized data value";
+	private static final String OTLP_METRIC_UNIT = "1";
+	private static final String OTLP_METRIC_NAME = "iot.normalized";
+	private static final String TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_MODEL_NAME_NAME = "iot.digital_twin.model_name";
+	private static final String TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_INSTANCE_DISPLAY_NAME_NAME = "iot.digital_twin.instance_display_name";
+	private static final String TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_MODEL_ID_NAME = "iot.digital_twin.model_id";
 	private final int order;
 	private final boolean sentDataIsCompleted;
 	private final DeviceModelInstancesCache deviceModelInstancesCache;
@@ -126,9 +134,9 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData normalizedData) throws Exception {
-		NormalizedDataMetricsDataBuilder builder = new NormalizedDataMetricsDataBuilder().serviceName("IoTDBJDBC")
-				.scope("com.oracle.demo.timg.iot.iotdbjdbc", "1.0.0")
-				.metric("iot.normalized", "1", "IoT normalized data value").gaugeMetric(normalizedData);
+		NormalizedDataMetricsDataBuilder builder = new NormalizedDataMetricsDataBuilder().serviceName(OTLP_SERVICE_NAME)
+				.scope(OTLP_SCOPE_NAME, OTLP_SCOPE_VERSION)
+				.metric(OTLP_METRIC_NAME, OTLP_METRIC_UNIT, OTLP_METRIC_DESCRIPTION).gaugeMetric(normalizedData);
 
 		// we want to have a few "standard" attributes (modelId and name) added beyond
 		// it's default setup
@@ -139,13 +147,13 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 
 		String metricsDataString = mapper.writeValueAsString(metricsData);
 		log.info(() -> "About to upload to time series db " + metricsDataString);
-		log.info(() -> "Uploading url=" + metricsClientUrl + ", path=" + metricsPath + ", queryX=" + queryX
+		log.fine(() -> "Uploading url=" + metricsClientUrl + ", path=" + metricsPath + ", queryX=" + queryX
 				+ ", queryY=" + queryY);
 		if (noUpload) {
 			log.info("noUpload is true, skipping upload");
 		} else {
 			HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
-			log.info("Upload to time series DB response is " + resp.getStatus().getCode() + "("
+			log.fine("Upload to time series DB response is " + resp.getStatus().getCode() + "("
 					+ resp.getStatus().toString() + ") with body " + resp.getBody().orElse("No response data"));
 		}
 		return sentDataIsCompleted ? new NormalizedData[0] : new NormalizedData[] { normalizedData };
@@ -160,20 +168,21 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 		// if we have them add the model id and model name
 		try {
 			String modelId = deviceModelInstancesCache.getModelIdByInstanceId(instanceId, true);
-			builder.resourceAttribute("iot.digital_twin.model_id", modelId);
-			log.info("Added model ID resource attribute of " + modelId);
+			builder.resourceAttribute(TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_MODEL_ID_NAME, modelId);
+			log.finer("Added model ID resource attribute of " + modelId);
 			String instanceDisplayName = deviceModelInstancesCache.getInstanceDisplayNameByInstanceId(instanceId, true);
 			if (instanceDisplayName != null) {
-				builder.resourceAttribute("iot.digital_twin.display_name", instanceDisplayName);
-				log.info("Added instance display name of " + instanceDisplayName);
+				builder.resourceAttribute(TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_INSTANCE_DISPLAY_NAME_NAME,
+						instanceDisplayName);
+				log.finer(() -> "Added instance display name of " + instanceDisplayName);
 			} else {
-				log.info("Can't locate instance display name for instance " + instanceId);
+				log.info(() -> "Can't locate instance display name for instance " + instanceId);
 			}
 			String modelName;
 			try {
 				modelName = deviceModelInstancesCache.getModelNameByModelId(modelId, true);
-				builder.resourceAttribute("iot.digital_twin.model_name", modelName);
-				log.info("Added model name resource attribute of " + modelName);
+				builder.resourceAttribute(TS_RESOURCE_ATTR_IOT_DIGITAL_TWIN_MODEL_NAME_NAME, modelName);
+				log.finer(() -> "Added model name resource attribute of " + modelName);
 			} catch (MissingModelException e) {
 				log.severe("No model name found for modelid " + modelId);
 			} catch (SQLException e) {
