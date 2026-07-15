@@ -143,7 +143,6 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 				+ ", queryY=" + queryY);
 		if (noUpload) {
 			log.info("noUpload is true, skipping upload");
-
 		} else {
 			HttpResponse<String> resp = metricsClient.uploadMetrics(queryX, queryY, metricsDataString);
 			log.info("Upload to time series DB response is " + resp.getStatus().getCode() + "("
@@ -190,7 +189,7 @@ public class TimeSeriesDBOutputOTLP implements NormalizedDataMessageHandler {
 	@EventListener
 	public void onStartup(StartupEvent event) {
 		log.info("Startup event received for TimeSeriesDBOutputOTLP, queryX=" + queryX + ", queryY=" + queryY
-				+ ", Uploading to " + metricsClientUrl + " with path " + metricsPath);
+				+ ", Uploading to " + metricsClientUrl + " with path " + metricsPath + ", noUpload=" + noUpload);
 		if (noUpload) {
 			// trigger the oauth provider to do it's stuff
 			try {
