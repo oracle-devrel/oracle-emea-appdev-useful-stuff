@@ -1,0 +1,19 @@
+[
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"relativehumidity\"}",
+		"description": "Humidity adapter",
+		"payload-mapping": {
+			"$.relativehumidity": "$.payload.relativehumidity"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"payload": {
+					"timestamp": "2026-07-10T16:09:18.934123Z",
+					"relativehumidity": 65.2
+				},
+				"devicekey": "def"
+			}
+		}
+	}
+]

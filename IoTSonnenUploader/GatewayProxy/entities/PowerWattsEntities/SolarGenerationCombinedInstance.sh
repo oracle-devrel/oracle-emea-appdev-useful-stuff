@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=SolarGenerationCombined
+export INSTANCE_KEY=SolGenTotal

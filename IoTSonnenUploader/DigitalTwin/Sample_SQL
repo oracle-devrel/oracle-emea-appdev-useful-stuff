@@ -10,3 +10,15 @@ INNER JOIN digital_twin_models dtm
   ON JSON_VALUE(dti.data, '$.digitalTwinModelId' )
    = JSON_VALUE(dtm.data, '$._id' )
 WHERE  JSON_VALUE(dtm.data, '$.displayName' ) = 'homebattery'
+
+
+
+This will get the rejected data info in human readable form
+select ENDPOINT, TIME_RECEIVED, REASON_MESSAGE, UTL_RAW.CAST_TO_VARCHAR2(DBMS_LOB.SUBSTR(content, 4000, 1)) AS content_text from rejected_data order by TIME_RECEIVED DESC fetch first 10 rows only;
+
+this gets the most recent normalized data
+select * from SNAPSHOT_DATA order by  TIME_OBSERVED desc fetch first 20 rows only ;
+
+
+this gets the most recent history data, best to ass a WHERE contentPath = 'path' clause though to focus on specific data items
+select * from HISTORIZED_DATA order by  TIME_OBSERVED desc fetch first 10 rows only ;

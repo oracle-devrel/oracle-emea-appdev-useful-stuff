@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=AverageOutdoorRelativeHumidity
+export INSTANCE_KEY=AvgOtdrRltvHmdty

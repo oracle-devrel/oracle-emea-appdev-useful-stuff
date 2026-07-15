@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=SonnenManualReserveSettings
+export INSTANCE_KEY=SnnManRsrvSttngs

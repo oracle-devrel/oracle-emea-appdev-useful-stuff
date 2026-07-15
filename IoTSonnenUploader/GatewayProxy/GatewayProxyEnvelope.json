@@ -1,0 +1,21 @@
+{
+	"reference-endpoint": "house/homeassistant/gateway/*",
+	"reference-payload": {
+		"data": {
+			"timestamp": "2026-07-10T16:09:18.934Z",
+			"payload": {
+				"haretrievesuccess": 54.5,
+				"haretrievefail": 0.5,
+				"uploadsuccess": 53.5,
+				"uploadfail": 1.5
+			},
+			"devicekey": "abc"
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "$.timestamp",
+		"target": "$.devicekey",
+		"contentRoot": "$.payload"
+	}
+}

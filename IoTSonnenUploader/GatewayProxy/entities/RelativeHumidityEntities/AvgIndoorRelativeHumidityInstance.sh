@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=AverageIndoorRelativeHumidity
+export INSTANCE_KEY=AvgIndrRltvHmdty

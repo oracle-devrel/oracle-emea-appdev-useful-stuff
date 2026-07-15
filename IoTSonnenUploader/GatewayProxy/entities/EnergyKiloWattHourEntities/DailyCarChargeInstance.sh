@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=CarChargeToday
+export INSTANCE_KEY=CrChrgTdy

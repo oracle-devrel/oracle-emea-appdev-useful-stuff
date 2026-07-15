@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=UtilityLuminance
+export INSTANCE_KEY=UtilIlluminance

@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=DailyGridFlows
+export INSTANCE_KEY=DlyGrdFlws

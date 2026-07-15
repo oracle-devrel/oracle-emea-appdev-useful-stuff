@@ -1,0 +1,13 @@
+{
+	"reference-endpoint": "house/homeassistant/entities/luxtest",
+	"reference-payload": {
+		"data": {
+			"timestamp": "2000-01-01T00:00:00.000000Z",
+			"lux": 216.1
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "${if has(\"timestamp\") then .timestamp else \"2000-01-01T00:00:00.000000Z\" end}"
+	}
+}

@@ -1,13 +1,46 @@
-Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to enable the basion agent)
+#Setup a Linux instance VM connected to the VCN as per the IoT setup (be sure to enable the basion agent)
+# general update
+sudo dnf update  --assumeyes
 
-once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
-install java and maven to allow for compilation as well as the sqlcl command
-we also need git to get the code itself
-# install the java version
+# install the oci command and it's dependencies
+sudo dnf -y install oraclelinux-developer-release-el9  --assumeyes
+sudo dnf install python39-oci-cli  --assumeyes
+
+#once VM is in place and you're connected using the bastion (The CreatebastionSession.sh can set this up for you)
+#€install java and maven to allow for compilation as well as the sqlcl command
+#we also need git to get the code itself
+# install the desired java version
 sudo dnf install java-25-openjdk-devel --assumeyes
+# try to switch to the new version
+sudo alternatives --config java
+sudo alternatives --config javac
+# For Oracle alternatives system
+# to list older versions of java if needed
+alternatives --list | grep java
+# to uninstall one (e.g. jre_17)
+sudo  alternatives --remove-all jre_17
+sudo  alternatives --remove-all jre_openjdk 
+# for java installed using RPM
+dnf list --installed 'java-*-openjdk*' 'jdk-*'
+# then to remove
+sudo dnf remove  java-17-openjdk-headless
+# make sure it's what we want
+sudo alternatives --display java
+sudo alternatives --display javac
+
+make sure that the path is setup, if it's not then you'll need to do so
+echo $JAVA_HOME
+# this shoudl work
+sudo alternatives --config java
+#(then chose the java version you want)
+# logout then back in
+java -version
+#if it's not there (or wrong) then get the best path with  and add to ~/.bash_profile
+
+# IMPORTANT, you will then need to log out and back in
 # this insista on installing jdk 17 with maven, so don't do that
 #sudo dnf install maven --assumeyes
-# get maven
+# get maven, the dnf install method insiste oon installing jdk 17 and that's not what we want so we have to do it manually
 cd /tmp
 curl -LO https://dlcdn.apache.org/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz
 

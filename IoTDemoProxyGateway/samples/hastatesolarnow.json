@@ -1,0 +1,23 @@
+{
+	"entity_id": "input_number.solargenerationcombinedcurrent",
+	"state": "1030.31",
+	"attributes": {
+		"initial": null,
+		"editable": true,
+		"min": 0.0,
+		"max": 10000000.0,
+		"step": 1.0,
+		"mode": "box",
+		"unit_of_measurement": "kWh",
+		"icon": "mdi:solar-power-variant",
+		"friendly_name": "SolarGenerationCombinedCurrent"
+	},
+	"last_changed": "2026-07-02T10:23:21.838557+00:00",
+	"last_reported": "2026-07-02T10:23:21.838557+00:00",
+	"last_updated": "2026-07-02T10:23:21.838557+00:00",
+	"context": {
+		"id": "01KWH5NH7DHWXMZBNAVHRETKYT",
+		"parent_id": "01KWH5NH79058RDFHAC73D09X5",
+		"user_id": null
+	}
+}

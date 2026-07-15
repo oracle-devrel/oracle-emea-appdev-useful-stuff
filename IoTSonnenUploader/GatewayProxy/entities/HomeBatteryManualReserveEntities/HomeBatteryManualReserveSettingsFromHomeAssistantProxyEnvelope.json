@@ -1,0 +1,17 @@
+{
+	"reference-endpoint": "house/homeassistant/entities/homebatterymanualreservesettings",
+	"reference-payload": {
+		"data": {
+			"payload": {
+				"timestamp": "2026-07-10T16:09:18.934123Z",
+				"repeatmanualreserveenabled": true,
+				"manualreserveenabled": true
+			},
+			"devicekey": "abc"
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "$.payload.timestamp"
+	}
+}

@@ -1,0 +1,21 @@
+[
+	{
+		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"entities\"  and endpoint(4) == \"dailygridenergyflows\"}",
+		"description": "Grid Energy Flows adapter",
+		"payload-mapping": {
+			"$.importkwh": "$.payload.importkwh",
+			"$.exportkwh": "$.payload.exportkwh"
+		},
+		"reference-payload": {
+			"dataFormat": "JSON",
+			"data": {
+				"payload": {
+					"timestamp": "2026-07-10T16:09:18.934123Z",
+					"importkwh": 2.312,
+					"exportkwh": 1.2
+				},
+				"devicekey": "def"
+			}
+		}
+	}
+]

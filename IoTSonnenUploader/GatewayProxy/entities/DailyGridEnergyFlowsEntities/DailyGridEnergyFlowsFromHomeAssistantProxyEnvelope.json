@@ -1,0 +1,17 @@
+{
+	"reference-endpoint": "house/homeassistant/entities/dailygridenergyflows",
+	"reference-payload": {
+		"data": {
+			"payload": {
+				"timestamp": "2026-07-10T16:09:18.934123Z",
+				"importkwh": 2.312,
+				"exportkwh": 1.2
+			},
+			"devicekey": "def"
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "$.payload.timestamp"
+	}
+}

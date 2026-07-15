@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=SonnenUserCharge
+export INSTANCE_KEY=SnnBatUsrChrg
