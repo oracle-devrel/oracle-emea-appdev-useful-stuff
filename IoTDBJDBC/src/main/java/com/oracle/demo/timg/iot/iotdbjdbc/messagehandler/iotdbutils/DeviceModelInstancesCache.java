@@ -451,10 +451,10 @@ public class DeviceModelInstancesCache {
 		}
 		// do we already have the info ? note that empty string and null are valid
 		// responses here.
-		if (instanceIdToExternalKey.containsKey(instanceId)) {
+		if (instanceIdToInstanceName.containsKey(instanceId)) {
 			// we have the key, the model could be a string, null blank etc if one hasn't
 			// been set, but that's still valid.
-			return instanceIdToExternalKey.get(instanceId);
+			return instanceIdToInstanceName.get(instanceId);
 		}
 		// we don't have a cached version
 		// let's try and locate it
