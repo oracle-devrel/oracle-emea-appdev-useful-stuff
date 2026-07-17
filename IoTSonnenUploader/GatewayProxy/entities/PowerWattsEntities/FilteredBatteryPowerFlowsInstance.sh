@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=FilteredBatteryPowerFlows
+export INSTANCE_KEY=FltBttryPwrFlws

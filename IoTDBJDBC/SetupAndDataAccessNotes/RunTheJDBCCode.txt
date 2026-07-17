@@ -1,0 +1,1 @@
+nohup java -Dmicronaut.config.files=config/config.properties   -jar target/IoTDBJDBC-0.0.1.jar  > /tmp/tsdb.txt 2>&1 &
