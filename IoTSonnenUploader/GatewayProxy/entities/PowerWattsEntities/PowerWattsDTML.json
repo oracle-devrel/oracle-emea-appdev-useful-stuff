@@ -19,7 +19,7 @@
 			"name": "watts",
 			"schema": "double",
 			"unit": "watt",
-			"minimum": 0,
+			"minimum": -100000,
 			"maximum": 1000000
 		}
 	]
