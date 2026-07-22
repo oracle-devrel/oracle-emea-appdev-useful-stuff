@@ -55,7 +55,7 @@ import lombok.extern.java.Log;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @Serdeable
 public class RawDataFileVersion extends IoTDataCoreFileVersion {
 	// there should be a way to use the MediaType.isTextBased here
