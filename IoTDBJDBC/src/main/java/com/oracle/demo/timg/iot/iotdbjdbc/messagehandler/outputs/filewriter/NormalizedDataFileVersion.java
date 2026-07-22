@@ -37,6 +37,7 @@ SOFTWARE.
 
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.filewriter;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
@@ -61,6 +62,7 @@ import oracle.sql.json.OracleJsonIntervalDS;
 import oracle.sql.json.OracleJsonIntervalYM;
 import oracle.sql.json.OracleJsonNumber;
 import oracle.sql.json.OracleJsonObject;
+import oracle.sql.json.OracleJsonParser;
 import oracle.sql.json.OracleJsonString;
 import oracle.sql.json.OracleJsonStructure;
 import oracle.sql.json.OracleJsonTimestamp;
@@ -122,8 +124,11 @@ public class NormalizedDataFileVersion extends IoTDataCoreFileVersion {
 	}
 
 	public static NormalizedData buildTo(NormalizedDataFileVersion input, String instanceId) {
+		StringReader contentInputReader = new StringReader(input.getContentJsonValue());
+		OracleJsonParser oracleJsonParser = NormalizedDataFileVersion.factory.createJsonTextParser(contentInputReader);
+		OracleJsonValue oracleJsonValue = oracleJsonParser.getValue();
 		return NormalizedData.builder().digitalTwinInstanceId(instanceId).contentPath(input.getContentPath())
 				.timeObserved(input.getTimeObserved()).contentType(input.getContentType()).content(input.getContent())
-				.contentJsonValue(input.getContentJsonValue()).contentJsonType(input.getContentJsonType()).build();
+				.contentJsonValue(oracleJsonValue).contentJsonType(input.getContentJsonType()).build();
 	}
 }
