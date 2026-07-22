@@ -37,33 +37,26 @@ SOFTWARE.
 
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.filewriter;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
 
 @Log
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@SuperBuilder
+@AllArgsConstructor
+@Builder
 @Serdeable
-public class RawDataFileVersion extends IoTDataCoreFileVersion {
-	// there should be a way to use the MediaType.isTextBased here
-	private final static HashSet<String> STRING_OUTPUT_TYPES = new HashSet<>(Arrays.asList(
-			MediaType.APPLICATION_JSON.toLowerCase(), MediaType.APPLICATION_JSON_SCHEMA.toLowerCase(),
-			MediaType.APPLICATION_XML.toLowerCase(), MediaType.TEXT_CSV.toLowerCase(),
-			MediaType.TEXT_HTML.toLowerCase(), MediaType.TEXT_XML.toLowerCase(), MediaType.TEXT_JSON.toLowerCase(),
-			MediaType.TEXT_MARKDOWN.toLowerCase(), MediaType.TEXT_PLAIN.toLowerCase()));
+public class RawDataFileVersion {
+
+	private String digitalTwinInstanceDisplayName;
 	private String endpoint;
 	// we don't want to dump raw text
 	@ToString.Exclude

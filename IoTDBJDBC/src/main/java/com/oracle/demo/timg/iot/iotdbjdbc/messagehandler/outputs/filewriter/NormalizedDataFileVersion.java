@@ -44,12 +44,10 @@ import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
-import oracle.sql.json.OracleJsonFactory;
 import oracle.sql.json.OracleJsonGenerator;
 import oracle.sql.json.OracleJsonParser;
 import oracle.sql.json.OracleJsonValue;
@@ -57,13 +55,12 @@ import oracle.sql.json.OracleJsonValue.OracleJsonType;
 
 @Log
 @Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Serdeable
-public class NormalizedDataFileVersion extends IoTDataCoreFileVersion {
-	private final static OracleJsonFactory factory = new OracleJsonFactory();
+public class NormalizedDataFileVersion {
+	private String digitalTwinInstanceDisplayName;
 	private String contentPath;
 	private String timeObserved;
 	private String contentType;
