@@ -68,7 +68,7 @@ import oracle.sql.json.OracleJsonVector;
 @Log
 @Data
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @SerdeImport(OracleJsonValue.class)

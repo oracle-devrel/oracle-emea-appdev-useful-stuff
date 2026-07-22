@@ -9,7 +9,7 @@ import lombok.extern.java.Log;
 @Log
 @Data
 @NoArgsConstructor
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @Serdeable
 public abstract class IoTDataCoreFileVersion {
 	private String digitalTwinInstanceDisplayName;

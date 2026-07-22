@@ -116,7 +116,9 @@ public class NormalizedDataFileOutput implements NormalizedDataMessageHandler {
 		}
 		String deviceDisplayName = deviceModelInstancesCache
 				.getInstanceDisplayNameByInstanceId(input.getDigitalTwinInstanceId(), true);
+		log.info("Input NormalizedData " + input);
 		NormalizedDataFileVersion dataFileVersion = NormalizedDataFileVersion.buildFrom(input, deviceDisplayName);
+		log.info("Converted NormalizedDataFileVersion " + dataFileVersion);
 		String outputString = mapper.writeValueAsString(dataFileVersion);
 		log.info("Saving " + outputString);
 		output.write(outputString);
