@@ -37,6 +37,8 @@ SOFTWARE.
 
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.filewriter;
 
+import java.io.StringWriter;
+
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
 import io.micronaut.serde.annotation.SerdeImport;
@@ -52,7 +54,9 @@ import oracle.sql.json.OracleJsonBinary;
 import oracle.sql.json.OracleJsonDate;
 import oracle.sql.json.OracleJsonDecimal;
 import oracle.sql.json.OracleJsonDouble;
+import oracle.sql.json.OracleJsonFactory;
 import oracle.sql.json.OracleJsonFloat;
+import oracle.sql.json.OracleJsonGenerator;
 import oracle.sql.json.OracleJsonIntervalDS;
 import oracle.sql.json.OracleJsonIntervalYM;
 import oracle.sql.json.OracleJsonNumber;
@@ -71,6 +75,7 @@ import oracle.sql.json.OracleJsonVector;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable
 @SerdeImport(OracleJsonValue.class)
 @SerdeImport(OracleJsonStructure.class)
 @SerdeImport(OracleJsonObject.class)
@@ -88,22 +93,26 @@ import oracle.sql.json.OracleJsonVector;
 @SerdeImport(OracleJsonIntervalYM.class)
 @SerdeImport(OracleJsonVector.class)
 @SerdeImport(OracleJsonType.class)
-@Serdeable
 public class NormalizedDataFileVersion extends IoTDataCoreFileVersion {
+	private final static OracleJsonFactory factory = new OracleJsonFactory();
 	private String contentPath;
 	private String timeObserved;
 	private String contentType;
 	private String content;
-	private OracleJsonValue contentJsonValue;
+	private String contentJsonValue;
 	private OracleJsonType contentJsonType;
 
 	// build our version, but replace the instance id with the instance display
 	// name, that is (hopefully) portable (if it's been set)
 	public static NormalizedDataFileVersion buildFrom(NormalizedData input, String instanceDisplayName) {
+		StringWriter contentOuputWriter = new StringWriter();
+		OracleJsonGenerator oracleJsonGenerator = NormalizedDataFileVersion.factory
+				.createJsonTextGenerator(contentOuputWriter);
+		oracleJsonGenerator.write(input.getContentJsonValue()).close();
 		return NormalizedDataFileVersion.builder().digitalTwinInstanceDisplayName(instanceDisplayName)
 				.contentPath(input.getContentPath()).timeObserved(input.getTimeObserved())
 				.contentType(input.getContentType()).content(input.getContent())
-				.contentJsonValue(input.getContentJsonValue()).contentJsonType(input.getContentJsonType()).build();
+				.contentJsonValue(contentOuputWriter.toString()).contentJsonType(input.getContentJsonType()).build();
 	}
 
 	// build the NormalizedData version from our input
