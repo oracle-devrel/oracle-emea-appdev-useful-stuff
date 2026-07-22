@@ -42,7 +42,6 @@ import java.io.StringWriter;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
-import io.micronaut.serde.annotation.SerdeImport;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,26 +49,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.java.Log;
-import oracle.sql.json.OracleJsonArray;
-import oracle.sql.json.OracleJsonBinary;
-import oracle.sql.json.OracleJsonDate;
-import oracle.sql.json.OracleJsonDecimal;
-import oracle.sql.json.OracleJsonDouble;
 import oracle.sql.json.OracleJsonFactory;
-import oracle.sql.json.OracleJsonFloat;
 import oracle.sql.json.OracleJsonGenerator;
-import oracle.sql.json.OracleJsonIntervalDS;
-import oracle.sql.json.OracleJsonIntervalYM;
-import oracle.sql.json.OracleJsonNumber;
-import oracle.sql.json.OracleJsonObject;
 import oracle.sql.json.OracleJsonParser;
-import oracle.sql.json.OracleJsonString;
-import oracle.sql.json.OracleJsonStructure;
-import oracle.sql.json.OracleJsonTimestamp;
-import oracle.sql.json.OracleJsonTimestampTZ;
 import oracle.sql.json.OracleJsonValue;
 import oracle.sql.json.OracleJsonValue.OracleJsonType;
-import oracle.sql.json.OracleJsonVector;
 
 @Log
 @Data
@@ -78,23 +62,6 @@ import oracle.sql.json.OracleJsonVector;
 @NoArgsConstructor
 @AllArgsConstructor
 @Serdeable
-@SerdeImport(OracleJsonValue.class)
-@SerdeImport(OracleJsonStructure.class)
-@SerdeImport(OracleJsonObject.class)
-@SerdeImport(OracleJsonArray.class)
-@SerdeImport(OracleJsonString.class)
-@SerdeImport(OracleJsonNumber.class)
-@SerdeImport(OracleJsonDecimal.class)
-@SerdeImport(OracleJsonDouble.class)
-@SerdeImport(OracleJsonFloat.class)
-@SerdeImport(OracleJsonBinary.class)
-@SerdeImport(OracleJsonDate.class)
-@SerdeImport(OracleJsonTimestamp.class)
-@SerdeImport(OracleJsonTimestampTZ.class)
-@SerdeImport(OracleJsonIntervalDS.class)
-@SerdeImport(OracleJsonIntervalYM.class)
-@SerdeImport(OracleJsonVector.class)
-@SerdeImport(OracleJsonType.class)
 public class NormalizedDataFileVersion extends IoTDataCoreFileVersion {
 	private final static OracleJsonFactory factory = new OracleJsonFactory();
 	private String contentPath;
