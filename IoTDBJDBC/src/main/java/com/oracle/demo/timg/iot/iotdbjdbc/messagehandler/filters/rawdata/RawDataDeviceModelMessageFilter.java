@@ -36,8 +36,6 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.rawdata;
 
-import java.sql.PreparedStatement;
-
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.filters.common.DeviceModelMessageFilterCoreOrig;
@@ -58,9 +56,6 @@ import lombok.extern.java.Log;
 @Requires(property = "iotdatacache.schemaname")
 @Log
 public class RawDataDeviceModelMessageFilter extends DeviceModelMessageFilterCoreOrig implements RawDataMessageHandler {
-
-	private PreparedStatement selectModelIdByInstanceIdPS;
-
 	@Inject
 	public RawDataDeviceModelMessageFilter(DBConnectionSupplier dbConnectionSupplier,
 			@Property(name = "iotdatacache.schemaname") String schemaName,
