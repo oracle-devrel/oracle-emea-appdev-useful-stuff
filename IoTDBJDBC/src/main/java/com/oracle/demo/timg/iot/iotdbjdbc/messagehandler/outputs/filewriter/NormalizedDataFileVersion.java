@@ -48,6 +48,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
+import oracle.sql.json.OracleJsonFactory;
 import oracle.sql.json.OracleJsonGenerator;
 import oracle.sql.json.OracleJsonParser;
 import oracle.sql.json.OracleJsonValue;
@@ -60,6 +61,7 @@ import oracle.sql.json.OracleJsonValue.OracleJsonType;
 @AllArgsConstructor
 @Serdeable
 public class NormalizedDataFileVersion {
+	private final static OracleJsonFactory factory = new OracleJsonFactory();
 	private String digitalTwinInstanceDisplayName;
 	private String contentPath;
 	private String timeObserved;
