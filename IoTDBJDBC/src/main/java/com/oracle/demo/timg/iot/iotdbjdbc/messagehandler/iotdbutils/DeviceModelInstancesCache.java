@@ -84,7 +84,7 @@ public class DeviceModelInstancesCache {
 
 	private final Map<String, String> instanceIdToModelId = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> instanceIdToExternalKey = Collections.synchronizedMap(new HashMap<>());
-	private final Map<String, String> instanceIdToInstanceName = Collections.synchronizedMap(new HashMap<>());
+	private final Map<String, String> instanceIdToInstanceDisplayName = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> instanceDisplayNameToInstanceId = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> instanceIdToModelName = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, String> externalKeyToInstanceId = Collections.synchronizedMap(new HashMap<>());
@@ -366,13 +366,15 @@ public class DeviceModelInstancesCache {
 				String instanceDisplayName = rs.getString(INSTANCE_ID_COLUMN_DISPLAY_NAME);
 				String modelName = modelIdToModelName.get(modelIdExistingInstance);
 				instanceIdToModelId.put(instanceIdExistingInstance, modelIdExistingInstance);
-				instanceIdToInstanceName.put(instanceIdExistingInstance, instanceDisplayName);
+				instanceIdToInstanceDisplayName.put(instanceIdExistingInstance, instanceDisplayName);
 				if (instanceDisplayNameToInstanceId.containsKey(instanceDisplayName)) {
 					log.warning("Instance display name cache already contains key " + instanceDisplayName
 							+ " connected to instance id " + instanceDisplayNameToInstanceId.get(instanceDisplayName)
 							+ ", duplicates are not added");
 				} else {
 					instanceDisplayNameToInstanceId.put(instanceDisplayName, instanceIdExistingInstance);
+					log.info("Added instance name " + instanceDisplayName + " to instanceId "
+							+ instanceIdExistingInstance + " mapping");
 				}
 				log.info("Added instance id " + instanceIdExistingInstance + " named " + instanceDisplayName
 						+ " to modelId " + modelIdExistingInstance + " mapping");
@@ -464,10 +466,10 @@ public class DeviceModelInstancesCache {
 		}
 		// do we already have the info ? note that empty string and null are valid
 		// responses here.
-		if (instanceIdToInstanceName.containsKey(instanceId)) {
+		if (instanceIdToInstanceDisplayName.containsKey(instanceId)) {
 			// we have the key, the model could be a string, null blank etc if one hasn't
 			// been set, but that's still valid.
-			return instanceIdToInstanceName.get(instanceId);
+			return instanceIdToInstanceDisplayName.get(instanceId);
 		}
 		// we don't have a cached version
 		// let's try and locate it
@@ -641,7 +643,7 @@ public class DeviceModelInstancesCache {
 					instanceIdToModelId.put(instanceId, modelId);
 					instanceIdToModelName.put(instanceId, modelName);
 					instanceIdToExternalKey.put(instanceId, externalKey);
-					instanceIdToInstanceName.put(instanceId, instanceDisplayName);
+					instanceIdToInstanceDisplayName.put(instanceId, instanceDisplayName);
 					if (instanceDisplayNameToInstanceId.containsKey(instanceDisplayName)) {
 						log.warning("Instance display name cache already contains key " + instanceDisplayName
 								+ " connected to instance id "
@@ -684,7 +686,7 @@ public class DeviceModelInstancesCache {
 					instanceIdToModelId.put(instanceId, modelId);
 					instanceIdToModelName.put(instanceId, modelName);
 					instanceIdToExternalKey.put(instanceId, externalKey);
-					instanceIdToInstanceName.put(instanceId, instanceDisplayName);
+					instanceIdToInstanceDisplayName.put(instanceId, instanceDisplayName);
 					if (instanceDisplayNameToInstanceId.containsKey(instanceDisplayName)) {
 						log.warning("Instance display name cache already contains key " + instanceDisplayName
 								+ " connected to instance id "
@@ -699,7 +701,11 @@ public class DeviceModelInstancesCache {
 					throw new MissingInstanceException("No instance found for instance id " + instanceDisplayName);
 				}
 			} catch (SQLException e) {
-				log.severe("SQLException getting existing model / instance mappings, " + e.getLocalizedMessage());
+				log.severe(
+						"SQLException getting existing model / instance mappings in loadInstanceByInstanceDisplayName, "
+								+ e.getLocalizedMessage() + " in class " + e.getStackTrace()[0].getFileName()
+								+ " in method " + e.getStackTrace()[0].getMethodName() + " at line "
+								+ e.getStackTrace()[0].getLineNumber());
 				throw e;
 			}
 		}
