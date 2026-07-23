@@ -88,7 +88,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 	@ToString.Include
 	private Duration replayDuration;
 	@ToString.Include
-	private ZonedDateTime replayEnd;
+	private ZonedDateTime replayEndTimeObserved;
 	@ToString.Include
 	private final FileDataInputMode mode;
 	@ToString.Include
@@ -123,7 +123,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_SOURCE_FILE) String sourceFilename,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_START_OFFSET, defaultValue = "0s") Duration replayStartOffset,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_DURATION) Duration replayDuration,
-			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_END) Optional<ZonedDateTime> replayEnd,
+			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_OUTPUT_END_TIME_OBSERVED) Optional<ZonedDateTime> replayEndTimeObserved,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_MODE, defaultValue = "REAL_TIME") FileDataInputMode mode,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_HIGH_SPEED_PLAYBACK_DELAY, defaultValue = "100ms") Duration highSpeedReplayDelay) {
 		this.mapper = mapper;
@@ -137,7 +137,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		this.highSpeedReplayDelay = highSpeedReplayDelay;
 		// if we have a specified end time for the replay use the current time, if now
 		// use what's been specified
-		this.replayEnd = replayEnd.orElse(ZonedDateTime.now(UTC_TZ));
+		this.replayEndTimeObserved = replayEndTimeObserved.orElse(ZonedDateTime.now(UTC_TZ));
 	}
 
 	@Override
@@ -169,7 +169,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 					+ ZonedDateTime.now().format(dateTimeFormatter));
 		} else {
 			log.info(() -> "Replay is high speed so the time observed for the last entry uploaded is "
-					+ replayEnd.format(dateTimeFormatter));
+					+ replayEndTimeObserved.format(dateTimeFormatter));
 		}
 
 		// if we are in REAL_TIME replay mode we will be sending based on the current
@@ -183,10 +183,10 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		// sent, and the timestamp found at the replay end point (which of course could
 		// be in the past as well as now) relative to the end timestamp we want to
 		// finish with.
-		highSpeedOffset = Duration.between(stopAfterZDT, replayEnd);
+		highSpeedOffset = Duration.between(stopAfterZDT, replayEndTimeObserved);
 		log.info(() -> "Calculated highspeed offset from is " + highSpeedOffset
 				+ ", this represents the time from the calculated replay " + stopAfterZDT.format(dateTimeFormatter)
-				+ " to the specified end timeobserved of " + replayEnd.format(dateTimeFormatter));
+				+ " to the specified end timeobserved of " + replayEndTimeObserved.format(dateTimeFormatter));
 		// we're going to reset the reader as we're looking to load
 		// now we need to move forwards until we get to the start point, if we get null
 		// then we've fallen off the end of the input stream, so need to error
@@ -341,12 +341,25 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 				log.info("extracted timeObserved from followingNormalizedDataFileVersion is null, cannot reschedule");
 				return;
 			}
+			// is the one just loaded BEFORE the stop time ?
+			if (followingNormalizedDataFileVersionTimeObserved.isAfter(stopAfterZDT)) {
+				log.info("the next data item just loaded has a timeObserved of "
+						+ followingNormalizedDataFileVersionTimeObserved.format(dateTimeFormatter)
+						+ " which is after the stop time of " + stopAfterZDT.format(dateTimeFormatter));
+				log.info("Stopping replay");
+				return;
+			}
+			// OK we need to send the next one, work out how long we have
 			// work out how long until we run again
 			Duration delayDuration = switch (mode) {
 			case HIGH_SPEED -> highSpeedReplayDelay;
 			case REAL_TIME -> Duration.between(nextDataToSendTimeStamp, followingNormalizedDataFileVersionTimeObserved);
 			};
-			log.info(() -> "duration to next upload run is " + delayDuration + " (mode = " + mode + ")");
+			if (delayDuration.isNegative()) {
+				delayDuration = Duration.ZERO;
+			}
+			Duration tmpDuration = delayDuration;
+			log.info(() -> "duration to next upload run is " + tmpDuration + " (mode = " + mode + ")");
 			// move the saved data along
 			nextDataToSend = followingNormalizedDataFileVersion;
 			nextDataToSendTimeStamp = followingNormalizedDataFileVersionTimeObserved;
