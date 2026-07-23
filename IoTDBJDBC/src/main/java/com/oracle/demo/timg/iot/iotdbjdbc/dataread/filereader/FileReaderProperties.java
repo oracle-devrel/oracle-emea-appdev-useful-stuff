@@ -9,11 +9,12 @@ public class FileReaderProperties {
 			+ ".duration";
 	public static final String NORMALIZED_DATA_FILE_INPUT_REPLAY_START_OFFSET = NORMALIZED_DATA_FILE_INPUT_REPLAY
 			+ ".startoffset";
-	public final static String NORMALIZED_DATA_FILE_INPUT_REPLAY_END = NORMALIZED_DATA_FILE_INPUT_REPLAY + ".end";
+	public final static String NORMALIZED_DATA_FILE_INPUT_REPLAY_OUTPUT_END_TIME_OBSERVED = NORMALIZED_DATA_FILE_INPUT_REPLAY
+			+ ".endtimeobserved";
 	public final static String NORMALIZED_DATA_FILE_INPUT_REPLAY_HIGH_SPEED_PLAYBACK_DELAY = NORMALIZED_DATA_FILE_INPUT_REPLAY
 			+ ".highspeeddelay";
 	public final static String NORMALIZED_DATA_FILE_INPUT_MODE = NORMALIZED_DATA_FILE_INPUT + ".mode";
-	public final static String NORMALIZED_DATA_FILE_INPUT_SOURCE_FILE = NORMALIZED_DATA_FILE_INPUT + ".source_file";
+	public final static String NORMALIZED_DATA_FILE_INPUT_SOURCE_FILE = NORMALIZED_DATA_FILE_INPUT + ".sourcefile";
 
 	public final static String RAW_DATA_FILE_INPUT = "iotdatacache.filereader.rawdata";
 	public final static String RAW_DATA_FILE_INPUT_ENABLED = RAW_DATA_FILE_INPUT + ".enabled";
@@ -21,9 +22,10 @@ public class FileReaderProperties {
 	public final static String RAW_DATA_FILE_INPUT_REPLAY = RAW_DATA_FILE_INPUT + ".replay";
 	public final static String RAW_DATA_FILE_INPUT_REPLAY_DURATION = RAW_DATA_FILE_INPUT_REPLAY + ".duration";
 	public static final String RAW_DATA_FILE_INPUT_REPLAY_START_OFFSET = RAW_DATA_FILE_INPUT_REPLAY + ".startoffset";
-	public final static String RAW_DATA_FILE_INPUT_REPLAY_END = RAW_DATA_FILE_INPUT_REPLAY + ".end";
+	public final static String RAW_DATA_FILE_INPUT_REPLAY_OUTPUT_END_TIME_OBSERVED = RAW_DATA_FILE_INPUT_REPLAY
+			+ ".endtimeobserved";
 	public final static String RAW_DATA_FILE_INPUT_REPLAY_HIGH_SPEED_PLAYBACK_DELAY = RAW_DATA_FILE_INPUT_REPLAY
 			+ ".highspeeddelay";
 	public final static String RAW_DATA_FILE_INPUT_MODE = RAW_DATA_FILE_INPUT + ".mode";
-	public final static String RAW_DATA_FILE_INPUT_SOURCE_FILE = RAW_DATA_FILE_INPUT + ".source_file";
+	public final static String RAW_DATA_FILE_INPUT_SOURCE_FILE = RAW_DATA_FILE_INPUT + ".sourcefile";
 }
