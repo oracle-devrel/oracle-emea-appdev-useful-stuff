@@ -51,8 +51,8 @@ import com.oracle.demo.timg.iot.iotdbjdbc.oci.DBConnectionSupplier;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.event.ShutdownEvent;
-import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotEmpty;
@@ -117,9 +117,9 @@ public class DeviceModelInstancesCache {
 		this.preloadExistingInstances = preloadExistingInstances;
 	}
 
-	@EventListener
-	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for DeviceModelInstancesCache");
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Post Construct event received for DeviceModelInstancesCache");
 		try {
 			configure();
 		} catch (Exception e) {
@@ -677,7 +677,7 @@ public class DeviceModelInstancesCache {
 		synchronized (selectInstanceDetailsByInstanceDisplayNamePS) {
 			selectInstanceDetailsByInstanceDisplayNamePS.setString(1, instanceDisplayName);
 			// get all of the results
-			try (ResultSet rs = selectInstanceDetailsByInstanceIdPS.executeQuery()) {
+			try (ResultSet rs = selectInstanceDetailsByInstanceDisplayNamePS.executeQuery()) {
 				if (rs.next()) {
 					String modelId = rs.getString(MODEL_ID_COLUMN_NAME);
 					String externalKey = rs.getString(EXTERNAL_KEY_COLUMN_NAME);
@@ -703,9 +703,7 @@ public class DeviceModelInstancesCache {
 			} catch (SQLException e) {
 				log.severe(
 						"SQLException getting existing model / instance mappings in loadInstanceByInstanceDisplayName, "
-								+ e.getLocalizedMessage() + " in class " + e.getStackTrace()[0].getFileName()
-								+ " in method " + e.getStackTrace()[0].getMethodName() + " at line "
-								+ e.getStackTrace()[0].getLineNumber());
+								+ e.getLocalizedMessage());
 				throw e;
 			}
 		}
