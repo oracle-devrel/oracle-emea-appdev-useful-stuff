@@ -287,70 +287,76 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 
 	@Override
 	public void run() {
-		// save the thread we're running in so we can interrupt it later
-		currentThread = Thread.currentThread();
-		if (nextDataToSend == null) {
-			log.info("nextDataToSend is null, stopping processing");
-		}
-
-		log.info(() -> "Running a send cycle on " + nextDataToSend);
-		// the timestamp was extracted when the nextDataToSend was setup, but just for
-		// defensive reasons
-		if (nextDataToSendTimeStamp == null) {
-			log.warning("nextDataToSendTimeStamp is null, cant continue with processing");
-			return;
-		}
-		// get the normalized data using the instance device name to map to the instance
-		// OCID
-		NormalizedData normalizedData = getNormalizedDataFromNormalizedDataFileVersion(nextDataToSend);
-		if (normalizedData == null) {
-			log.info(
-					"Programming error, this should not have happened, conversion of NormalizedDataFromNormalized to NormalizedData returned null, stopping processing");
-			return;
-		}
-		log.info(() -> "Extracted NormalizedData pre time adjustment is " + normalizedData);
-		// depending on the mode we need to replace the timestamp with the current time
-		// or work out an offset for it
-		ZonedDateTime timeToSet = switch (this.mode) {
-		case REAL_TIME -> ZonedDateTime.now(UTC_TZ);
-		case HIGH_SPEED -> nextDataToSendTimeStamp.plus(highSpeedOffset);
-		};
-		normalizedData.setTimeObserved(timeToSet.format(dateTimeFormatter));
-		log.info(() -> "Extracted NormalizedData tiemObserved after time adjustment is "
-				+ normalizedData.getTimeObserved() + " Sending to message handlers");
-		// OK, got it all, let's send it
-		normalizedDataMessageHandlerService.handle(normalizedData);
-		// need to re-schedule for the next instance ;
-		NormalizedDataFileVersion followingNormalizedDataFileVersion;
 		try {
-			followingNormalizedDataFileVersion = readNormalizedDataFileVersionFromInput(inputReader);
-		} catch (IOException e) {
-			log.info("retrieving followingNormalizedDataFileVersion threw an IOException (" + e.getLocalizedMessage()
-					+ ") will not reschedule");
+			// save the thread we're running in so we can interrupt it later
+			currentThread = Thread.currentThread();
+			if (nextDataToSend == null) {
+				log.info("nextDataToSend is null, stopping processing");
+			}
+
+			log.info(() -> "Running a send cycle on " + nextDataToSend);
+			// the timestamp was extracted when the nextDataToSend was setup, but just for
+			// defensive reasons
+			if (nextDataToSendTimeStamp == null) {
+				log.warning("nextDataToSendTimeStamp is null, cant continue with processing");
+				return;
+			}
+			// get the normalized data using the instance device name to map to the instance
+			// OCID
+			NormalizedData normalizedData = getNormalizedDataFromNormalizedDataFileVersion(nextDataToSend);
+			if (normalizedData == null) {
+				log.info(
+						"Programming error, this should not have happened, conversion of NormalizedDataFromNormalized to NormalizedData returned null, stopping processing");
+				return;
+			}
+			log.info(() -> "Extracted NormalizedData pre time adjustment is " + normalizedData);
+			// depending on the mode we need to replace the timestamp with the current time
+			// or work out an offset for it
+			ZonedDateTime timeToSet = switch (this.mode) {
+			case REAL_TIME -> ZonedDateTime.now(UTC_TZ);
+			case HIGH_SPEED -> nextDataToSendTimeStamp.plus(highSpeedOffset);
+			};
+			normalizedData.setTimeObserved(timeToSet.format(dateTimeFormatter));
+			log.info(() -> "Extracted NormalizedData tiemObserved after time adjustment is "
+					+ normalizedData.getTimeObserved() + " Sending to message handlers");
+			// OK, got it all, let's send it
+			normalizedDataMessageHandlerService.handle(normalizedData);
+			// need to re-schedule for the next instance ;
+			NormalizedDataFileVersion followingNormalizedDataFileVersion;
+			try {
+				followingNormalizedDataFileVersion = readNormalizedDataFileVersionFromInput(inputReader);
+			} catch (IOException e) {
+				log.info("retrieving followingNormalizedDataFileVersion threw an IOException ("
+						+ e.getLocalizedMessage() + ") will not reschedule");
+				return;
+			}
+			if (followingNormalizedDataFileVersion == null) {
+				log.info("retrieved followingNormalizedDataFileVersion is null, cannot reschedule");
+				return;
+			}
+			// get the time stamp of the next file
+			ZonedDateTime followingNormalizedDataFileVersionTimeObserved = getTimeObservedFromNormalizedDataFileVersion(
+					followingNormalizedDataFileVersion);
+			if (followingNormalizedDataFileVersionTimeObserved == null) {
+				log.info("extracted timeObserved from followingNormalizedDataFileVersion is null, cannot reschedule");
+				return;
+			}
+			// work out how long until we run again
+			Duration delayDuration = switch (mode) {
+			case HIGH_SPEED -> highSpeedReplayDelay;
+			case REAL_TIME -> Duration.between(nextDataToSendTimeStamp, followingNormalizedDataFileVersionTimeObserved);
+			};
+			log.info(() -> "duration to next upload run is " + delayDuration + " (mode = " + mode + ")");
+			// move the saved data along
+			nextDataToSend = followingNormalizedDataFileVersion;
+			nextDataToSendTimeStamp = followingNormalizedDataFileVersionTimeObserved;
+			// reschedule us to run later on
+			executor.schedule(this, delayDuration.toNanos(), TimeUnit.NANOSECONDS);
+		} catch (Exception e) {
+			log.severe("Exception in run, cannot continue. " + e.getLocalizedMessage());
+			e.printStackTrace();
 			return;
 		}
-		if (followingNormalizedDataFileVersion == null) {
-			log.info("retrieved followingNormalizedDataFileVersion is null, cannot reschedule");
-			return;
-		}
-		// get the time stamp of the next file
-		ZonedDateTime followingNormalizedDataFileVersionTimeObserved = getTimeObservedFromNormalizedDataFileVersion(
-				followingNormalizedDataFileVersion);
-		if (followingNormalizedDataFileVersionTimeObserved == null) {
-			log.info("extracted timeObserved from followingNormalizedDataFileVersion is null, cannot reschedule");
-			return;
-		}
-		// work out how long until we run again
-		Duration delayDuration = switch (mode) {
-		case HIGH_SPEED -> highSpeedReplayDelay;
-		case REAL_TIME -> Duration.between(nextDataToSendTimeStamp, followingNormalizedDataFileVersionTimeObserved);
-		};
-		log.info(() -> "duration to next upload run is " + delayDuration + " (mode = " + mode + ")");
-		// move the saved data along
-		nextDataToSend = followingNormalizedDataFileVersion;
-		nextDataToSendTimeStamp = followingNormalizedDataFileVersionTimeObserved;
-		// reschedule us to run later on
-		executor.schedule(this, delayDuration.toNanos(), TimeUnit.NANOSECONDS);
 	}
 
 	/**
