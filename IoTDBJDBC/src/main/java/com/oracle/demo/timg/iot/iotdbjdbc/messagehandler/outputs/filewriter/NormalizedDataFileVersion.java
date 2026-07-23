@@ -92,7 +92,25 @@ public class NormalizedDataFileVersion {
 	public static NormalizedData buildTo(NormalizedDataFileVersion input, String instanceId) {
 		StringReader contentInputReader = new StringReader(input.getContentJsonValue());
 		OracleJsonParser oracleJsonParser = NormalizedDataFileVersion.factory.createJsonTextParser(contentInputReader);
-		OracleJsonValue oracleJsonValue = oracleJsonParser.getValue();
+
+		OracleJsonValue oracleJsonValue;
+		if (oracleJsonParser.hasNext()) {
+			oracleJsonParser.next();
+			oracleJsonValue = oracleJsonParser.getValue();
+		} else {
+			// try and get it from the previous text
+			contentInputReader = new StringReader(input.getContent());
+			oracleJsonParser = NormalizedDataFileVersion.factory.createJsonTextParser(contentInputReader);
+
+			if (oracleJsonParser.hasNext()) {
+				oracleJsonParser.next();
+				oracleJsonValue = oracleJsonParser.getValue();
+			} else {
+				log.warning(
+						"Unable to create normalized object from the stored oracle jason value or the content string");
+				return null;
+			}
+		}
 		return NormalizedData.builder().digitalTwinInstanceId(instanceId).contentPath(input.getContentPath())
 				.timeObserved(input.getTimeObserved()).contentType(input.getContentType()).content(input.getContent())
 				.contentJsonValue(oracleJsonValue).contentJsonType(input.getContentJsonType()).build();
