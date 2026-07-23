@@ -123,9 +123,9 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_SOURCE_FILE) String sourceFilename,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_START_OFFSET, defaultValue = "0s") Duration replayStartOffset,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_DURATION) Duration replayDuration,
+			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_END) Optional<ZonedDateTime> replayEnd,
 			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_MODE, defaultValue = "REAL_TIME") FileDataInputMode mode,
-			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_HIGH_SPEED_PLAYBACK_DELAY, defaultValue = "100ms") Duration highSpeedReplayDelay,
-			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_END) Optional<ZonedDateTime> replayEnd) {
+			@Property(name = FileReaderProperties.NORMALIZED_DATA_FILE_INPUT_REPLAY_HIGH_SPEED_PLAYBACK_DELAY, defaultValue = "100ms") Duration highSpeedReplayDelay) {
 		this.mapper = mapper;
 		this.normalizedDataMessageHandlerService = normalizedDataMessageHandlerService;
 		this.deviceModelInstancesCache = deviceModelInstancesCache;
@@ -153,11 +153,25 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			// this, it's up to the caller to then remove us from any further processing
 			throw new EOFException("No data in input file, cannot determine time stamps or start point");
 		}
+		log.info(() -> "Initial start time observed is " + startZDT.format(dateTimeFormatter));
 		// this is the start point based on the timestamps in the data file
-		startOffsetZDT = startZDT.plus(replayDuration);
+		startOffsetZDT = startZDT.plus(replayStartOffset);
+
+		log.info(() -> "Start time observed after applying start offset of " + replayStartOffset + " is "
+				+ startOffsetZDT.format(dateTimeFormatter));
 		// now add the replay time to the start offset time, this is also based on the
 		// data file timestamps
 		this.stopAfterZDT = startOffsetZDT.plus(replayDuration);
+		log.info(() -> "Stop time after applying offset of " + replayDuration + " to the start time observed is "
+				+ stopAfterZDT.format(dateTimeFormatter));
+		if (mode == FileDataInputMode.REAL_TIME) {
+			log.info(() -> "Replay is in real time, so will start with time observed of now ("
+					+ ZonedDateTime.now().format(dateTimeFormatter));
+		} else {
+			log.info(() -> "Replay is high speed so the time observed for the last entry uploaded is "
+					+ replayEnd.format(dateTimeFormatter));
+		}
+
 		// if we are in REAL_TIME replay mode we will be sending based on the current
 		// time and then waiting for the next to send (based on the difference between
 		// the one we just sent and the next one we're about to send) so for that we
@@ -170,15 +184,20 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		// be in the past as well as now) relative to the end timestamp we want to
 		// finish with.
 		highSpeedOffset = Duration.between(stopAfterZDT, replayEnd);
+		log.info(() -> "Calculated highspeed offset from is " + highSpeedOffset
+				+ ", this represents the time from the calculated replay " + stopAfterZDT.format(dateTimeFormatter)
+				+ " to the specified end timeobserved of " + replayEnd.format(dateTimeFormatter));
 		// we're going to reset the reader as we're looking to load
 		// now we need to move forwards until we get to the start point, if we get null
 		// then we've fallen off the end of the input stream, so need to error
 		ZonedDateTime readZDT = startZDT;
 		while ((readZDT != null) && (readZDT.isBefore(startOffsetZDT))) {
+			log.info("Discarding entry " + nextDataToSend + " as it's before the start point");
 			nextDataToSend = readNormalizedDataFileVersionFromInput(inputReader);
 			readZDT = getTimeObservedFromNormalizedDataFileVersion(nextDataToSend);
 		}
 		if (nextDataToSend == null) {
+			log.warning("Hit the end of file while moving forward to the specified start point");
 			throw new EOFException("Hit the end of file while moving forward to the specified start point");
 		}
 		// to avoid doing multiple time conversions later stash the current timestamp
@@ -274,7 +293,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			log.info("nextDataToSend is null, stopping processing");
 		}
 
-		log.info("Running a send cycle on " + nextDataToSend);
+		log.info(() -> "Running a send cycle on " + nextDataToSend);
 		// the timestamp was extracted when the nextDataToSend was setup, but just for
 		// defensive reasons
 		if (nextDataToSendTimeStamp == null) {
@@ -289,6 +308,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 					"Programming error, this should not have happened, conversion of NormalizedDataFromNormalized to NormalizedData returned null, stopping processing");
 			return;
 		}
+		log.finer(() -> "Extracted NormalizedData pre time adjustment is " + normalizedData);
 		// depending on the mode we need to replace the timestamp with the current time
 		// or work out an offset for it
 		ZonedDateTime timeToSet = switch (this.mode) {
@@ -296,6 +316,8 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		case HIGH_SPEED -> nextDataToSendTimeStamp.plus(highSpeedOffset);
 		};
 		normalizedData.setTimeObserved(timeToSet.format(dateTimeFormatter));
+		log.finer(() -> "Extracted NormalizedData tiemObserved after time adjustment is "
+				+ normalizedData.getTimeObserved() + " Sending to message handlers");
 		// OK, got it all, let's send it
 		normalizedDataMessageHandlerService.handle(normalizedData);
 		// need to re-schedule for the next instance ;
@@ -323,6 +345,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		case HIGH_SPEED -> highSpeedReplayDelay;
 		case REAL_TIME -> Duration.between(nextDataToSendTimeStamp, followingNormalizedDataFileVersionTimeObserved);
 		};
+		log.finer(() -> "duration to next upload run is " + delayDuration + " (mode = " + mode + ")");
 		// move the saved data along
 		nextDataToSend = followingNormalizedDataFileVersion;
 		nextDataToSendTimeStamp = followingNormalizedDataFileVersionTimeObserved;
