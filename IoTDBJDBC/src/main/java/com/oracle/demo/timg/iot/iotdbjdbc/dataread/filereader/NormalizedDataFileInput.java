@@ -99,6 +99,11 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 	private ZonedDateTime stopAfterZDT;
 	@ToString.Include
 	private Duration highSpeedOffset;
+	@ToString.Include
+	private NormalizedDataFileVersion nextDataToSend;
+	@ToString.Include
+	private ZonedDateTime nextDataToSendTimeStamp;
+
 	@ToString.Exclude
 	private final ObjectMapper mapper;
 	@ToString.Exclude
@@ -107,13 +112,10 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 	private Thread currentThread;
 	@ToString.Exclude
 	private ScheduledExecutorService executor;
-	@ToString.Include
-	private NormalizedDataFileVersion nextDataToSend;
-
+	@ToString.Exclude
 	private final NormalizedDataMessageHandlerService normalizedDataMessageHandlerService;
-
+	@ToString.Exclude
 	private final DeviceModelInstancesCache deviceModelInstancesCache;
-	private ZonedDateTime nextDataToSendTimeStamp;
 
 	@Inject
 	public NormalizedDataFileInput(ObjectMapper mapper,
@@ -193,8 +195,12 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		ZonedDateTime readZDT = startZDT;
 		while ((readZDT != null) && (readZDT.isBefore(startOffsetZDT))) {
 			log.info("Discarding entry " + nextDataToSend + " as it's before the start point");
-			nextDataToSend = readNormalizedDataFileVersionFromInput(inputReader);
-			readZDT = getTimeObservedFromNormalizedDataFileVersion(nextDataToSend);
+			try {
+				nextDataToSend = readNormalizedDataFileVersionFromInput(inputReader);
+				readZDT = getTimeObservedFromNormalizedDataFileVersion(nextDataToSend);
+			} catch (IOException e) {
+				log.warning("Problem getting line " + e.getLocalizedMessage() + ", skipping line anyway");
+			}
 		}
 		if (nextDataToSend == null) {
 			log.warning("Hit the end of file while moving forward to the specified start point");
@@ -322,13 +328,18 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			// OK, got it all, let's send it
 			normalizedDataMessageHandlerService.handle(normalizedData);
 			// need to re-schedule for the next instance ;
-			NormalizedDataFileVersion followingNormalizedDataFileVersion;
-			try {
-				followingNormalizedDataFileVersion = readNormalizedDataFileVersionFromInput(inputReader);
-			} catch (IOException e) {
-				log.info("retrieving followingNormalizedDataFileVersion threw an IOException ("
-						+ e.getLocalizedMessage() + ") will not reschedule");
-				return;
+			NormalizedDataFileVersion followingNormalizedDataFileVersion = null;
+			// try and get the line, if there is a json problem then an IOException will be
+			// thrown
+			while (true) {
+				try {
+					followingNormalizedDataFileVersion = readNormalizedDataFileVersionFromInput(inputReader);
+					break;
+				} catch (IOException e) {
+					log.info("retrieving followingNormalizedDataFileVersion threw an IOException ("
+							+ e.getLocalizedMessage() + ") skipping this input");
+					return;
+				}
 			}
 			if (followingNormalizedDataFileVersion == null) {
 				log.info("retrieved followingNormalizedDataFileVersion is null, cannot reschedule");
