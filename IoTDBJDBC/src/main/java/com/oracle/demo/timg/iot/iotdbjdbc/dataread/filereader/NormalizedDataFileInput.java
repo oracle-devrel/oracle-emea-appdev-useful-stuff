@@ -84,11 +84,11 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 	@ToString.Include
 	private final String sourceFilename;
 	@ToString.Include
-	private Duration replayStartOffset;
+	private final Duration replayStartOffset;
 	@ToString.Include
-	private Duration replayDuration;
+	private final Duration replayDuration;
 	@ToString.Include
-	private ZonedDateTime replayEndTimeObserved;
+	private final ZonedDateTime replayEndTimeObserved;
 	@ToString.Include
 	private final FileDataInputMode mode;
 	@ToString.Include
@@ -194,7 +194,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 		// then we've fallen off the end of the input stream, so need to error
 		ZonedDateTime readZDT = startZDT;
 		while ((readZDT != null) && (readZDT.isBefore(startOffsetZDT))) {
-			log.info("Discarding entry " + nextDataToSend + " as it's before the start point");
+			log.finer("Discarding entry " + nextDataToSend + " as it's before the start point");
 			try {
 				nextDataToSend = readNormalizedDataFileVersionFromInput(inputReader);
 				readZDT = getTimeObservedFromNormalizedDataFileVersion(nextDataToSend);
@@ -300,7 +300,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 				log.info("nextDataToSend is null, stopping processing");
 			}
 
-			log.info(() -> "Running a send cycle on " + nextDataToSend);
+			log.fine(() -> "Running a send cycle on " + nextDataToSend);
 			// the timestamp was extracted when the nextDataToSend was setup, but just for
 			// defensive reasons
 			if (nextDataToSendTimeStamp == null) {
@@ -315,7 +315,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 						"Programming error, this should not have happened, conversion of NormalizedDataFromNormalized to NormalizedData returned null, stopping processing");
 				return;
 			}
-			log.info(() -> "Extracted NormalizedData pre time adjustment is " + normalizedData);
+			log.finer(() -> "Extracted NormalizedData pre time adjustment is " + normalizedData);
 			// depending on the mode we need to replace the timestamp with the current time
 			// or work out an offset for it
 			ZonedDateTime timeToSet = switch (this.mode) {
@@ -323,7 +323,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 			case HIGH_SPEED -> nextDataToSendTimeStamp.plus(highSpeedOffset);
 			};
 			normalizedData.setTimeObserved(timeToSet.format(dateTimeFormatter));
-			log.info(() -> "Extracted NormalizedData tiemObserved after time adjustment is "
+			log.finer(() -> "Extracted NormalizedData tiemObserved after time adjustment is "
 					+ normalizedData.getTimeObserved() + " Sending to message handlers");
 			// OK, got it all, let's send it
 			normalizedDataMessageHandlerService.handle(normalizedData);
@@ -370,7 +370,7 @@ public class NormalizedDataFileInput implements IoTDBClient, Runnable {
 				delayDuration = Duration.ZERO;
 			}
 			Duration tmpDuration = delayDuration;
-			log.info(() -> "duration to next upload run is " + tmpDuration + " (mode = " + mode + ")");
+			log.finer(() -> "duration to next upload run is " + tmpDuration + " (mode = " + mode + ")");
 			// move the saved data along
 			nextDataToSend = followingNormalizedDataFileVersion;
 			nextDataToSendTimeStamp = followingNormalizedDataFileVersionTimeObserved;
