@@ -34,38 +34,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.filewriter;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStatsData;
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
 
+import io.micronaut.http.MediaType;
 import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.java.Log;
 
+@Log
 @Data
-@Serdeable
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class IoTGatewayStatsData {
-	// get the UTC TZ once to speed things later
+@Serdeable
+public class RawDataFileVersion {
+
+	private String digitalTwinInstanceDisplayName;
+	private String endpoint;
+	// we don't want to dump raw text
 	@ToString.Exclude
-	@JsonIgnore
-	private final static ZoneId utcTz = ZoneId.of("UTC");
-	// note that for Indirectly connected devices the timestamp must be within the
-	// payload sub object as the current configuration of the gateway envelope means
-	// that's all that's passed on to the indirectly connected devices
-	// for the telemetry on the gateway itself then we can get to the envelope
-	// attributes before the contentRoot is applied (if there is one and its not $)
-	// so we can if we want we can have the timestamp at the outer (envelope) level
-	// or within the payload,
-	@Builder.Default
-	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
-	private ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
-	private final String devicekey = null;
-	private GatewayStatsData payload;
+	private byte content[];
+	private String contentType;
+	private String timeReceived;
+
+	public String getContentString() {
+		if (getMediaType().isTextBased()) {
+			return new String(content);
+		} else {
+			return "Blob data, non next based content type of " + content.length + " bytes";
+		}
+	}
+
+	public MediaType getMediaType() {
+		if ((contentType == null) || contentType.isEmpty()) {
+			return MediaType.TEXT_PLAIN_TYPE;
+		}
+		return MediaType.of(contentType);
+	}
+
+	// build our version, but replace the instance id with the instance display
+	// name, that is (hopefully) portable (if it's been set)
+	public static RawDataFileVersion buildFrom(RawData input, String instanceDisplayName) {
+		return RawDataFileVersion.builder().digitalTwinInstanceDisplayName(instanceDisplayName)
+				.timeReceived(input.getTimeReceived()).content(input.getContent()).contentType(input.getContentType())
+				.build();
+	}
+
+	// build the RawData version from our input
+	public static RawData buildTo(RawDataFileVersion input, String instanceId) {
+		return RawData.builder().digitalTwinInstanceId(instanceId).timeReceived(input.getTimeReceived())
+				.contentType(input.getContentType()).content(input.getContent()).build();
+	}
 }

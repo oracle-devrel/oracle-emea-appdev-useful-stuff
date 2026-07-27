@@ -80,7 +80,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 	private Duration retrievalrate = Duration.ofSeconds(10);
 	private String devicekey;
 	private String endpoint;
-	private TimestampMode timestampMode = TimestampMode.EARLIEST;
+	private TimestampMode timestampMode = TimestampMode.LATEST;
 	private List<HomeAssistantMonitoredEntity> monitoredentities;
 	@ToString.Exclude
 	@Inject
@@ -198,7 +198,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			gatewayStats.trackFailedHARetrieveCall();
 			return null;
 		}
-		log.finer("Returned state string is :" + stateString);
+		log.finer(() -> "Returned state string is :" + stateString);
 		HomeAssistantState state;
 		try {
 			state = mapper.readValue(stateString, HomeAssistantState.class);
@@ -207,7 +207,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			gatewayStats.trackFailedHARetrieveCall();
 			return null;
 		}
-		log.fine("Extracted state is " + state);
+		log.fine(() -> "Extracted state is " + state);
 		gatewayStats.trackSucessfullHARetrieveCall();
 		// make sure that we have the relevant times, even if we don't use them here
 		// they may be needed on another pass through
