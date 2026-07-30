@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=ElectricityTotalChargesToday
+export INSTANCE_KEY=LctrctyTtlChrgsTdy

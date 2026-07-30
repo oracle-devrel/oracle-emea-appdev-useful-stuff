@@ -1,0 +1,21 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homeassistant:cost;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Cost",
+			"name": "cost",
+			"schema": "double"
+		}
+	]
+}

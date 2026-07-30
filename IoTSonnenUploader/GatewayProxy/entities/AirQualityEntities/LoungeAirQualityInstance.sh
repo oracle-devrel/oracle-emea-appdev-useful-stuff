@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=LoungeAirQuality
+export INSTANCE_KEY=LngRQlty

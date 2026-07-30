@@ -1,0 +1,3 @@
+export INSTANCE_DISPLAY_NAME=KitchenAirQuality
+export INSTANCE_KEY=KtcnRQlty
+export INSTANCE_SECONDARY=true

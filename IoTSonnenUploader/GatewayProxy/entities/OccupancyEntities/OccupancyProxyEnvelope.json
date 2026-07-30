@@ -1,0 +1,16 @@
+{
+	"reference-endpoint": "house/homeassistant/entities/occupancy",
+	"reference-payload": {
+		"data": {
+			"payload": {
+				"timestamp": "2026-07-10T16:09:18.934123Z",
+				"occupied": true
+			},
+			"devicekey": "abc"
+		},
+		"data-format": "JSON"
+	},
+	"envelope-mapping": {
+		"timeObserved": "$.payload.timestamp"
+	}
+}

@@ -47,6 +47,13 @@ else
   echo "Found existing instance for $INSTANCE_DISPLAY_NAME with key $INSTANCE_KEY"
 fi
 
+# if the INSTANCE_SECONDARY=true then set the endpoint and sample data to be based on the secondary entries
+if [[ "$INSTANCE_SECONDARY" == "true" ]]
+then
+   ENTITY_ENDPOINT_NAME=$ENTITY_ENDPOINT_NAME_SECONDARY
+   ENTITY_SAMPLE_DATA=$ENTITY_SAMPLE_DATA_SECONDARY
+fi
+
 ENDPOINT=$ENDPOINT_MAIN/$ENTITY_ENDPOINT_NAME
 echo
 echo "To send the instance test data using https for device $INSTANCE_DISPLAY_NAME"

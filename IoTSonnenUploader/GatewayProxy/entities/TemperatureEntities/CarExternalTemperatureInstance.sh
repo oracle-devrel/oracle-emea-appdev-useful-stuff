@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=CarInternalTemperature
+export INSTANCE_KEY=CrIntrnlTmp

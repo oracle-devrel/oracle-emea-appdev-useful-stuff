@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=CurrentElecticityRatePerKwhConsumed
+export INSTANCE_KEY=CrntLctrctyRtPrKwhCnsmd
