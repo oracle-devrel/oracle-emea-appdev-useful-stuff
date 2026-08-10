@@ -46,6 +46,8 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOu
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -82,7 +84,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
 		log.info(() -> "NormalizedData is " + input);
-		String result;
+		HttpResponse<String> result;
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent().getBytes());
@@ -93,7 +95,8 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 							bodyContent)
 					: httpClient.postNormalizedDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), bodyContent);
-			log.info("() -> Send result is " + result);
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
 		case STRING: {
@@ -105,14 +108,15 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 							input.getContent())
 					: httpClient.postNormalizedDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), input.getContent());
-			log.info("() -> Send result is " + result);
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
 		default:
 			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
 		}
 		NormalizedData results[];
-		if (result) {
+		if (result.getStatus() == HttpStatus.OK) {
 			if (sentDataIsCompleted) {
 				results = new NormalizedData[1];
 				results[0] = input;

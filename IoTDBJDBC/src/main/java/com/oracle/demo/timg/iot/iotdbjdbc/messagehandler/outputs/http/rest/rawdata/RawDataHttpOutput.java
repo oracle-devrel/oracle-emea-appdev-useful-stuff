@@ -47,6 +47,8 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOu
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -83,7 +85,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
 		log.info(() -> "RawData is " + input);
-		String result;
+		HttpResponse<String> result;
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
@@ -93,7 +95,8 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 							input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(), bodyContent)
 					: httpClient.postRawDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getEndpoint(), input.getTimeReceived(), bodyContent);
-			log.info("() -> Send result is " + result);
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
 		case STRING: {
@@ -109,14 +112,15 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			} else {
 				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
 			}
-			log.info("() -> Send result is " + result);
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
 		default:
 			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
 		}
 		RawData results[];
-		if (result) {
+		if (result.getStatus() == HttpStatus.OK) {
 			if (sentDataIsCompleted) {
 				results = new RawData[1];
 				results[0] = input;
