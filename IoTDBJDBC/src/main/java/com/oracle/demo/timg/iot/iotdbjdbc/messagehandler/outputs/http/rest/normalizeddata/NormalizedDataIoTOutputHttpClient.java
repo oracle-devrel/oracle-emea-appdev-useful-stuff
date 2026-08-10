@@ -53,22 +53,22 @@ import jakarta.ws.rs.PathParam;
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpClient {
 	@Post(value = "/authenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postNormalizedDataAuthenticatedAsString(@Header(name = "Authorization") String authorization,
+	public String postNormalizedDataAuthenticatedAsString(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
 			@PathParam("timestamp") String timestamp, @Body String content);
 
 	@Post(value = "/authenticated/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postNormalizedDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
+	public String postNormalizedDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
 			@PathParam("timestamp") String timestamp, @Body String base64content);
 
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postNormalizedDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
+	public String postNormalizedDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("contentpath") String contentpath, @PathParam("timestamp") String timestamp,
 			@Body String content);
 
 	@Post(value = "/unauthenticated/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postNormalizedDataUnauthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
+	public String postNormalizedDataUnauthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("contentpath") String contentpath, @PathParam("timestamp") String timestamp,
 			@Body String base64content);
 }

@@ -82,19 +82,23 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 
 	@Override
 	public RawData[] processRawData(RawData input) throws Exception {
-		log.finer(() -> "RawData is " + input);
-		boolean result;
+		log.info(() -> "RawData is " + input);
+		String result;
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
+			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending base64 content of " + bodyContent);
 			result = useAuthentication
 					? httpClient.postRawDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
 							input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(), bodyContent)
 					: httpClient.postRawDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getEndpoint(), input.getTimeReceived(), bodyContent);
+			log.info("() -> Send result is " + result);
 			break;
 		}
 		case STRING: {
+			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending string content of "
+					+ input.getContent());
 			if (input.getMediaType().isTextBased()) {
 				result = useAuthentication
 						? httpClient.postRawDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
@@ -105,6 +109,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			} else {
 				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
 			}
+			log.info("() -> Send result is " + result);
 			break;
 		}
 		default:

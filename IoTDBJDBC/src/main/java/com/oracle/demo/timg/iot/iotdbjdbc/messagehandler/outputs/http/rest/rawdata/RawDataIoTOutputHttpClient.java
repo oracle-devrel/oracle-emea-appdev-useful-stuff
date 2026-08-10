@@ -53,21 +53,21 @@ import jakarta.ws.rs.PathParam;
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface RawDataIoTOutputHttpClient {
 	@Post(value = "/authenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAuthenticatedAsString(@Header(name = "Authorization") String authorization,
+	public String postRawDataAuthenticatedAsString(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("endpoint") String endpoint,
 			@PathParam("timestamp") String timestamp, @Body String content);
 
 	@Post(value = "/authenticated/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
+	public String postRawDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("endpoint") String endpoint,
 			@PathParam("timestamp") String timestamp, @Body String base64content);
 
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
+	public String postRawDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp, @Body String content);
 
 	@Post(value = "/unauthenticated/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataUnauthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
+	public String postRawDataUnauthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
 			@Body String base64content);
 }

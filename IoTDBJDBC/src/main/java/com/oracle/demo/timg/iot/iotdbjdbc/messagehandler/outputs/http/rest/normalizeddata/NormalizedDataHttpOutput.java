@@ -81,26 +81,31 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 
 	@Override
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
-		log.finer(() -> "NormalizedData is " + input);
-		boolean result;
+		log.info(() -> "NormalizedData is " + input);
+		String result;
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent().getBytes());
+			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending base64 content of " + bodyContent);
 			result = useAuthentication
 					? httpClient.postNormalizedDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
 							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
 							bodyContent)
 					: httpClient.postNormalizedDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), bodyContent);
+			log.info("() -> Send result is " + result);
 			break;
 		}
 		case STRING: {
+			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending string content of "
+					+ input.getContent());
 			result = useAuthentication
 					? httpClient.postNormalizedDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
 							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
 							input.getContent())
 					: httpClient.postNormalizedDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), input.getContent());
+			log.info("() -> Send result is " + result);
 			break;
 		}
 		default:
