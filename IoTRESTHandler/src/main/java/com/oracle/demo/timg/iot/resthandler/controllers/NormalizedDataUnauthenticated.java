@@ -53,7 +53,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
-@Controller("/api/v1/iotdata/normnalizeddata/unauthenticated")
+@Controller("/api/v1/iotdata/normalizeddata/unauthenticated")
 @Log
 @ExecuteOn(TaskExecutors.BLOCKING)
 @Singleton
