@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.oracle.demo.timg.iot</groupId>
-	<artifactId>resthandler</artifactId>
+	<artifactId>IoTRESTHandler</artifactId>
 	<version>0.1</version>
 	<packaging>${packaging}</packaging>
 
@@ -22,7 +22,7 @@
 		<micronaut.runtime>netty</micronaut.runtime>
 		<micronaut.aot.enabled>false</micronaut.aot.enabled>
 		<micronaut.aot.packageName>com.oracle.demo.timg.iot.aot.generated</micronaut.aot.packageName>
-		<exec.mainClass>com.oracle.demo.timg.iot.Application</exec.mainClass>
+		<exec.mainClass>com.oracle.demo.timg.iot.resthandler.Application</exec.mainClass>
 	</properties>
 
 	<repositories>
