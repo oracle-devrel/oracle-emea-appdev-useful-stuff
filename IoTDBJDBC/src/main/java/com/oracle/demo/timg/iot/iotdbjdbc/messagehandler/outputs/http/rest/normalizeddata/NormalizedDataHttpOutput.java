@@ -48,6 +48,7 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -56,7 +57,7 @@ import lombok.extern.java.Log;
 // need the username and password
 @Requires(property = "micronaut.http.services.normalizeddataiotoutputhttpclient.url")
 @Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled.order")
+@Requires(property = "messagehandler.output.normalizeddata.httpclient.order")
 @Log
 public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	private final NormalizedDataIoTOutputHttpClient httpClient;
@@ -70,9 +71,10 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	public NormalizedDataHttpOutput(NormalizedDataIoTOutputHttpClient httpClient,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.order") int order,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
-			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
+			@Property(name = "messagehandler.output.normalizeddata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
 			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
+		log.info("In normalized data http client constructor");
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;
@@ -143,6 +145,11 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	@Override
 	public String getConfig() {
 		return getName() + " order " + getOrder() + " output type " + type;
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		log.info("NormalizedDataHttpOutput " + this.getConfig());
 	}
 
 }

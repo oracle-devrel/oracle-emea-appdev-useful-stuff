@@ -57,7 +57,7 @@ import lombok.extern.java.Log;
 // need the username and password
 @Requires(property = "micronaut.http.services.rawdataiotoutputhttpclient.url")
 @Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.httpclient.enabled.order")
+@Requires(property = "messagehandler.output.rawdata.httpclient.order")
 @Log
 public class RawDataHttpOutput implements RawDataMessageHandler {
 	private final RawDataIoTOutputHttpClient httpClient;
