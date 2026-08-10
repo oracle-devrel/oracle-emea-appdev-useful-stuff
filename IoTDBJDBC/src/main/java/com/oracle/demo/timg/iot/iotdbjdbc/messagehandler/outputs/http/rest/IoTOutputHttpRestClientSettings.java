@@ -34,21 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 
-import io.micronaut.context.annotation.ConfigurationProperties;
-import io.micronaut.context.annotation.Requires;
-import lombok.Data;
-
-// need the username and password to run
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@ConfigurationProperties(RawDataIoTOutputHttpClientSettings.PREFIX)
-@Data
-public class RawDataIoTOutputHttpClientSettings {
-	public static final String PREFIX = "messagehandler.output.rawdata.iotoutputhttpclient";
-	// as we are operating as a configuration then the fields are set based on the
-	// config tree
-	private String username;
-	private String password;
+public class IoTOutputHttpRestClientSettings {
+	public static final String PREFIX = "messagehandler.output.iotoutputhttprestclient";
+	public final static String AUTH_TYPE = PREFIX + ".authtype";
+	public final static String USERNAME_PROPERTY = PREFIX + ".username";
+	public final static String PASSWORD_BASE64_PROPERTY = PREFIX + ".passwordbase64";
 }

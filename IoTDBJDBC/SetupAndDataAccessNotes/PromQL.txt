@@ -70,10 +70,15 @@ Get the labels (need more info on this)
   END_TIME_EPOCH            NUMBER               IN      
   FETCH_SQL                 NUMBER               IN     Y
 
-example (using the current limitations on naming)
-select  dbms_cloud_telemetry_query.promql_instant('{__name__="iot.normalized.inverter_power_watts_point_in_time"}',1782928327) from dual;
+get current timestamp 
+SELECT CAST( (CAST((SYSTIMESTAMP AT TIME ZONE 'UTC') AS DATE) - DATE '1970-01-01') * 86400  AS INTEGER) AS epoch_seconds FROM dual;
 
-getting a set of ranges using the default step of 10
-select  dbms_cloud_telemetry_query.promql_range('{__name__="iot.normalized.InverterPowerWattsPointInTime"}',1782925327, 1782928327) from dual;
+get timestamp 30 mins ago
+SELECT CAST((CAST(((SYSTIMESTAMP - (interval '30' minute)) AT TIME ZONE 'UTC') AS DATE) - DATE '1970-01-01') * 86400 AS INTEGER) AS epoch_seconds FROM dual;
 
-getting a set of ranged using a step of 100
+get instant value (given the current name mapping situation)
+select  dbms_cloud_telemetry_query.promql_instant('{__name__="iot.normalized.userchargepercent"}', (SELECT CAST((CAST(((SYSTIMESTAMP - (interval '1' minute)) AT TIME ZONE 'UTC') AS DATE) - DATE '1970-01-01') * 86400 AS INTEGER) AS epoch_seconds FROM dual)) from dual;
+
+range from the last 30 mins every 5 mins (given the current name mapping situation)
+select  dbms_cloud_telemetry_query.promql_range('{__name__="iot.normalized.userchargepercent"}', (SELECT CAST((CAST(((SYSTIMESTAMP - (interval '30' minute)) AT TIME ZONE 'UTC') AS DATE) - DATE '1970-01-01') * 86400 AS INTEGER) AS epoch_seconds FROM dual), (SELECT CAST((CAST(((SYSTIMESTAMP - (interval '0' minute)) AT TIME ZONE 'UTC') AS DATE) - DATE '1970-01-01') * 86400 AS INTEGER) AS epoch_seconds FROM dual), 60) from dual;
+

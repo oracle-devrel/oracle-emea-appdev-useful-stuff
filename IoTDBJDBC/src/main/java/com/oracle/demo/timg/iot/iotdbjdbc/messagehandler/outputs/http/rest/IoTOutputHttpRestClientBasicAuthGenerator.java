@@ -34,42 +34,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 
 import java.util.Base64;
 
+import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.ClientFilter;
-import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.http.HttpHeaderValues;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.java.Log;
 
-// needs a endpoint
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@ClientFilter(patterns = { "${messagehandler.output.rawdata.iotoutputhttpclient.path:/api/v1/iotdata}/**" })
+@Singleton
 @Log
-public class RawDataIoTOutputHttpClientRequestFilter {
+@Requires(property = IoTOutputHttpRestClientSettings.AUTH_TYPE, defaultValue = "BASIC", value = "BASIC")
+public class IoTOutputHttpRestClientBasicAuthGenerator implements IoTOutputHttpRestClientAuthGenerator {
+	public final static String BASIC_AUTH_TYPE_NAME = "BASIC ";
 	private final String username;
 	private final String password;
+	@Getter
+	private final String authString;
 
 	@Inject
-	public RawDataIoTOutputHttpClientRequestFilter(RawDataIoTOutputHttpClientSettings clientSettings) {
-		this.username = clientSettings.getUsername();
-		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
-	}
+	public IoTOutputHttpRestClientBasicAuthGenerator(
+			@Property(name = IoTOutputHttpRestClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
+			@Property(name = IoTOutputHttpRestClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
+		if (username == null) {
+			this.username = "";
+		} else {
+			this.username = username;
+		}
+		if (passwordBase64.length() > 0) {
+			this.password = new String(Base64.getDecoder().decode(passwordBase64));
+		} else {
+			this.password = "";
+		}
 
-	@RequestFilter
-	public void doFilter(MutableHttpRequest<?> request) {
-		log.finer("Adding user auth username=" + this.username);
-		request.basicAuth(this.username, this.password);
+		this.authString = HttpHeaderValues.AUTHORIZATION_PREFIX_BASIC + " "
+				+ Base64.getEncoder().encode((username + ":" + password).getBytes());
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for RawDataIoTOutputHttpClientRequestFilter username=" + this.username);
+		log.info("Startup event received for IoTOutputHttpRestClientRequestFilter username=" + this.username);
 	}
 }

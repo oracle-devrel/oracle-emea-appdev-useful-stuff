@@ -34,15 +34,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata;
 
 import java.util.Base64;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.RawData;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.HttpOutputType;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.InvalidHttpOutputTypeException;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.NotAStringBasedMediaType;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOutputHttpRestClientAuthGenerator;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -52,62 +52,70 @@ import lombok.extern.java.Log;
 
 @Singleton
 // need the username and password
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@Requires(property = "micronaut.http.services.rawdataiotoutputhttpclient.url")
-@Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.httpclient.enabled.order")
+@Requires(property = "micronaut.http.services.normalizeddataiotoutputhttpclient.url")
+@Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled", value = "true", defaultValue = "false")
+@Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled.order")
 @Log
-public class RawDataHttpOutput implements RawDataMessageHandler {
-	private final RawDataIoTOutputHttpClient httpClient;
+public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
+	private final NormalizedDataIoTOutputHttpClient httpClient;
 	private final int order;
 	private final HttpOutputType type;
+	private final boolean useAuthentication;
 	private final boolean sentDataIsCompleted;
+	private final IoTOutputHttpRestClientAuthGenerator clientAuthGenerator;
 
 	@Inject
-	public RawDataHttpOutput(RawDataIoTOutputHttpClient httpClient,
-			@Property(name = "messagehandler.output.rawdata.httpclient.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
-			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted) {
+	public NormalizedDataHttpOutput(NormalizedDataIoTOutputHttpClient httpClient,
+			@Property(name = "messagehandler.output.normalizeddata.httpclient.order") int order,
+			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
+			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
+			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
+			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;
+		this.useAuthentication = useAuthentication;
 		this.sentDataIsCompleted = sentDataIsCompleted;
+		this.clientAuthGenerator = clientAuthGenerator;
 	}
 
 	@Override
-	public RawData[] processRawData(RawData input) throws Exception {
-		log.finer(() -> "RawData is " + input);
+	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
+		log.finer(() -> "NormalizedData is " + input);
 		boolean result;
 		switch (type) {
 		case BASE64_BYTES: {
-			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
-			result = httpClient.postRawDataAsBase64(input.getDigitalTwinInstanceId(), input.getEndpoint(),
-					input.getContentType(), bodyContent);
+			String bodyContent = Base64.getEncoder().encodeToString(input.getContent().getBytes());
+			result = useAuthentication
+					? httpClient.postNormalizedDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
+							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
+							bodyContent)
+					: httpClient.postNormalizedDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), bodyContent);
 			break;
 		}
 		case STRING: {
-			if (input.getMediaType().isTextBased()) {
-				result = httpClient.postRawDataAsString(input.getDigitalTwinInstanceId(), input.getEndpoint(),
-						input.getContentType(), input.getContentString());
-			} else {
-				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
-			}
+			result = useAuthentication
+					? httpClient.postNormalizedDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
+							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
+							input.getContent())
+					: httpClient.postNormalizedDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), input.getContent());
 			break;
 		}
 		default:
 			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
 		}
-		RawData results[];
+		NormalizedData results[];
 		if (result) {
 			if (sentDataIsCompleted) {
-				results = new RawData[1];
+				results = new NormalizedData[1];
 				results[0] = input;
 			} else {
-				results = new RawData[0];
+				results = new NormalizedData[0];
 			}
 		} else {
-			results = new RawData[1];
+			results = new NormalizedData[1];
 			results[0] = input;
 		}
 		return results;
@@ -120,7 +128,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 
 	@Override
 	public String getName() {
-		return "IoT HTTP Client";
+		return "IoT HTTP Normalized Data Client";
 	}
 
 	@Override

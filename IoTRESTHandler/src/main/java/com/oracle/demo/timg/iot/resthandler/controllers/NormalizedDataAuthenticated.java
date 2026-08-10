@@ -53,21 +53,21 @@ import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
-@Controller("/authenticated")
+@Controller("/api/v1/iotdata/normalizeddata/authenticated")
 @Log
 @ExecuteOn(TaskExecutors.BLOCKING)
 @Singleton
-public class Authenticated {
+public class NormalizedDataAuthenticated {
 
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
 	@Secured(SecurityRule.IS_AUTHENTICATED)
-	@Post(value = "/rawdata/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public String postRawDataAsString(@PathVariable("digitaltwinid") String digitaltwinid,
-			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
+	@Post(value = "/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
+	public String postNormalizedDataAsString(@PathVariable("digitaltwinid") String digitaltwinid,
+			@PathVariable("contentpath") String contentpath, @PathVariable("timestamp") String timestamp,
 			@Body String content) {
-		String resp = "Authenticated Received string request for digitaltwinid=" + digitaltwinid + ", endpoint="
-				+ endpoint + ", timestamp=" + timestamp + " with body contents of " + content;
+		String resp = "NormalizedDataAuthenticated Received string request for digitaltwinid=" + digitaltwinid
+				+ ", contentpath=" + contentpath + ", timestamp=" + timestamp + " with body contents of " + content;
 		log.info(resp);
 		return resp;
 	}
@@ -75,13 +75,14 @@ public class Authenticated {
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
 	@Secured(SecurityRule.IS_AUTHENTICATED)
-	@Post(value = "/rawdata/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public String postRawDataAsBase64(@PathVariable("digitaltwinid") String digitaltwinid,
-			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
+	@Post(value = "/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
+	public String postNormalizedDataAsBase64(@PathVariable("digitaltwinid") String digitaltwinid,
+			@PathVariable("contentpath") String contentpath, @PathVariable("timestamp") String timestamp,
 			@Body String base64content) {
 		String content = new String(Base64.getDecoder().decode(base64content));
-		String resp = "Authenticated Received base64 request for digitaltwinid=" + digitaltwinid + ", endpoint="
-				+ endpoint + ", timestamp=" + timestamp + " with decoded body contents of " + content;
+		String resp = "NormalizedDataAuthenticated Received base64 request for digitaltwinid=" + digitaltwinid
+				+ ", contentpath=" + contentpath + ", timestamp=" + timestamp + " with decoded body contents of "
+				+ content;
 		log.info(resp);
 		return resp;
 	}

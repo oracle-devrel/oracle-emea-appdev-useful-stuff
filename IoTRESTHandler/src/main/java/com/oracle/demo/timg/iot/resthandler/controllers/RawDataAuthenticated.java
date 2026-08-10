@@ -53,20 +53,20 @@ import jakarta.annotation.PostConstruct;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
-@Controller("/unauthenticated")
+@Controller("/api/v1/iotdata/rawdata/authenticated")
 @Log
 @ExecuteOn(TaskExecutors.BLOCKING)
 @Singleton
-public class Unauthenticated {
+public class RawDataAuthenticated {
 
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
-	@Secured({ SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED })
-	@Post(value = "/rawdata/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public String postRawDataAsString(@PathVariable("digitaltwinid") String digitaltwinid,
 			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
 			@Body String content) {
-		String resp = "Unauthenticated Received string request for digitaltwinid=" + digitaltwinid + ", endpoint="
+		String resp = "RawDataAuthenticated Received string request for digitaltwinid=" + digitaltwinid + ", endpoint="
 				+ endpoint + ", timestamp=" + timestamp + " with body contents of " + content;
 		log.info(resp);
 		return resp;
@@ -74,14 +74,13 @@ public class Unauthenticated {
 
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
-	// allow anon or authenticated access
-	@Secured({ SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED })
-	@Post(value = "/rawdata/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public String postRawDataAsBase64(@PathVariable("digitaltwinid") String digitaltwinid,
 			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
 			@Body String base64content) {
 		String content = new String(Base64.getDecoder().decode(base64content));
-		String resp = "Unauthenticated Received base64 request for digitaltwinid=" + digitaltwinid + ", endpoint="
+		String resp = "RawDataAuthenticated Received base64 request for digitaltwinid=" + digitaltwinid + ", endpoint="
 				+ endpoint + ", timestamp=" + timestamp + " with decoded body contents of " + content;
 		log.info(resp);
 		return resp;
