@@ -59,7 +59,7 @@ public interface NormalizedDataIoTOutputHttpClient {
 
 	@Post(value = "/authenticated/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public boolean postNormalizedDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
-			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("endpoint") String endpoint,
+			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
 			@PathParam("timestamp") String timestamp, @Body String base64content);
 
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)

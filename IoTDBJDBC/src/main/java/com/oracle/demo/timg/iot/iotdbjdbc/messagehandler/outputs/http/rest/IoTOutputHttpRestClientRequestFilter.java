@@ -41,7 +41,6 @@ import java.util.Base64;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
@@ -70,7 +69,7 @@ public class IoTOutputHttpRestClientRequestFilter {
 		}
 	}
 
-	@RequestFilter
+	// @RequestFilter
 	public void doFilter(MutableHttpRequest<?> request) {
 		if (username != null) {
 			log.finer("Adding user auth username=" + this.username);
