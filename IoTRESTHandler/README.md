@@ -1,3 +1,23 @@
+#Sample commands
+
+## normalized unauthenticated string
+curl  http://localhost:8192/api/v1/iotdata/normalizeddata/unauthenticated/string/ocid/homepower/ts -d 'Im a chunk of unauthenticated normalized data' -H "content-type: text/plain"
+## normalized auauthenticated string
+curl -u 'un:pw' http://localhost:8192/api/v1/iotdata/normalizeddata/authenticated/string/ocid/homepower/ts -d 'Im a chunk of authenticated normalized data' -H "content-type: text/plain"
+## raw unauthenticated string
+curl  http://localhost:8192/api/v1/iotdata/rawdata/unauthenticated/string/ocid/homepower/ts -d 'Im a chunk of unauthenticated raw data' -H "content-type: text/plain"
+## raw auauthenticated string
+curl -u 'un:pw' http://localhost:8192/api/v1/iotdata/rawdata/authenticated/string/ocid/homepower/ts -d 'Im a chunk of authenticated raw data' -H "content-type: text/plain"
+
+## normalized unauthenticated base 64 string
+curl  http://localhost:8192/api/v1/iotdata/normalizeddata/unauthenticated/base64/ocid/homepower/ts -d 'SW0gYSBjaHVuayBvZiBiYXNlNjQgdW5hdXRoZW50aWNhdGVkIG5vcm1hbGl6ZWQgZGF0YQo=' -H "content-type: text/plain"
+## normalized auauthenticated base 64 string
+curl -u 'un:pw' http://localhost:8192/api/v1/iotdata/normalizeddata/authenticated/base64/ocid/homepower/ts -d 'SW0gYSBjaHVuayBvZiBiYXNlNjQgYXV0aGVudGljYXRlZCBub3JtYWxpemVkIGRhdGEK' -H "content-type: text/plain"
+## raw unauthenticated base 64 string
+curl  http://localhost:8192/api/v1/iotdata/rawdata/unauthenticated/base64/ocid/homepower/ts -d 'SW0gYSBjaHVuayBvZiBiYXNlNjQgdW5hdXRoZW50aWNhdGVkIHJhdyBkYXRhCg==' -H "content-type: text/plain"
+## raw auauthenticated base 64 string
+curl -u 'un:pw' http://localhost:8192/api/v1/iotdata/rawdata/authenticated/base64/ocid/homepower/ts -d 'SW0gYSBjaHVuayBvZiBiYXNlNjQgYXV0aGVudGljYXRlZCByYXcgZGF0YQo=' -H "content-type: text/plain"
+
 ## Micronaut 4.10.17 Documentation
 
 - [User Guide](https://docs.micronaut.io/4.10.17/guide/index.html)
