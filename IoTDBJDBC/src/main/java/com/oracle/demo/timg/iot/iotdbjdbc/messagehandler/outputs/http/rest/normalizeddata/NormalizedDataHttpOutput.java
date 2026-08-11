@@ -48,6 +48,7 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -65,6 +66,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	private final HttpOutputType type;
 	private final boolean useAuthentication;
 	private final boolean sentDataIsCompleted;
+	private final String targetUrl;
 	private final IoTOutputHttpRestClientAuthGenerator clientAuthGenerator;
 
 	@Inject
@@ -73,6 +75,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl,
 			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
 		log.info("In normalized data http client constructor");
 		this.httpClient = httpClient;
@@ -80,6 +83,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 		this.type = type;
 		this.useAuthentication = useAuthentication;
 		this.sentDataIsCompleted = sentDataIsCompleted;
+		this.targetUrl = targetUrl;
 		this.clientAuthGenerator = clientAuthGenerator;
 	}
 
@@ -90,26 +94,71 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent().getBytes());
-			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending base64 content of " + bodyContent);
-			result = useAuthentication
-					? httpClient.postNormalizedDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
+			if (useAuthentication) {
+				try {
+					log.info("Making authenticated call with auth " + clientAuthGenerator.getAuthString()
+							+ ", Sending base64 content of " + bodyContent);
+					result = httpClient.postNormalizedDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
 							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
-							bodyContent)
-					: httpClient.postNormalizedDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
+							bodyContent);
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataAuthenticatedAsBase64 - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			} else {
+				try {
+					log.info("Making unauthenticated call, Sending base64 content of " + bodyContent);
+					result = httpClient.postNormalizedDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), bodyContent);
-			log.info("() -> Send result is " + result.getStatus() + " with body "
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataUnauthenticatedAsBase64 - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			}
+
+			log.info("() -> Send base 64 result is " + result.getStatus() + " with body "
 					+ result.getBody().orElse("No body content returned"));
 			break;
+
 		}
 		case STRING: {
-			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending string content of "
-					+ input.getContent());
-			result = useAuthentication
-					? httpClient.postNormalizedDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
+			if (useAuthentication) {
+				try {
+					log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
+							+ ", Sending string content of " + input.getContent());
+					result = httpClient.postNormalizedDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
 							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
-							input.getContent())
-					: httpClient.postNormalizedDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
+							input.getContent());
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataAuthenticatedAsString - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			} else {
+				try {
+					log.info(() -> "Making unauthenticated call, Sending string content of " + input.getContent());
+					result = httpClient.postNormalizedDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 							input.getContentPath(), input.getTimeObserved(), input.getContent());
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataUnauthenticatedAsString - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			}
 			log.info("() -> Send result is " + result.getStatus() + " with body "
 					+ result.getBody().orElse("No body content returned"));
 			break;
@@ -144,7 +193,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " output type " + type;
+		return getName() + " order " + getOrder() + " output type " + type + " targetting " + targetUrl;
 	}
 
 	@PostConstruct

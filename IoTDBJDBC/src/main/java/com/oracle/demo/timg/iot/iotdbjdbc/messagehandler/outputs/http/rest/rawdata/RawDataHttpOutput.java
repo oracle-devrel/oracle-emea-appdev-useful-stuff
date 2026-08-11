@@ -49,6 +49,8 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.exceptions.HttpClientException;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -65,6 +67,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 	private final HttpOutputType type;
 	private final boolean useAuthentication;
 	private final boolean sentDataIsCompleted;
+	private final String targetUrl;
 	private final IoTOutputHttpRestClientAuthGenerator clientAuthGenerator;
 
 	@Inject
@@ -73,12 +76,14 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = "micronaut.http.services.rawdataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl,
 			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;
 		this.useAuthentication = useAuthentication;
 		this.sentDataIsCompleted = sentDataIsCompleted;
+		this.targetUrl = targetUrl;
 		this.clientAuthGenerator = clientAuthGenerator;
 	}
 
@@ -89,26 +94,72 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 		switch (type) {
 		case BASE64_BYTES: {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
-			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending base64 content of " + bodyContent);
-			result = useAuthentication
-					? httpClient.postRawDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
-							input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(), bodyContent)
-					: httpClient.postRawDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
+			if (useAuthentication) {
+				try {
+					log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
+							+ ", Sending base64 content of " + input.getContent());
+					result = httpClient.postRawDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
+							input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(),
+							bodyContent);
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postRawDataAuthenticatedAsBase64 - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					RawData[] returnResp = new RawData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			} else {
+				try {
+					log.info(() -> "Making unauthenticated call , Sending base64 content of " + input.getContent());
+					result = httpClient.postRawDataUnauthenticatedAsBase64(input.getDigitalTwinInstanceId(),
 							input.getEndpoint(), input.getTimeReceived(), bodyContent);
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postRawDataUnauthenticatedAsBase64 - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					RawData[] returnResp = new RawData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			}
 			log.info("() -> Send result is " + result.getStatus() + " with body "
 					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
 		case STRING: {
-			log.info(() -> "useAuthentication=" + useAuthentication + ", Sending string content of "
-					+ input.getContent());
+
 			if (input.getMediaType().isTextBased()) {
-				result = useAuthentication
-						? httpClient.postRawDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
+				if (useAuthentication) {
+					try {
+						log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
+								+ ", Sending string content of " + input.getContent());
+						result = httpClient.postRawDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
 								input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(),
-								input.getContentString())
-						: httpClient.postRawDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
+								input.getContentString());
+					} catch (HttpClientException e) {
+						log.warning("HttpClient exception making call postRawDataAuthenticatedAsString - "
+								+ e.getLocalizedMessage());
+						e.printStackTrace();
+						RawData[] returnResp = new RawData[1];
+						returnResp[0] = input;
+						return returnResp;
+					}
+				} else {
+					try {
+						log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
+								+ ", Sending string content of " + input.getContent());
+						result = httpClient.postRawDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 								input.getEndpoint(), input.getTimeReceived(), input.getContentString());
+					} catch (HttpClientException e) {
+						log.warning("HttpClient exception making call postRawDataUnauthenticatedAsString - "
+								+ e.getLocalizedMessage());
+						e.printStackTrace();
+						RawData[] returnResp = new RawData[1];
+						returnResp[0] = input;
+						return returnResp;
+					}
+				}
 			} else {
 				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
 			}
@@ -146,7 +197,11 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " output type " + type;
+		return getName() + " order " + getOrder() + " output type " + type + " targetUrl " + targetUrl;
 	}
 
+	@PostConstruct
+	public void postConstruct() {
+		log.info("RawDataHttpOutput " + this.getConfig());
+	}
 }
