@@ -30,8 +30,9 @@ public class AuthenticationProviderUserPassword<B> implements HttpRequestAuthent
 		String incommingPassword = authenticationRequest.getSecret();
 		log.info("Checking incomming credentials of " + incommingUsername + "/" + incommingPassword
 				+ " against required credentials of " + username + "/" + password);
-		return incommingUsername.equals(username) && incommingPassword.equals(password)
-				? AuthenticationResponse.success(authenticationRequest.getIdentity())
+		boolean match = incommingUsername.equals(username) && incommingPassword.equals(password);
+		log.info("Credentials match is " + match);
+		return match ? AuthenticationResponse.success(incommingUsername)
 				: AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
 	}
 
