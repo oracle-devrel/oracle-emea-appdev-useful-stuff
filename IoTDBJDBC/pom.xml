@@ -84,6 +84,11 @@ SOFTWARE. -->
 			<artifactId>micronaut-http-client</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.micronaut.security</groupId>
+			<artifactId>micronaut-security</artifactId>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>io.micronaut.jsonschema</groupId>

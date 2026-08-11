@@ -47,7 +47,8 @@ import lombok.extern.java.Log;
 
 // needs a endpoint
 //@ClientFilter(patterns = {
-//		"${messagehandler.output.rawdata.iotoutputhttpclient.path:/api/v1/iotdata/authenticated}/**" })
+//		"${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}"+"/authenticated/**",
+//		"${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}"+"/authenticated/**"})
 @Log
 public class IoTOutputHttpRestClientRequestFilter {
 	private final String username;
@@ -69,7 +70,7 @@ public class IoTOutputHttpRestClientRequestFilter {
 		}
 	}
 
-	// @RequestFilter
+//	@RequestFilter
 	public void doFilter(MutableHttpRequest<?> request) {
 		if (username != null) {
 			log.finer("Adding user auth username=" + this.username);

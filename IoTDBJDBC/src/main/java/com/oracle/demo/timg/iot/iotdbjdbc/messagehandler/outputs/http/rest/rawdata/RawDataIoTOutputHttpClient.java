@@ -45,6 +45,8 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.ws.rs.PathParam;
 
 // needs the credentials
@@ -53,20 +55,25 @@ import jakarta.ws.rs.PathParam;
 @Client(id = "rawdataiotoutputhttpclient", path = "${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface RawDataIoTOutputHttpClient {
+
+	@Secured(SecurityRule.IS_AUTHENTICATED)
 	@Post(value = "/authenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataAuthenticatedAsString(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("endpoint") String endpoint,
 			@PathParam("timestamp") String timestamp, @Body String content);
 
+	@Secured(SecurityRule.IS_AUTHENTICATED)
 	@Post(value = "/authenticated/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataAuthenticatedAsBase64(@Header(name = "Authorization") String authorization,
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("endpoint") String endpoint,
 			@PathParam("timestamp") String timestamp, @Body String base64content);
 
+	@Secured({ SecurityRule.IS_ANONYMOUS })
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp, @Body String content);
 
+	@Secured({ SecurityRule.IS_ANONYMOUS })
 	@Post(value = "/unauthenticated/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataUnauthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
