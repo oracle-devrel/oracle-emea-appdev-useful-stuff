@@ -59,6 +59,19 @@ import lombok.extern.java.Log;
 @Singleton
 public class RawDataAuthenticated {
 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/jsonobject/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public String postRawDataAsJson(@PathVariable("digitaltwinid") String digitaltwinid,
+			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
+			@Body RawDataTransfer rdt) {
+		String resp = "RawDataAuthenticated Received json request for digitaltwinid=" + digitaltwinid + ", endpoint="
+				+ endpoint + ", timestamp=" + timestamp + " with body json contents of " + rdt.toString();
+		log.info(resp);
+		return resp;
+	}
+
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
 	@Secured(SecurityRule.IS_AUTHENTICATED)

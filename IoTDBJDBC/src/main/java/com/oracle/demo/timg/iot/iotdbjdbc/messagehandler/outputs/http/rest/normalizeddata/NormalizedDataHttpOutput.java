@@ -155,6 +155,41 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 					+ result.getBody().orElse("No body content returned"));
 			break;
 		}
+		case JSON_OBJECT: {
+			NormalizedDataTransfer normalizedDataTransfer = NormalizedDataTransfer.buildNormalizedDataTransfer(input);
+			if (useAuthentication) {
+				try {
+					log.info(() -> "Making authenticated call , Sending json object with content of "
+							+ normalizedDataTransfer);
+					result = httpClient.postNormalizedDataAuthenticatedAsJsonObject(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), normalizedDataTransfer);
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataAuthenticatedAsJsonObject - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			} else {
+				try {
+					log.info(() -> "Making unauthenticated call, Sending json object with content of "
+							+ normalizedDataTransfer);
+					result = httpClient.postNormalizedDataUnauthenticatedAsJsonObject(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), normalizedDataTransfer);
+				} catch (HttpClientException e) {
+					log.warning("HttpClient exception making call postNormalizedDataUnauthenticatedAsJsonObject - "
+							+ e.getLocalizedMessage());
+					e.printStackTrace();
+					NormalizedData[] returnResp = new NormalizedData[1];
+					returnResp[0] = input;
+					return returnResp;
+				}
+			}
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
+			break;
+		}
 		default:
 			throw new InvalidHttpOutputTypeException("Processing type " + type + " is unknown");
 		}

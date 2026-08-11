@@ -122,7 +122,6 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			break;
 		}
 		case STRING: {
-
 			if (input.getMediaType().isTextBased()) {
 				if (useAuthentication) {
 					try {
@@ -139,9 +138,48 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 					}
 				} else {
 					try {
-						log.info(() -> "Making authenticated call , Sending string content of " + input.getContent());
+						log.info(() -> "Making unauthenticated call , Sending string content of " + input.getContent());
 						result = httpClient.postRawDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 								input.getEndpoint(), input.getTimeReceived(), input.getContentString());
+					} catch (HttpClientException e) {
+						log.warning("HttpClient exception making call postRawDataUnauthenticatedAsString - "
+								+ e.getLocalizedMessage());
+						e.printStackTrace();
+						RawData[] returnResp = new RawData[1];
+						returnResp[0] = input;
+						return returnResp;
+					}
+				}
+			} else {
+				throw new NotAStringBasedMediaType("Media type " + input.getMediaType());
+			}
+			log.info("() -> Send result is " + result.getStatus() + " with body "
+					+ result.getBody().orElse("No body content returned"));
+			break;
+		}
+		case JSON_OBJECT: {
+			RawDataTransfer rawDataTransfer = RawDataTransfer.buildRawDataTransfer(input);
+			if (input.getMediaType().isTextBased()) {
+				if (useAuthentication) {
+					try {
+						log.info(() -> "Making authenticated call, Sending json object with content of "
+								+ input.getContent());
+						result = httpClient.postRawDataAuthenticatedAsJsonObject(input.getDigitalTwinInstanceId(),
+								input.getEndpoint(), input.getTimeReceived(), rawDataTransfer);
+					} catch (HttpClientException e) {
+						log.warning("HttpClient exception making call postRawDataAuthenticatedAsString - "
+								+ e.getLocalizedMessage());
+						e.printStackTrace();
+						RawData[] returnResp = new RawData[1];
+						returnResp[0] = input;
+						return returnResp;
+					}
+				} else {
+					try {
+						log.info(() -> "Making unauthenticated call , Sending json object with content of "
+								+ input.getContent());
+						result = httpClient.postRawDataUnauthenticatedAsJsonObject(input.getDigitalTwinInstanceId(),
+								input.getEndpoint(), input.getTimeReceived(), rawDataTransfer);
 					} catch (HttpClientException e) {
 						log.warning("HttpClient exception making call postRawDataUnauthenticatedAsString - "
 								+ e.getLocalizedMessage());

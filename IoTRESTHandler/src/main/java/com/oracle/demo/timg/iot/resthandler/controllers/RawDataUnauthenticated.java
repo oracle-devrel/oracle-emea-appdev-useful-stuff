@@ -59,6 +59,19 @@ import lombok.extern.java.Log;
 @Singleton
 public class RawDataUnauthenticated {
 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secured({ SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED })
+	@Post(value = "/jsonobject/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public String postRawDataAsJson(@PathVariable("digitaltwinid") String digitaltwinid,
+			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
+			@Body RawDataTransfer rdt) {
+		String resp = "RawDataUnauthenticated Received json request for digitaltwinid=" + digitaltwinid + ", endpoint="
+				+ endpoint + ", timestamp=" + timestamp + " with body json contents of " + rdt.toString();
+		log.info(resp);
+		return resp;
+	}
+
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
 	@Secured({ SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED })
@@ -66,8 +79,8 @@ public class RawDataUnauthenticated {
 	public String postRawDataAsString(@PathVariable("digitaltwinid") String digitaltwinid,
 			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
 			@Body String content) {
-		String resp = "RawDataUnauthenticated Received string request for digitaltwinid=" + digitaltwinid + ", endpoint="
-				+ endpoint + ", timestamp=" + timestamp + " with body contents of " + content;
+		String resp = "RawDataUnauthenticated Received string request for digitaltwinid=" + digitaltwinid
+				+ ", endpoint=" + endpoint + ", timestamp=" + timestamp + " with body contents of " + content;
 		log.info(resp);
 		return resp;
 	}
@@ -81,8 +94,8 @@ public class RawDataUnauthenticated {
 			@PathVariable("endpoint") String endpoint, @PathVariable("timestamp") String timestamp,
 			@Body String base64content) {
 		String content = new String(Base64.getDecoder().decode(base64content));
-		String resp = "RawDataUnauthenticated Received base64 request for digitaltwinid=" + digitaltwinid + ", endpoint="
-				+ endpoint + ", timestamp=" + timestamp + " with decoded body contents of " + content;
+		String resp = "RawDataUnauthenticated Received base64 request for digitaltwinid=" + digitaltwinid
+				+ ", endpoint=" + endpoint + ", timestamp=" + timestamp + " with decoded body contents of " + content;
 		log.info(resp);
 		return resp;
 	}

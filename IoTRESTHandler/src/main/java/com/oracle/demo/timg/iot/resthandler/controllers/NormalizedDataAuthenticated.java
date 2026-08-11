@@ -59,6 +59,20 @@ import lombok.extern.java.Log;
 @Singleton
 public class NormalizedDataAuthenticated {
 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/jsonobject/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public String postNormalizedDataAsJson(@PathVariable("digitaltwinid") String digitaltwinid,
+			@PathVariable("contentpath") String contentpath, @PathVariable("timestamp") String timestamp,
+			@Body NormalizedDataTransfer ndt) {
+		String resp = "NormalizedDataAuthenticated Received json request for digitaltwinid=" + digitaltwinid
+				+ ", contentpath=" + contentpath + ", timestamp=" + timestamp + " with body json contents of "
+				+ ndt.toString();
+		log.info(resp);
+		return resp;
+	}
+
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.TEXT_PLAIN)
 	@Secured(SecurityRule.IS_AUTHENTICATED)

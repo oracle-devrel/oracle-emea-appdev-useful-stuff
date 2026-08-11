@@ -53,6 +53,11 @@ import jakarta.ws.rs.PathParam;
 @Client(id = "normalizeddataiotoutputhttpclient", path = "${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpClient {
+	@Post(value = "/authenticated/jsonobject/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public HttpResponse<String> postNormalizedDataAuthenticatedAsJsonObject(
+			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
+			@PathParam("timestamp") String timestamp, @Body NormalizedDataTransfer normalizedDataTransfer);
+
 	@Post(value = "/authenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataAuthenticatedAsString(
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
@@ -62,6 +67,11 @@ public interface NormalizedDataIoTOutputHttpClient {
 	public HttpResponse<String> postNormalizedDataAuthenticatedAsBase64(
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
 			@PathParam("timestamp") String timestamp, @Body String base64content);
+
+	@Post(value = "/unauthenticated/jsonobject/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public HttpResponse<String> postNormalizedDataUnauthenticatedAsJsonObject(
+			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
+			@PathParam("timestamp") String timestamp, @Body NormalizedDataTransfer normalizedDataTransfer);
 
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataUnauthenticatedAsString(

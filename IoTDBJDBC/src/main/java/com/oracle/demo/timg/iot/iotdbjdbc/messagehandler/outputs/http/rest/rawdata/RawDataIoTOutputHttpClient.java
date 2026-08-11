@@ -54,6 +54,11 @@ import jakarta.ws.rs.PathParam;
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface RawDataIoTOutputHttpClient {
 
+	@Post(value = "/authenticated/jsonobject/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public HttpResponse<String> postRawDataAuthenticatedAsJsonObject(@PathParam("digitaltwinid") String digitaltwinid,
+			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
+			@Body RawDataTransfer rawDataTransfer);
+
 	@Post(value = "/authenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataAuthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp, @Body String content);
@@ -62,6 +67,11 @@ public interface RawDataIoTOutputHttpClient {
 	public HttpResponse<String> postRawDataAuthenticatedAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
 			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
 			@Body String base64content);
+
+	@Post(value = "/unauthenticated/jsonobject/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public HttpResponse<String> postRawDataUnauthenticatedAsJsonObject(@PathParam("digitaltwinid") String digitaltwinid,
+			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
+			@Body RawDataTransfer rawDataTransfer);
 
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postRawDataUnauthenticatedAsString(@PathParam("digitaltwinid") String digitaltwinid,
