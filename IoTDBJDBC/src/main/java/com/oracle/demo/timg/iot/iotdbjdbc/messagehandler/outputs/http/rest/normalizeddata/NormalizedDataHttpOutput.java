@@ -70,7 +70,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	@Inject
 	public NormalizedDataHttpOutput(NormalizedDataIoTOutputHttpClient httpClient,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.order") int order,
-			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
+			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "JSON_OBJECT") HttpOutputType type,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
 			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {

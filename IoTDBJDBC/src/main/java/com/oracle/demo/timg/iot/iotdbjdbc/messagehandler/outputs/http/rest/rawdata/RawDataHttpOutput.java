@@ -71,7 +71,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 	@Inject
 	public RawDataHttpOutput(RawDataIoTOutputHttpClient httpClient,
 			@Property(name = "messagehandler.output.rawdata.httpclient.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
+			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "JSON_OBJECT") HttpOutputType type,
 			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
 			@Property(name = "micronaut.http.services.rawdataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {
