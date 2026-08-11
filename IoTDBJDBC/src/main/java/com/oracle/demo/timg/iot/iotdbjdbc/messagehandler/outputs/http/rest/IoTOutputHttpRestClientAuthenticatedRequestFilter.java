@@ -41,21 +41,24 @@ import java.util.Base64;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
 // needs a endpoint
-//@ClientFilter(patterns = {
-//		"${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}"+"/authenticated/**",
-//		"${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}"+"/authenticated/**"})
+@ClientFilter(patterns = {
+		"${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}"
+				+ "/authenticated/**",
+		"${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}" + "/authenticated/**" })
 @Log
-public class IoTOutputHttpRestClientRequestFilter {
+public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
 	private final String username;
 	private final String password;
 
 	@Inject
-	public IoTOutputHttpRestClientRequestFilter(
+	public IoTOutputHttpRestClientAuthenticatedRequestFilter(
 			@Property(name = IoTOutputHttpRestClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
 			@Property(name = IoTOutputHttpRestClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
 		if ((username == null) || (username.length() == 0)) {
@@ -70,16 +73,23 @@ public class IoTOutputHttpRestClientRequestFilter {
 		}
 	}
 
-//	@RequestFilter
+	@RequestFilter
 	public void doFilter(MutableHttpRequest<?> request) {
+		log.info("Filter authenticated");
 		if (username != null) {
-			log.finer("Adding user auth username=" + this.username);
+			log.info(() -> "Adding user auth username=" + this.username);
 			request.basicAuth(this.username, this.password);
 		}
+		log.info(() -> "Request uri " + request.getUri().toASCIIString());
+		log.info(() -> "Request path " + request.getPath());
+		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
+		log.info(() -> "Request headers = " + request.getHeaders().asMap().toString());
+		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttpRestClientRequestFilter username=" + this.username);
+		log.info("Startup event received for IoTOutputHttpRestClientAuthenticatedRequestFilter username="
+				+ this.username);
 	}
 }

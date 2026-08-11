@@ -42,7 +42,6 @@ import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.HttpOutputType;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.InvalidHttpOutputTypeException;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOutputHttpRestClientAuthGenerator;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -67,7 +66,6 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	private final boolean useAuthentication;
 	private final boolean sentDataIsCompleted;
 	private final String targetUrl;
-	private final IoTOutputHttpRestClientAuthGenerator clientAuthGenerator;
 
 	@Inject
 	public NormalizedDataHttpOutput(NormalizedDataIoTOutputHttpClient httpClient,
@@ -75,8 +73,7 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl,
-			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
+			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {
 		log.info("In normalized data http client constructor");
 		this.httpClient = httpClient;
 		this.order = order;
@@ -84,7 +81,6 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 		this.useAuthentication = useAuthentication;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 		this.targetUrl = targetUrl;
-		this.clientAuthGenerator = clientAuthGenerator;
 	}
 
 	@Override
@@ -96,11 +92,9 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent().getBytes());
 			if (useAuthentication) {
 				try {
-					log.info("Making authenticated call with auth " + clientAuthGenerator.getAuthString()
-							+ ", Sending base64 content of " + bodyContent);
-					result = httpClient.postNormalizedDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
-							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
-							bodyContent);
+					log.info("Making authenticated call , Sending base64 content of " + bodyContent);
+					result = httpClient.postNormalizedDataAuthenticatedAsBase64(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), bodyContent);
 				} catch (HttpClientException e) {
 					log.warning("HttpClient exception making call postNormalizedDataAuthenticatedAsBase64 - "
 							+ e.getLocalizedMessage());
@@ -132,11 +126,9 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 		case STRING: {
 			if (useAuthentication) {
 				try {
-					log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
-							+ ", Sending string content of " + input.getContent());
-					result = httpClient.postNormalizedDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
-							input.getDigitalTwinInstanceId(), input.getContentPath(), input.getTimeObserved(),
-							input.getContent());
+					log.info(() -> "Making authenticated call , Sending string content of " + input.getContent());
+					result = httpClient.postNormalizedDataAuthenticatedAsString(input.getDigitalTwinInstanceId(),
+							input.getContentPath(), input.getTimeObserved(), input.getContent());
 				} catch (HttpClientException e) {
 					log.warning("HttpClient exception making call postNormalizedDataAuthenticatedAsString - "
 							+ e.getLocalizedMessage());

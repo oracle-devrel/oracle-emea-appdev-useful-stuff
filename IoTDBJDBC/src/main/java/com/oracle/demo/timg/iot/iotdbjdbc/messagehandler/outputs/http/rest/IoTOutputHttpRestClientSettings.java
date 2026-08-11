@@ -38,7 +38,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 
 public class IoTOutputHttpRestClientSettings {
 	public static final String PREFIX = "messagehandler.output.iotoutputhttprestclient";
-	public final static String AUTH_TYPE = PREFIX + ".authtype";
 	public final static String USERNAME_PROPERTY = PREFIX + ".username";
 	public final static String PASSWORD_BASE64_PROPERTY = PREFIX + ".passwordbase64";
+	public final static String UNAUTHENTICATED_FILTER_ENABLED_PROPERTY = PREFIX + ".unauthenticated.filter.enabled";
 }

@@ -36,6 +36,36 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 
-public interface IoTOutputHttpRestClientAuthGenerator {
-	public String getAuthString();
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.runtime.event.annotation.EventListener;
+import lombok.extern.java.Log;
+
+// only load if expressly enabled
+@Requires(property = IoTOutputHttpRestClientSettings.UNAUTHENTICATED_FILTER_ENABLED_PROPERTY, value = "true", defaultValue = "false")
+// needs a endpoint
+@ClientFilter(patterns = {
+		"${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}"
+				+ "/unauthenticated/**",
+		"${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}" + "/unauthenticated/**" })
+@Log
+public class IoTOutputHttpRestClientUnauthenticatedRequestFilter {
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.info("Filter unauthenticated");
+		log.info(() -> "Request uri " + request.getUri().toASCIIString());
+		log.info(() -> "Request path " + request.getPath());
+		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
+		log.info(() -> "Request headers = " + request.getHeaders().asMap().toString());
+		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
+	}
+
+	@EventListener
+	public void onStartup(StartupEvent event) {
+		log.info("Startup event received for IoTOutputHttpRestClientUnauthenticatedRequestFilter");
+	}
 }

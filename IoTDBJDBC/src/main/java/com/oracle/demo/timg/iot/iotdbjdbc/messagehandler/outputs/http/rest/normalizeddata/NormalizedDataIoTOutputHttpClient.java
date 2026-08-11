@@ -45,8 +45,6 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import jakarta.ws.rs.PathParam;
 
 // needs the credentials
@@ -55,27 +53,21 @@ import jakarta.ws.rs.PathParam;
 @Client(id = "normalizeddataiotoutputhttpclient", path = "${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpClient {
-	@Secured(SecurityRule.IS_AUTHENTICATED)
 	@Post(value = "/authenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataAuthenticatedAsString(
-			@Header(name = "Authorization") String authorization, @PathParam("digitaltwinid") String digitaltwinid,
-			@PathParam("contentpath") String contentpath, @PathParam("timestamp") String timestamp,
-			@Body String content);
+			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
+			@PathParam("timestamp") String timestamp, @Body String content);
 
-	@Secured(SecurityRule.IS_AUTHENTICATED)
 	@Post(value = "/authenticated/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataAuthenticatedAsBase64(
-			@Header(name = "Authorization") String authorization, @PathParam("digitaltwinid") String digitaltwinid,
-			@PathParam("contentpath") String contentpath, @PathParam("timestamp") String timestamp,
-			@Body String base64content);
+			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
+			@PathParam("timestamp") String timestamp, @Body String base64content);
 
-	@Secured({ SecurityRule.IS_ANONYMOUS })
 	@Post(value = "/unauthenticated/string/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataUnauthenticatedAsString(
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,
 			@PathParam("timestamp") String timestamp, @Body String content);
 
-	@Secured({ SecurityRule.IS_ANONYMOUS })
 	@Post(value = "/unauthenticated/base64/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
 	public HttpResponse<String> postNormalizedDataUnauthenticatedAsBase64(
 			@PathParam("digitaltwinid") String digitaltwinid, @PathParam("contentpath") String contentpath,

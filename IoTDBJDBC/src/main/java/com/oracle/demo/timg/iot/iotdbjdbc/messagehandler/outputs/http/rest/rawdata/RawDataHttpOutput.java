@@ -43,7 +43,6 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.RawDataMessageHandler;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.HttpOutputType;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.InvalidHttpOutputTypeException;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.common.NotAStringBasedMediaType;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOutputHttpRestClientAuthGenerator;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -68,7 +67,6 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 	private final boolean useAuthentication;
 	private final boolean sentDataIsCompleted;
 	private final String targetUrl;
-	private final IoTOutputHttpRestClientAuthGenerator clientAuthGenerator;
 
 	@Inject
 	public RawDataHttpOutput(RawDataIoTOutputHttpClient httpClient,
@@ -76,15 +74,13 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "STRING") HttpOutputType type,
 			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
 			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = "micronaut.http.services.rawdataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl,
-			IoTOutputHttpRestClientAuthGenerator clientAuthGenerator) {
+			@Property(name = "micronaut.http.services.rawdataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;
 		this.useAuthentication = useAuthentication;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 		this.targetUrl = targetUrl;
-		this.clientAuthGenerator = clientAuthGenerator;
 	}
 
 	@Override
@@ -96,11 +92,9 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			String bodyContent = Base64.getEncoder().encodeToString(input.getContent());
 			if (useAuthentication) {
 				try {
-					log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
-							+ ", Sending base64 content of " + input.getContent());
-					result = httpClient.postRawDataAuthenticatedAsBase64(clientAuthGenerator.getAuthString(),
-							input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(),
-							bodyContent);
+					log.info(() -> "Making authenticated call, Sending base64 content of " + input.getContent());
+					result = httpClient.postRawDataAuthenticatedAsBase64(input.getDigitalTwinInstanceId(),
+							input.getEndpoint(), input.getTimeReceived(), bodyContent);
 				} catch (HttpClientException e) {
 					log.warning("HttpClient exception making call postRawDataAuthenticatedAsBase64 - "
 							+ e.getLocalizedMessage());
@@ -132,11 +126,9 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 			if (input.getMediaType().isTextBased()) {
 				if (useAuthentication) {
 					try {
-						log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
-								+ ", Sending string content of " + input.getContent());
-						result = httpClient.postRawDataAuthenticatedAsString(clientAuthGenerator.getAuthString(),
-								input.getDigitalTwinInstanceId(), input.getEndpoint(), input.getTimeReceived(),
-								input.getContentString());
+						log.info(() -> "Making authenticated call, Sending string content of " + input.getContent());
+						result = httpClient.postRawDataAuthenticatedAsString(input.getDigitalTwinInstanceId(),
+								input.getEndpoint(), input.getTimeReceived(), input.getContentString());
 					} catch (HttpClientException e) {
 						log.warning("HttpClient exception making call postRawDataAuthenticatedAsString - "
 								+ e.getLocalizedMessage());
@@ -147,8 +139,7 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 					}
 				} else {
 					try {
-						log.info(() -> "Making authenticated call with auth " + clientAuthGenerator.getAuthString()
-								+ ", Sending string content of " + input.getContent());
+						log.info(() -> "Making authenticated call , Sending string content of " + input.getContent());
 						result = httpClient.postRawDataUnauthenticatedAsString(input.getDigitalTwinInstanceId(),
 								input.getEndpoint(), input.getTimeReceived(), input.getContentString());
 					} catch (HttpClientException e) {
