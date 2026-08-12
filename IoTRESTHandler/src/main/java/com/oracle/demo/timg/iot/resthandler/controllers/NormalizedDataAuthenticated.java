@@ -1,4 +1,4 @@
-/*Copyright (c) 2024 Oracle and/or its affiliates.
+/*Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -37,6 +37,8 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.resthandler.controllers;
 
 import java.util.Base64;
+
+import com.oracle.demo.timg.iot.resthandler.jsondata.NormalizedDataTransfer;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;

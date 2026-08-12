@@ -38,6 +38,8 @@ package com.oracle.demo.timg.iot.resthandler.controllers;
 
 import java.util.Base64;
 
+import com.oracle.demo.timg.iot.resthandler.jsondata.NormalizedDataTransfer;
+
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Consumes;

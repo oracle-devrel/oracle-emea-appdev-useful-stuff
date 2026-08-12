@@ -36,11 +36,46 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.resthandler.controllers;
 
-public class RESTServerProperties {
-	public final static String REST_PREFIX = "restserver";
-	public final static String USERNAME = REST_PREFIX + ".username";
-	public final static String PASSWORD = REST_PREFIX + ".password";
-	public final static String BASTION_KEEPALIVE = REST_PREFIX + ".bastion.keepalive";
-	public final static String BASTION_ENABLED = BASTION_KEEPALIVE + ".enabled";
-	public final static String BASTION_FREQUENCY = BASTION_KEEPALIVE + ".frequency";
+import com.oracle.demo.timg.iot.resthandler.jsondata.NormalizedDataMetadataTransfer;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Consumes;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
+
+@Controller("/api/v1/iotdata/wrappednormalizeddata/oic")
+@Log
+@ExecuteOn(TaskExecutors.BLOCKING)
+@Singleton
+public class WrappedNormalizedDataOIC {
+
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post
+	public void postNormalizedDataAsJson(@Body NormalizedDataMetadataTransfer ndmt) {
+		String resp = "WrappedNormalizedDataOIC jsonobject Received json request with body json object contents of "
+				+ ndmt.toString();
+		log.info(resp);
+	}
+
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/string")
+	public void postNormalizedDataAsString(@Body String body) {
+		String resp = "WrappedNormalizedDataOIC jsonobject Received json request with body string contents of " + body;
+		log.info(resp);
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Controller built");
+	}
 }

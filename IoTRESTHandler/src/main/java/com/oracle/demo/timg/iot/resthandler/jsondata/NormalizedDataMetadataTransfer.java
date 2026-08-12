@@ -34,13 +34,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.resthandler.controllers;
+package com.oracle.demo.timg.iot.resthandler.jsondata;
 
-public class RESTServerProperties {
-	public final static String REST_PREFIX = "restserver";
-	public final static String USERNAME = REST_PREFIX + ".username";
-	public final static String PASSWORD = REST_PREFIX + ".password";
-	public final static String BASTION_KEEPALIVE = REST_PREFIX + ".bastion.keepalive";
-	public final static String BASTION_ENABLED = BASTION_KEEPALIVE + ".enabled";
-	public final static String BASTION_FREQUENCY = BASTION_KEEPALIVE + ".frequency";
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.java.Log;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Serdeable
+@Log
+public class NormalizedDataMetadataTransfer {
+	private String externalKey;
+	private String digitalTwinInstanceId;
+	private String digitalTwinInstanceDisplayName;
+	private String digitalTwinModelId;
+	private String digitalTwinModelDisplayName;
+	private NormalizedDataEventTransfer normalizedDataEventTransfer;
 }
