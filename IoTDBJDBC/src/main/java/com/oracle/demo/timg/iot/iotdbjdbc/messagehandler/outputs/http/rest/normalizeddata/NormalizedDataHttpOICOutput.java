@@ -62,6 +62,8 @@ public class NormalizedDataHttpOICOutput implements NormalizedDataMessageHandler
 	private final boolean sentDataIsCompleted;
 	private final String targetUrl;
 	private final boolean sendtojsonobject;
+	@Property(name = IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY, defaultValue = "/api/v1/iotdata/normalizeddata/oic")
+	private String path;
 
 	@Inject
 	public NormalizedDataHttpOICOutput(NormalizedDataIoTOutputHttpOICClient httpOicClient,
@@ -93,8 +95,7 @@ public class NormalizedDataHttpOICOutput implements NormalizedDataMessageHandler
 			}
 		} catch (HttpClientException e) {
 			log.warning(
-					"HttpOICClient exception making call postNormalizedDataAsJsonObject - " + e.getLocalizedMessage());
-			e.printStackTrace();
+					"HttpOICClient exception making call postNormalizedDataAsJsonToXXXX - " + e.getLocalizedMessage());
 			NormalizedData[] returnResp = new NormalizedData[1];
 			returnResp[0] = input;
 			return returnResp;
@@ -129,7 +130,7 @@ public class NormalizedDataHttpOICOutput implements NormalizedDataMessageHandler
 
 	@Override
 	public String getConfig() {
-		return getName() + " order " + getOrder() + " targetting " + targetUrl;
+		return getName() + " order " + getOrder() + " targetting " + targetUrl + " and path " + path;
 	}
 
 	@PostConstruct

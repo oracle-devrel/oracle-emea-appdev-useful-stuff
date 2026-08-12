@@ -40,11 +40,10 @@ import java.util.Base64;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
-import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
@@ -55,6 +54,8 @@ import lombok.extern.java.Log;
 		"${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**}" })
 @Log
 public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
+	@Property(name = IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY, defaultValue = "/api/v1/iotdata/normalizeddata/oic")
+	private String patternPath;
 	private final String username;
 	private final String password;
 
@@ -88,9 +89,9 @@ public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
-	@EventListener
-	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttpOICClientAuthenticatedRequestFilter username="
-				+ this.username);
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Post Construct for IoTOutputHttpOICClientAuthenticatedRequestFilter username=" + this.username
+				+ ", password=" + password + " pattern =" + patternPath + "/**");
 	}
 }
