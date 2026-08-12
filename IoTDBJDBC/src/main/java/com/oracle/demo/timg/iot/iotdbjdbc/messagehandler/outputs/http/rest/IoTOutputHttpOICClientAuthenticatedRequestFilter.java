@@ -51,7 +51,7 @@ import lombok.extern.java.Log;
 @Requires(property = IoTOutputHttpOICClientSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
 // needs a endpoint
 @ClientFilter(patterns = {
-		"${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**}" })
+		"${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**" })
 @Log
 public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 	@Property(name = IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY, defaultValue = "/api/v1/iotdata/normalizeddata/oic")
