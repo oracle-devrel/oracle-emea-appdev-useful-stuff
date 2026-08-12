@@ -39,6 +39,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 import java.util.Base64;
 
 import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
@@ -47,9 +48,11 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
+// enabled if sending to OIC
+@Requires(property = IoTOutputHttpOICClientSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
 // needs a endpoint
 @ClientFilter(patterns = {
-		"${messagehandler.output.normalizeddata.oicrestadapter.targetpath:/api/v1/iotdata/normalizeddata/oic/**}" })
+		"${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**}" })
 @Log
 public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 	private final String username;
@@ -87,7 +90,7 @@ public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttpRestClientAuthenticatedRequestFilter username="
+		log.info("Startup event received for IoTOutputHttpOICClientAuthenticatedRequestFilter username="
 				+ this.username);
 	}
 }

@@ -38,6 +38,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.norm
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOutputHttpOICClientSettings;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -51,9 +52,9 @@ import lombok.extern.java.Log;
 
 @Singleton
 // need the username and password
-@Requires(property = "micronaut.http.services.normalizeddataiotoutputhttpoicclient.url")
-@Requires(property = "messagehandler.output.normalizeddata.httpoicclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.normalizeddata.httpoicclient.order")
+@Requires(property = IoTOutputHttpOICClientSettings.URL)
+@Requires(property = IoTOutputHttpOICClientSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpOICClientSettings.ORDER_PROPERTY)
 @Log
 public class NormalizedDataHttpOICOutput implements NormalizedDataMessageHandler {
 	private final NormalizedDataIoTOutputHttpOICClient httpOicClient;
@@ -64,11 +65,11 @@ public class NormalizedDataHttpOICOutput implements NormalizedDataMessageHandler
 
 	@Inject
 	public NormalizedDataHttpOICOutput(NormalizedDataIoTOutputHttpOICClient httpOicClient,
-			@Property(name = "messagehandler.output.normalizeddata.httpoicclient.order") int order,
-			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpoicclient.url") String targetUrl,
-			@Property(name = "messagehandler.output.normalizeddata.httpoicclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = "messagehandler.output.normalizeddata.httpoicclient.sendtojsonobject", defaultValue = "true") boolean sendtojsonobject) {
-		log.info("In normalized data http client constructor");
+			@Property(name = IoTOutputHttpOICClientSettings.ORDER_PROPERTY) int order,
+			@Property(name = IoTOutputHttpOICClientSettings.URL) String targetUrl,
+			@Property(name = IoTOutputHttpOICClientSettings.SENT_DATA_IS_COMPLETED_PROPERTY, defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = IoTOutputHttpOICClientSettings.SEND_TO_JSON_PROPERTY, defaultValue = "true") boolean sendtojsonobject) {
+		log.info("In normalized data http oic client constructor");
 		this.httpOicClient = httpOicClient;
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;

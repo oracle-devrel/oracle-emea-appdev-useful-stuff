@@ -37,7 +37,13 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
 
 public class IoTOutputHttpOICClientSettings {
-	public static final String PREFIX = "messagehandler.output.iotoutputhttpoicclient";
+	public final static String URL = "micronaut.http.services.normalizeddataiotoutputhttpoicclient.url";
+	public final static String PREFIX = "messagehandler.output.normalizeddata.httpoicclient";
+	public final static String ENABLED_PROPERTY = PREFIX + ".enabled";
+	public final static String ORDER_PROPERTY = PREFIX + ".order";
 	public final static String USERNAME_PROPERTY = PREFIX + ".username";
 	public final static String PASSWORD_BASE64_PROPERTY = PREFIX + ".passwordbase64";
+	public final static String SEND_TO_JSON_PROPERTY = PREFIX + ".sendtojsonobject";
+	public final static String SENT_DATA_IS_COMPLETED_PROPERTY = PREFIX + ".sentdataiscompleted";
+	public final static String TARGET_PATH_PROPERTY = PREFIX + ".targetpath";
 }
