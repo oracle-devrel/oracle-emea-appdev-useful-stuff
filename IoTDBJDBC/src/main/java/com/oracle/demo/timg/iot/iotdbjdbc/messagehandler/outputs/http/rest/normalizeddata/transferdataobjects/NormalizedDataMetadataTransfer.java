@@ -37,28 +37,62 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.DeviceModelInstancesCache;
 
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.java.Log;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Serdeable
-public class NormalizedDataTransfer {
+@Log
+public class NormalizedDataMetadataTransfer {
+	private String externalKey;
 	private String digitalTwinInstanceId;
-	private String contentPath;
-	private String contentType;
-	private String content;
-	private String timeObserved;
+	private String digitalTwinInstanceDisplayName;
+	private String digitalTwinModelId;
+	private String digitalTwinModelDisplayName;
+	private NormalizedDataEventTransfer normalizedDataEventTransfer;
 
-	public static NormalizedDataTransfer buildNormalizedDataTransfer(NormalizedData input) {
-		return NormalizedDataTransfer.builder().digitalTwinInstanceId(input.getDigitalTwinInstanceId())
+	public static NormalizedDataMetadataTransfer buildTransfer(NormalizedData input,
+			DeviceModelInstancesCache deviceModelInstancesCache) {
+		NormalizedDataEventTransfer normalizedDataEventTransfer = NormalizedDataEventTransfer.builder()
 				.contentPath(input.getContentPath()).contentType(input.getContentType()).content(input.getContent())
 				.timeObserved(input.getTimeObserved()).build();
+		String instanceId = input.getDigitalTwinInstanceId();
+		NormalizedDataMetadataTransferBuilder normalizedDataMetadataTransferBuilder = NormalizedDataMetadataTransfer
+				.builder().digitalTwinInstanceId(instanceId).normalizedDataEventTransfer(normalizedDataEventTransfer);
+		// try and work out what else is available, if we can find it add it
+		try {
+			normalizedDataMetadataTransferBuilder
+					.externalKey(deviceModelInstancesCache.getExternalKeyByInstanceId(instanceId, false));
+		} catch (Exception e) {
+			log.info("Problem getting external key from instance Id " + instanceId);
+		}
+		try {
+			normalizedDataMetadataTransferBuilder.digitalTwinInstanceDisplayName(
+					deviceModelInstancesCache.getInstanceDisplayNameByInstanceId(instanceId, false));
+		} catch (Exception e) {
+			log.info("Problem getting display name from instance Id " + instanceId);
+		}
+		try {
+			normalizedDataMetadataTransferBuilder
+					.digitalTwinModelId(deviceModelInstancesCache.getModelIdByInstanceId(instanceId, false));
+		} catch (Exception e) {
+			log.info("Problem getting model Id from instance Id " + instanceId);
+		}
+		try {
+			normalizedDataMetadataTransferBuilder
+					.digitalTwinModelDisplayName(deviceModelInstancesCache.getModelNameByInstanceId(instanceId, false));
+		} catch (Exception e) {
+			log.info("Problem getting model display name from instance Id " + instanceId);
+		}
+		return normalizedDataMetadataTransferBuilder.build();
 	}
 }

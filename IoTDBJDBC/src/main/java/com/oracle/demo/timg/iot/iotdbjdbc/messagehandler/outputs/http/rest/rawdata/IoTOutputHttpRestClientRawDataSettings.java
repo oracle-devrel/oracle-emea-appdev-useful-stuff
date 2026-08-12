@@ -45,4 +45,5 @@ public class IoTOutputHttpRestClientRawDataSettings {
 	public final static String USE_AUTHENTICATION_PEROPERTY = PREFIX + ".useauthentication";
 	public final static String SENT_DATA_IS_COMPLETED_PROPERTY = PREFIX + ".sentdataiscompleted";
 	public final static String TARGET_PATH_PROPERTY = PREFIX + ".targetpath";
+	public final static String TARGET_PATH_DEFAULT = "/api/v1/iotdata/rawdata";
 }

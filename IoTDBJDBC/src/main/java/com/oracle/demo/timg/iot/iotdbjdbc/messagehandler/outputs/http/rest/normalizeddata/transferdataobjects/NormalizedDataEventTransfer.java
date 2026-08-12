@@ -34,16 +34,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects;
 
-public class IoTOutputHttpRestClientNormalizedDataSettings {
-	public final static String URL = "micronaut.http.services.normalizeddataiotoutputhttpclient.url";
-	public final static String PREFIX = "messagehandler.output.normalizeddata.httpclient";
-	public final static String ENABLED_PROPERTY = PREFIX + ".enabled";
-	public final static String ORDER_PROPERTY = PREFIX + ".order";
-	public final static String TYPE_PROPERTY = PREFIX + ".type";
-	public final static String USE_AUTHENTICATION_PEROPERTY = PREFIX + ".useauthentication";
-	public final static String SENT_DATA_IS_COMPLETED_PROPERTY = PREFIX + ".sentdataiscompleted";
-	public final static String TARGET_PATH_PROPERTY = PREFIX + ".targetpath";
-	public final static String TARGET_PATH_DEFAULT = "/api/v1/iotdata/normalizeddata";
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
+
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Serdeable
+public class NormalizedDataEventTransfer {
+	private String contentPath;
+	private String contentType;
+	private String content;
+	private String timeObserved;
+
+	public static NormalizedDataEventTransfer buildNormalizedDataTransfer(NormalizedData input) {
+		return NormalizedDataEventTransfer.builder().contentPath(input.getContentPath())
+				.contentType(input.getContentType()).content(input.getContent()).timeObserved(input.getTimeObserved())
+				.build();
+	}
 }

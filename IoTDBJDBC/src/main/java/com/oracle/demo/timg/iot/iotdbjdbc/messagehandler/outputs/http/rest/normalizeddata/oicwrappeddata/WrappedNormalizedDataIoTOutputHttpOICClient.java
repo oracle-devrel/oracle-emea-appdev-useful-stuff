@@ -34,16 +34,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicwrappeddata;
 
-public class IoTOutputHttpRestClientNormalizedDataSettings {
-	public final static String URL = "micronaut.http.services.normalizeddataiotoutputhttpclient.url";
-	public final static String PREFIX = "messagehandler.output.normalizeddata.httpclient";
-	public final static String ENABLED_PROPERTY = PREFIX + ".enabled";
-	public final static String ORDER_PROPERTY = PREFIX + ".order";
-	public final static String TYPE_PROPERTY = PREFIX + ".type";
-	public final static String USE_AUTHENTICATION_PEROPERTY = PREFIX + ".useauthentication";
-	public final static String SENT_DATA_IS_COMPLETED_PROPERTY = PREFIX + ".sentdataiscompleted";
-	public final static String TARGET_PATH_PROPERTY = PREFIX + ".targetpath";
-	public final static String TARGET_PATH_DEFAULT = "/api/v1/iotdata/normalizeddata";
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects.NormalizedDataMetadataTransfer;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.client.annotation.Client;
+
+// needs the credentials
+
+@Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Client(id = "normalizeddataiotoutputhttpoicclient", path = "${"
+		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
+		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT + "}")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+public interface WrappedNormalizedDataIoTOutputHttpOICClient {
+	@Post(consumes = MediaType.APPLICATION_JSON)
+	public HttpResponse<Void> postWrappedNormalizedDataAsJsonToJsonObject(
+			@Body NormalizedDataMetadataTransfer normalizedDataMetadataTransfer);
+
+	@Post(value = "/string", consumes = MediaType.APPLICATION_JSON)
+	public HttpResponse<Void> postWrappedNormalizedDataAsJsonToString(
+			@Body NormalizedDataMetadataTransfer normalizedDataMetadataTransfer);
 }

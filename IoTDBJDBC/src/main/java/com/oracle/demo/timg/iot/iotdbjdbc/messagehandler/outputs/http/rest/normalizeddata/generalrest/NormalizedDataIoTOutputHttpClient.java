@@ -34,9 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest;
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects.NormalizedDataTransfer;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
@@ -51,7 +53,8 @@ import jakarta.ws.rs.PathParam;
 
 @Requires(property = IoTOutputHttpRestClientNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
 @Client(id = "normalizeddataiotoutputhttpclient", path = "${"
-		+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata}")
+		+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
+		+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_DEFAULT + "}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpClient {
 	@Post(value = "/authenticated/jsonobject/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)

@@ -36,7 +36,7 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.IoTOutputHttpRestClientNormalizedDataSettings;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest.IoTOutputHttpRestClientNormalizedDataSettings;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.rawdata.IoTOutputHttpRestClientRawDataSettings;
 
 import io.micronaut.context.annotation.Requires;
@@ -54,10 +54,10 @@ import lombok.extern.java.Log;
 
 // needs a endpoint
 @ClientFilter(patterns = {
-		"${" + IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata}"
-				+ "/unauthenticated/**",
-		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/rawdata}"
-				+ "/unauthenticated/**" })
+		"${" + IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
+				+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_DEFAULT + "}" + "/unauthenticated/**",
+		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":"
+				+ IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_DEFAULT + "}" + "/unauthenticated/**" })
 @Log
 public class IoTOutputHttpRestClientUnauthenticatedRequestFilter {
 

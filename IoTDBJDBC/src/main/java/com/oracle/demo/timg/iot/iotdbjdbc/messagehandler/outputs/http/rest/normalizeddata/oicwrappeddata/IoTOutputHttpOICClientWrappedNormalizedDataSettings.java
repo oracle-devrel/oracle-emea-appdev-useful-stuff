@@ -34,16 +34,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicwrappeddata;
 
-public class IoTOutputHttpRestClientNormalizedDataSettings {
-	public final static String URL = "micronaut.http.services.normalizeddataiotoutputhttpclient.url";
-	public final static String PREFIX = "messagehandler.output.normalizeddata.httpclient";
+public class IoTOutputHttpOICClientWrappedNormalizedDataSettings {
+	public final static String URL = "micronaut.http.services.wrappednormalizeddataiotoutputhttpclient.url";
+	public final static String PREFIX = "messagehandler.output.normalizeddata.wrappedhttpociclient";
 	public final static String ENABLED_PROPERTY = PREFIX + ".enabled";
 	public final static String ORDER_PROPERTY = PREFIX + ".order";
-	public final static String TYPE_PROPERTY = PREFIX + ".type";
+	public final static String USERNAME_PROPERTY = PREFIX + ".username";
+	public final static String PASSWORD_BASE64_PROPERTY = PREFIX + ".passwordbase64";
 	public final static String USE_AUTHENTICATION_PEROPERTY = PREFIX + ".useauthentication";
 	public final static String SENT_DATA_IS_COMPLETED_PROPERTY = PREFIX + ".sentdataiscompleted";
 	public final static String TARGET_PATH_PROPERTY = PREFIX + ".targetpath";
-	public final static String TARGET_PATH_DEFAULT = "/api/v1/iotdata/normalizeddata";
+	public final static String TARGET_PATH_DEFAULT = "/api/v1/iotdata/wrappednormalizeddata/oic";
+	public static final String SEND_TO_JSON_PROPERTY = PREFIX + "sendtojsonobject";
 }

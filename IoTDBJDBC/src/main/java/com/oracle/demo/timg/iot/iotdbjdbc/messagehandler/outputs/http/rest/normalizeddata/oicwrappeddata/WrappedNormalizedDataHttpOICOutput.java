@@ -34,11 +34,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicwrappeddata;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.NormalizedDataMessageHandler;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects.NormalizedDataTransfer;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.iotdbutils.DeviceModelInstancesCache;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects.NormalizedDataMetadataTransfer;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -52,27 +53,30 @@ import lombok.extern.java.Log;
 
 @Singleton
 // need the username and password
-@Requires(property = IoTOutputHttpOICClientNormalizedDataSimpleSettings.URL)
-@Requires(property = IoTOutputHttpOICClientNormalizedDataSimpleSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
-@Requires(property = IoTOutputHttpOICClientNormalizedDataSimpleSettings.ORDER_PROPERTY)
+@Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.URL)
+@Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ORDER_PROPERTY)
 @Log
-public class NormalizedDataHttpOICSimpleOutput implements NormalizedDataMessageHandler {
-	private final NormalizedDataIoTOutputHttpOICSimpleClient httpOicClient;
+public class WrappedNormalizedDataHttpOICOutput implements NormalizedDataMessageHandler {
+	private final WrappedNormalizedDataIoTOutputHttpOICClient wrappedHttpOicClient;
+	private final DeviceModelInstancesCache deviceModelInstancesCache;
 	private final int order;
 	private final boolean sentDataIsCompleted;
 	private final String targetUrl;
 	private final boolean sendtojsonobject;
-	@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT)
+	@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT)
 	private String path;
 
 	@Inject
-	public NormalizedDataHttpOICSimpleOutput(NormalizedDataIoTOutputHttpOICSimpleClient httpOicClient,
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.ORDER_PROPERTY) int order,
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.URL) String targetUrl,
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.SENT_DATA_IS_COMPLETED_PROPERTY, defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.SEND_TO_JSON_PROPERTY, defaultValue = "true") boolean sendtojsonobject) {
-		log.info("In normalized data http oic client constructor");
-		this.httpOicClient = httpOicClient;
+	public WrappedNormalizedDataHttpOICOutput(WrappedNormalizedDataIoTOutputHttpOICClient wrappedHttpOicClient,
+			DeviceModelInstancesCache deviceModelInstancesCache,
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ORDER_PROPERTY) int order,
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.URL) String targetUrl,
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.SENT_DATA_IS_COMPLETED_PROPERTY, defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.SEND_TO_JSON_PROPERTY, defaultValue = "true") boolean sendtojsonobject) {
+		log.info("In wrapped normalized data http oic client constructor");
+		this.wrappedHttpOicClient = wrappedHttpOicClient;
+		this.deviceModelInstancesCache = deviceModelInstancesCache;
 		this.order = order;
 		this.sentDataIsCompleted = sentDataIsCompleted;
 		this.targetUrl = targetUrl;
@@ -83,15 +87,17 @@ public class NormalizedDataHttpOICSimpleOutput implements NormalizedDataMessageH
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
 		log.info(() -> "NormalizedData is " + input);
 		HttpResponse<Void> result;
-		NormalizedDataTransfer normalizedDataTransfer = NormalizedDataTransfer.buildNormalizedDataTransfer(input);
+		NormalizedDataMetadataTransfer normalizedDataTransfer = NormalizedDataMetadataTransfer.buildTransfer(input,
+				deviceModelInstancesCache);
 		try {
 			if (sendtojsonobject) {
-				log.info(
-						() -> "Making OIC call, Sending json to json object with content of " + normalizedDataTransfer);
-				result = httpOicClient.postNormalizedDataAsJsonToJsonObject(normalizedDataTransfer);
+				log.info(() -> "Making OIC call, Sending wrapped json to json object with content of "
+						+ normalizedDataTransfer);
+				result = wrappedHttpOicClient.postWrappedNormalizedDataAsJsonToJsonObject(normalizedDataTransfer);
 			} else {
-				log.info(() -> "Making OIC call, Sending json to string with content of " + normalizedDataTransfer);
-				result = httpOicClient.postNormalizedDataAsJsonToString(normalizedDataTransfer);
+				log.info(() -> "Making OIC call, Sending wrapped json to string with content of "
+						+ normalizedDataTransfer);
+				result = wrappedHttpOicClient.postWrappedNormalizedDataAsJsonToString(normalizedDataTransfer);
 			}
 		} catch (HttpClientException e) {
 			log.warning(
