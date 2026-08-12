@@ -61,8 +61,8 @@ public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 
 	@Inject
 	public IoTOutputHttpOICClientAuthenticatedRequestFilter(
-			@Property(name = IoTOutputHttpRestClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
-			@Property(name = IoTOutputHttpRestClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
+			@Property(name = IoTOutputHttpOICClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
+			@Property(name = IoTOutputHttpOICClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
 		if ((username == null) || (username.length() == 0)) {
 			this.username = null;
 		} else {
