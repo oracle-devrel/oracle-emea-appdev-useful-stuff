@@ -55,9 +55,9 @@ import lombok.extern.java.Log;
 
 @Singleton
 // need the username and password
-@Requires(property = "micronaut.http.services.normalizeddataiotoutputhttpclient.url")
-@Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.normalizeddata.httpclient.order")
+@Requires(property = IoTOutputHttpRestClientNormalizedDataSettings.URL)
+@Requires(property = IoTOutputHttpRestClientNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpRestClientNormalizedDataSettings.ORDER_PROPERTY)
 @Log
 public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 	private final NormalizedDataIoTOutputHttpClient httpClient;
@@ -69,11 +69,11 @@ public class NormalizedDataHttpOutput implements NormalizedDataMessageHandler {
 
 	@Inject
 	public NormalizedDataHttpOutput(NormalizedDataIoTOutputHttpClient httpClient,
-			@Property(name = "messagehandler.output.normalizeddata.httpclient.order") int order,
-			@Property(name = "messagehandler.output.normalizeddata.httpclient.type", defaultValue = "JSON_OBJECT") HttpOutputType type,
-			@Property(name = "messagehandler.output.normalizeddata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
-			@Property(name = "messagehandler.output.normalizeddata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = "micronaut.http.services.normalizeddataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {
+			@Property(name = IoTOutputHttpRestClientNormalizedDataSettings.ORDER_PROPERTY) int order,
+			@Property(name = IoTOutputHttpRestClientNormalizedDataSettings.TYPE_PROPERTY, defaultValue = "JSON_OBJECT") HttpOutputType type,
+			@Property(name = IoTOutputHttpRestClientNormalizedDataSettings.USE_AUTHENTICATION_PEROPERTY, defaultValue = "false") boolean useAuthentication,
+			@Property(name = IoTOutputHttpRestClientNormalizedDataSettings.SENT_DATA_IS_COMPLETED_PROPERTY, defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = IoTOutputHttpRestClientNormalizedDataSettings.URL, defaultValue = "URL is missing") String targetUrl) {
 		log.info("In normalized data http client constructor");
 		this.httpClient = httpClient;
 		this.order = order;

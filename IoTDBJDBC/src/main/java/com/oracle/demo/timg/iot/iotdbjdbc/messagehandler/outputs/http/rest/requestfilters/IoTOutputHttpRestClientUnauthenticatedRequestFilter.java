@@ -34,52 +34,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
-import java.util.Base64;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.IoTOutputHttpRestClientNormalizedDataSettings;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.rawdata.IoTOutputHttpRestClientRawDataSettings;
 
-import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
-import jakarta.inject.Inject;
 import lombok.extern.java.Log;
+
+// only load if expressly enabled
+@Requires(property = IoTOutputHttpClientCommonFilterSettings.UNAUTHENTICATED_FILTER_ENABLED_PROPERTY, value = "true", defaultValue = "false")
+// load if the http clients are enabled
+@Requires(condition = IoTOutputHttpRestClientEnableRequestFilter.class)
 
 // needs a endpoint
 @ClientFilter(patterns = {
-		"${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}"
-				+ "/authenticated/**",
-		"${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}" + "/authenticated/**" })
+		"${" + IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata}"
+				+ "/unauthenticated/**",
+		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/rawdata}"
+				+ "/unauthenticated/**" })
 @Log
-public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
-	private final String username;
-	private final String password;
-
-	@Inject
-	public IoTOutputHttpRestClientAuthenticatedRequestFilter(
-			@Property(name = IoTOutputHttpRestClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
-			@Property(name = IoTOutputHttpRestClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
-		if ((username == null) || (username.length() == 0)) {
-			this.username = null;
-		} else {
-			this.username = username;
-		}
-		if (passwordBase64.length() > 0) {
-			this.password = new String(Base64.getDecoder().decode(passwordBase64));
-		} else {
-			this.password = "";
-		}
-	}
+public class IoTOutputHttpRestClientUnauthenticatedRequestFilter {
 
 	@RequestFilter
 	public void doFilter(MutableHttpRequest<?> request) {
-		log.info("Filter authenticated");
-		if (username != null) {
-			log.info(() -> "Adding user auth username=" + this.username);
-			request.basicAuth(this.username, this.password);
-		}
+		log.info("Filter unauthenticated");
 		log.info(() -> "Request uri " + request.getUri().toASCIIString());
 		log.info(() -> "Request path " + request.getPath());
 		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
@@ -89,7 +73,6 @@ public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
 
 	@EventListener
 	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttpRestClientAuthenticatedRequestFilter username="
-				+ this.username);
+		log.info("Startup event received for IoTOutputHttpRestClientUnauthenticatedRequestFilter");
 	}
 }

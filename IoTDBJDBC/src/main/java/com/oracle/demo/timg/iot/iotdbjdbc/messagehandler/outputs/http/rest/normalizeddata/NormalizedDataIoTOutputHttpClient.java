@@ -49,8 +49,9 @@ import jakarta.ws.rs.PathParam;
 
 // needs the credentials
 
-@Requires(property = "messagehandler.output.normalizeddata.httpclient.enabled", value = "true", defaultValue = "false")
-@Client(id = "normalizeddataiotoutputhttpclient", path = "${messagehandler.output.normalizeddata.httpclient.targetpath:/api/v1/iotdata/normalizeddata}")
+@Requires(property = IoTOutputHttpRestClientNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Client(id = "normalizeddataiotoutputhttpclient", path = "${"
+		+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpClient {
 	@Post(value = "/authenticated/jsonobject/{digitaltwinid}/{contentpath}/{timestamp}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)

@@ -34,9 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
 import java.util.Base64;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.IoTOutputHttpOICClientNormalizedDataSettings;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -48,21 +50,21 @@ import jakarta.inject.Inject;
 import lombok.extern.java.Log;
 
 // enabled if sending to OIC
-@Requires(property = IoTOutputHttpOICClientSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpOICClientNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
 // needs a endpoint
 @ClientFilter(patterns = {
-		"${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**" })
+		"${" + IoTOutputHttpOICClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":/api/v1/iotdata/normalizeddata/oic}/**" })
 @Log
-public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
-	@Property(name = IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY, defaultValue = "/api/v1/iotdata/normalizeddata/oic")
+public class IoTOutputHttpOICClientNormalizedDataRequestFilter {
+	@Property(name = IoTOutputHttpOICClientNormalizedDataSettings.TARGET_PATH_PROPERTY, defaultValue = "/api/v1/iotdata/normalizeddata/oic")
 	private String patternPath;
 	private final String username;
 	private final String password;
 
 	@Inject
-	public IoTOutputHttpOICClientAuthenticatedRequestFilter(
-			@Property(name = IoTOutputHttpOICClientSettings.USERNAME_PROPERTY, defaultValue = "") String username,
-			@Property(name = IoTOutputHttpOICClientSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
+	public IoTOutputHttpOICClientNormalizedDataRequestFilter(
+			@Property(name = IoTOutputHttpOICClientNormalizedDataSettings.USERNAME_PROPERTY, defaultValue = "") String username,
+			@Property(name = IoTOutputHttpOICClientNormalizedDataSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
 		if ((username == null) || (username.length() == 0)) {
 			this.username = null;
 		} else {
@@ -91,7 +93,7 @@ public class IoTOutputHttpOICClientAuthenticatedRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.info("Post Construct for IoTOutputHttpOICClientAuthenticatedRequestFilter username=" + this.username
+		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataRequestFilter username=" + this.username
 				+ ", password=" + password + " pattern =" + patternPath + "/**");
 	}
 }

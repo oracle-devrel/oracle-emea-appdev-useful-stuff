@@ -38,8 +38,6 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.norm
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.IoTOutputHttpOICClientSettings;
-
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -50,8 +48,8 @@ import io.micronaut.http.client.annotation.Client;
 
 // needs the credentials
 
-@Requires(property = IoTOutputHttpOICClientSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
-@Client(id = "normalizeddataiotoutputhttpoicclient", path = "${" + IoTOutputHttpOICClientSettings.TARGET_PATH_PROPERTY
+@Requires(property = IoTOutputHttpOICClientNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Client(id = "normalizeddataiotoutputhttpoicclient", path = "${" + IoTOutputHttpOICClientNormalizedDataSettings.TARGET_PATH_PROPERTY
 		+ ":/api/v1/iotdata/normalizeddata/oic}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface NormalizedDataIoTOutputHttpOICClient {

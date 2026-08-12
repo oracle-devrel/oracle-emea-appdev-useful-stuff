@@ -56,9 +56,9 @@ import lombok.extern.java.Log;
 
 @Singleton
 // need the username and password
-@Requires(property = "micronaut.http.services.rawdataiotoutputhttpclient.url")
-@Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
-@Requires(property = "messagehandler.output.rawdata.httpclient.order")
+@Requires(property = IoTOutputHttpRestClientRawDataSettings.URL)
+@Requires(property = IoTOutputHttpRestClientRawDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpRestClientRawDataSettings.ORDER_PROPERTY)
 @Log
 public class RawDataHttpOutput implements RawDataMessageHandler {
 	private final RawDataIoTOutputHttpClient httpClient;
@@ -70,11 +70,11 @@ public class RawDataHttpOutput implements RawDataMessageHandler {
 
 	@Inject
 	public RawDataHttpOutput(RawDataIoTOutputHttpClient httpClient,
-			@Property(name = "messagehandler.output.rawdata.httpclient.order") int order,
-			@Property(name = "messagehandler.output.rawdata.httpclient.type", defaultValue = "JSON_OBJECT") HttpOutputType type,
-			@Property(name = "messagehandler.output.rawdata.httpclient.useauthentication", defaultValue = "false") boolean useAuthentication,
-			@Property(name = "messagehandler.output.rawdata.httpclient.sentdataiscompleted", defaultValue = "true") boolean sentDataIsCompleted,
-			@Property(name = "micronaut.http.services.rawdataiotoutputhttpclient.url", defaultValue = "URL is missing") String targetUrl) {
+			@Property(name = IoTOutputHttpRestClientRawDataSettings.ORDER_PROPERTY) int order,
+			@Property(name = IoTOutputHttpRestClientRawDataSettings.TYPE_PROPERTY, defaultValue = "JSON_OBJECT") HttpOutputType type,
+			@Property(name = IoTOutputHttpRestClientRawDataSettings.USE_AUTHENTICATION_PEROPERTY, defaultValue = "false") boolean useAuthentication,
+			@Property(name = IoTOutputHttpRestClientRawDataSettings.SENT_DATA_IS_COMPLETED_PROPERTY, defaultValue = "true") boolean sentDataIsCompleted,
+			@Property(name = IoTOutputHttpRestClientRawDataSettings.URL, defaultValue = "URL is missing") String targetUrl) {
 		this.httpClient = httpClient;
 		this.order = order;
 		this.type = type;

@@ -49,8 +49,9 @@ import jakarta.ws.rs.PathParam;
 
 // needs the credentials
 
-@Requires(property = "messagehandler.output.rawdata.httpclient.enabled", value = "true", defaultValue = "false")
-@Client(id = "rawdataiotoutputhttpclient", path = "${messagehandler.output.rawdata.httpclient.targetpath:/api/v1/iotdata/rawdata}")
+@Requires(property = IoTOutputHttpRestClientRawDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Client(id = "rawdataiotoutputhttpclient", path = "${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY
+		+ ":/api/v1/iotdata/rawdata}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
 public interface RawDataIoTOutputHttpClient {
 
