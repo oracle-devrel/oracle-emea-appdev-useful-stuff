@@ -100,8 +100,8 @@ public class WrappedNormalizedDataHttpOICOutput implements NormalizedDataMessage
 				result = wrappedHttpOicClient.postWrappedNormalizedDataAsJsonToString(normalizedDataTransfer);
 			}
 		} catch (HttpClientException e) {
-			log.warning(
-					"HttpOICClient exception making call postNormalizedDataAsJsonToXXXX - " + e.getLocalizedMessage());
+			log.warning("HttpOICClient exception making call postWrappedNormalizedDataAsJsonToXXXX - "
+					+ e.getLocalizedMessage());
 			NormalizedData[] returnResp = new NormalizedData[1];
 			returnResp[0] = input;
 			return returnResp;
@@ -131,7 +131,7 @@ public class WrappedNormalizedDataHttpOICOutput implements NormalizedDataMessage
 
 	@Override
 	public String getName() {
-		return "IoT HTTP Normalized Data OIC Client";
+		return "IoT HTTP Wrapped Normalized Data OIC Client";
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class WrappedNormalizedDataHttpOICOutput implements NormalizedDataMessage
 
 	@PostConstruct
 	public void postConstruct() {
-		log.info("NormalizedDataHttpOICSimpleOutput " + this.getConfig());
+		log.info("WrappedNormalizedDataHttpOICSimpleOutput " + this.getConfig());
 	}
 
 }

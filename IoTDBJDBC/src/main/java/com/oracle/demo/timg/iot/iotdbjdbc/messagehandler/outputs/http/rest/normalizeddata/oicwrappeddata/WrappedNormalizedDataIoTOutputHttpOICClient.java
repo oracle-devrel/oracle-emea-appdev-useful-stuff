@@ -51,7 +51,7 @@ import io.micronaut.http.client.annotation.Client;
 // needs the credentials
 
 @Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
-@Client(id = "normalizeddataiotoutputhttpoicclient", path = "${"
+@Client(id = "wrappednormalizeddataiotoutputhttpclient", path = "${"
 		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
 		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT + "}")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
