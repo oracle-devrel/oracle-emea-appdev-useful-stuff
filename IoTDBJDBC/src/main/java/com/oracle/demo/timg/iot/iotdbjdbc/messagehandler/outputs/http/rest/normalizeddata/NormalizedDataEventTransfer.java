@@ -34,7 +34,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
@@ -49,16 +49,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Serdeable
-public class NormalizedDataTransfer {
-	private String digitalTwinInstanceId;
+public class NormalizedDataEventTransfer {
 	private String contentPath;
 	private String contentType;
 	private String content;
 	private String timeObserved;
 
-	public static NormalizedDataTransfer buildNormalizedDataTransfer(NormalizedData input) {
-		return NormalizedDataTransfer.builder().digitalTwinInstanceId(input.getDigitalTwinInstanceId())
-				.contentPath(input.getContentPath()).contentType(input.getContentType()).content(input.getContent())
-				.timeObserved(input.getTimeObserved()).build();
+	public static NormalizedDataEventTransfer buildNormalizedDataTransfer(NormalizedData input) {
+		return NormalizedDataEventTransfer.builder().contentPath(input.getContentPath())
+				.contentType(input.getContentType()).content(input.getContent()).timeObserved(input.getTimeObserved())
+				.build();
 	}
 }

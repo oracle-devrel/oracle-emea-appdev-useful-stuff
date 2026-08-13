@@ -38,7 +38,7 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.norm
 
 import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.transferdataobjects.NormalizedDataMetadataTransfer;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.NormalizedDataMetadataTransfer;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
