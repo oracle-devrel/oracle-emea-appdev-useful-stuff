@@ -34,47 +34,40 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
+package com.oracle.demo.timg.iot.resthandler.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import static io.micronaut.http.HttpHeaders.WWW_AUTHENTICATE;
+import static io.micronaut.http.HttpStatus.FORBIDDEN;
+import static io.micronaut.http.HttpStatus.UNAUTHORIZED;
 
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
+import io.micronaut.security.authentication.AuthorizationException;
+import io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler;
+import io.micronaut.security.config.RedirectConfiguration;
+import io.micronaut.security.config.RedirectService;
+import io.micronaut.security.errors.PriorToLoginPersistence;
+import jakarta.inject.Singleton;
 
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
-@Data
-@NoArgsConstructor
-// flag as jackson serdable
-@Serdeable
-public class TimeSeriesDBCredentials {
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-	@JsonProperty(value = "username")
-	private String username;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-	@JsonProperty(value = "password")
-	private String password;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-	@JsonProperty(value = "tenant_name")
-	private String tenant_name;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-	@JsonProperty(value = "database_name")
-	private String database_name;
+@Singleton
+@Replaces(DefaultAuthorizationExceptionHandler.class)
+public class DefaultAuthorizationExceptionHandlerReplacement extends DefaultAuthorizationExceptionHandler {
 
-	/**
-	 * a to string that does not display confidential info
-	 * 
-	 * @return
-	 */
-	public String safeToString() {
-		return "TimeSeriesDBCredentials[username" + username + ", password=XXXXX, tennant_name=XXXXX, database_name="
-				+ database_name + "]";
+	public DefaultAuthorizationExceptionHandlerReplacement(ErrorResponseProcessor<?> errorResponseProcessor,
+			RedirectConfiguration redirectConfiguration, RedirectService redirectService,
+			@Nullable PriorToLoginPersistence priorToLoginPersistence) {
+		super(errorResponseProcessor, redirectConfiguration, redirectService, priorToLoginPersistence);
+	}
+
+	@Override
+	protected MutableHttpResponse<?> httpResponseWithStatus(HttpRequest request, AuthorizationException e) {
+		if (e.isForbidden()) {
+			return HttpResponse.status(FORBIDDEN);
+		}
+		return HttpResponse.status(UNAUTHORIZED).header(WWW_AUTHENTICATE, "Basic realm=\"IoTRESTHandler\"");
 	}
 }

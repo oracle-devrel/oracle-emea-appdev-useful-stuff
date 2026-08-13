@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=UtilityRoomOccupancy
+export INSTANCE_KEY=TltyRmCcpncy

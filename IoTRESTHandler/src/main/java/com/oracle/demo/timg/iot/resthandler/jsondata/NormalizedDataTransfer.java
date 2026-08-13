@@ -34,47 +34,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
+package com.oracle.demo.timg.iot.resthandler.jsondata;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-// flag as jackson serdable
 @Serdeable
-public class TimeSeriesDBCredentials {
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-	@JsonProperty(value = "username")
-	private String username;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-	@JsonProperty(value = "password")
-	private String password;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-	@JsonProperty(value = "tenant_name")
-	private String tenant_name;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-	@JsonProperty(value = "database_name")
-	private String database_name;
-
-	/**
-	 * a to string that does not display confidential info
-	 * 
-	 * @return
-	 */
-	public String safeToString() {
-		return "TimeSeriesDBCredentials[username" + username + ", password=XXXXX, tennant_name=XXXXX, database_name="
-				+ database_name + "]";
-	}
+public class NormalizedDataTransfer {
+	private String digitalTwinInstanceId;
+	private String contentPath;
+	private String contentType;
+	private String content;
+	private String timeObserved;
 }

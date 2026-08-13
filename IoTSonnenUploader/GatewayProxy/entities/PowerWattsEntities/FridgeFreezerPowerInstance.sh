@@ -1,0 +1,2 @@
+export INSTANCE_DISPLAY_NAME=FridgeFreezerPower
+export INSTANCE_KEY=FrdgFrzrPwr

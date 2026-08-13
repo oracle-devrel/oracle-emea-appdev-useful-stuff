@@ -1,0 +1,46 @@
+Entity test commands
+
+
+
+Testing commands for instance ConservatoryAirQuality of model HAAirQualityModel
+
+To send the instance test data using https for device ConservatoryAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/airqualityruuvi" -H 'Content-Type: application/json' -d "{\"payload\": {\"qualityscore\": 92, \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"noxindex\":1.0, \"vocindex\": 137, \"airpressure\": 1013.25, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"CnsrvtryRQlty\"}"
+
+To send instance test data using mqttx for device ConservatoryAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/airqualityruuvi -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"qualityscore\": 92, \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"noxindex\":1.0, \"vocindex\": 137, \"airpressure\": 1013.25, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"CnsrvtryRQlty\"}"
+
+To get the most recent normalized data for instance ConservatoryAirQuality
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7btgshicy2tzgismh2shzwgnnohiw2yrhohvnjmnntsta
+
+
+
+Testing commands for instance KitchenAirQuality of model HAAirQualityModel
+
+To send the instance test data using https for device KitchenAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/airqualityalpstuga" -H 'Content-Type: application/json' -d "{\"payload\": {\"qualitydescription\": \"Good\", \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"KtcnRQlty\"}"
+
+To send instance test data using mqttx for device KitchenAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/airqualityalpstuga -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"qualitydescription\": \"Good\", \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"KtcnRQlty\"}"
+
+To get the most recent normalized data for instance KitchenAirQuality
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7jo2ixk2njfzmt6jvxyavsfbk274qkhv7piyqaq4axvpq
+
+
+
+Testing commands for instance LoungeAirQuality of model HAAirQualityModel
+
+To send the instance test data using https for device LoungeAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/airqualityruuvi" -H 'Content-Type: application/json' -d "{\"payload\": {\"qualityscore\": 92, \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"noxindex\":1.0, \"vocindex\": 137, \"airpressure\": 1013.25, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LngRQlty\"}"
+
+To send instance test data using mqttx for device LoungeAirQuality
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/airqualityruuvi -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"qualityscore\": 92, \"co2ppm\": 549, \"pm2_5_ugm3\": 2.0, \"noxindex\":1.0, \"vocindex\": 137, \"airpressure\": 1013.25, \"relativehumidity\": 53.4, \"temperature\": 22.1, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LngRQlty\"}"
+
+To get the most recent normalized data for instance LoungeAirQuality
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7aktnae3myqyrdkyojwjerqnmxwqjateo2fb5z6d7ctaa

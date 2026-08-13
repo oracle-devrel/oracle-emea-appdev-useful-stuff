@@ -47,11 +47,15 @@ import lombok.extern.java.Log;
 @AllArgsConstructor
 @Log
 public enum IoTType {
-	AIR_PRESSURE("-1", "millibar"), BINARY_ON_OFF("off", "boolean", "on"), BOOLEAN("false", "boolean"),
+	AIR_QUALITY_CO2_PPM("-1", "co2ppm"), AIR_QUALITY_NOX_INDEX("-1", "noxindex"),
+	AIR_QUALITY_VOC_INDEX("-1", "vocindex"), AIR_QUALITY_PM_2_5("-1", "pm2_5_ugm3"), AIR_PRESSURE("-1", "millibar"),
+	BINARY_ON_OFF("off", "boolean", "on"), BOOLEAN("false", "boolean"), COST("0", "cost"),
 	ENERGY_KILO_WATT_HOURS("-999999", "kilowatthours"), ENERGY_WATT_HOURS("-999999", "watthours"),
-	LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"), MATTER_WINDOW("Closed", "window", "Open"),
-	PERCENT("0", "percent"), POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"),
-	RELATIVE_HUMIDITY("-1", "humidity"), SWITCH("off", "switch", "On"), TEMPERATURE("-274", "temperature");
+	LUMINANCE("-1", "lux"), MATTER_DOOR("Closed", "door", "Open"), MATTER_OCCUPANCY("off", "occupied", "on"),
+	MATTER_WINDOW("Closed", "window", "Open"), NUMBER("-999999", "number"), PERCENT("0", "percent"),
+	POWER_WATTS("-999999", "watts"), POWER_KILO_WATTS("-999999", "kilowatts"),
+	RELATIVE_HUMIDITY("-1", "relativehumidity"), SWITCH("off", "switch", "On"), STRING("Unavailable", "stringvalue"),
+	TEMPERATURE("-274", "temperature");
 
 	@Getter
 	@NonNull
@@ -79,9 +83,12 @@ public enum IoTType {
 
 	public Object createObjectFrom(HomeAssistantState hastate) {
 		switch (this) {
+		case STRING:
+			return hastate.getState();
 		case BINARY_ON_OFF:
 		case MATTER_DOOR:
 		case MATTER_WINDOW:
+		case MATTER_OCCUPANCY:
 		case SWITCH: {
 			return hastate.getStateStringMatchesValue(unavailableDefault, valueToReturnTrue);
 		}
@@ -89,9 +96,15 @@ public enum IoTType {
 			return hastate.getStateAsBoolean(unavailableDefault);
 		}
 		case AIR_PRESSURE:
+		case AIR_QUALITY_CO2_PPM:
+		case AIR_QUALITY_NOX_INDEX:
+		case AIR_QUALITY_VOC_INDEX:
+		case AIR_QUALITY_PM_2_5:
+		case COST:
 		case ENERGY_KILO_WATT_HOURS:
 		case ENERGY_WATT_HOURS:
 		case LUMINANCE:
+		case NUMBER:
 		case PERCENT:
 		case POWER_WATTS:
 		case POWER_KILO_WATTS:

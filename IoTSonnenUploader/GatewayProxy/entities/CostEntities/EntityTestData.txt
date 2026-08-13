@@ -1,0 +1,46 @@
+Entity test commands
+
+
+
+Testing commands for instance ElectricityConsumedCostToday of model HACostModel
+
+To send the instance test data using https for device ElectricityConsumedCostToday
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/cost" -H 'Content-Type: application/json' -d "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyCnsmdCstTdy\"}"
+
+To send instance test data using mqttx for device ElectricityConsumedCostToday
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyCnsmdCstTdy\"}"
+
+To get the most recent normalized data for instance ElectricityConsumedCostToday
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7kcgymxs7mhy75vuu4o4x77figfifqpt4gfacyzchr4bq
+
+
+
+Testing commands for instance CurrentElecticityRatePerKwhConsumed of model HACostModel
+
+To send the instance test data using https for device CurrentElecticityRatePerKwhConsumed
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/cost" -H 'Content-Type: application/json' -d "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"CrntLctrctyRtPrKwhCnsmd\"}"
+
+To send instance test data using mqttx for device CurrentElecticityRatePerKwhConsumed
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"CrntLctrctyRtPrKwhCnsmd\"}"
+
+To get the most recent normalized data for instance CurrentElecticityRatePerKwhConsumed
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7xl75h7bmeknsis5der2smedteyrloovareho675rr3zq
+
+
+
+Testing commands for instance ElectricityTotalChargesToday of model HACostModel
+
+To send the instance test data using https for device ElectricityTotalChargesToday
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+curl -u "hagateway:ImAnI0TS3cr3tD0ntShar3M3" "https://vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com/house/homeassistant/entities/cost" -H 'Content-Type: application/json' -d "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyTtlChrgsTdy\"}"
+
+To send instance test data using mqttx for device ElectricityTotalChargesToday
+export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
+mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyTtlChrgsTdy\"}"
+
+To get the most recent normalized data for instance ElectricityTotalChargesToday
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7b2nhh2iigi4pecwgttb6woubtkzebebavq67plsa4qka

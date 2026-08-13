@@ -34,42 +34,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple;
 
-import java.util.Base64;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
+
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.NormalizedDataTransfer;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.ClientFilter;
-import io.micronaut.http.annotation.RequestFilter;
-import io.micronaut.runtime.event.annotation.EventListener;
-import jakarta.inject.Inject;
-import lombok.extern.java.Log;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.client.annotation.Client;
 
-// needs a endpoint
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@ClientFilter(patterns = { "${messagehandler.output.rawdata.iotoutputhttpclient.path:/api/v1/iotdata}/**" })
-@Log
-public class RawDataIoTOutputHttpClientRequestFilter {
-	private final String username;
-	private final String password;
+// needs the credentials
 
-	@Inject
-	public RawDataIoTOutputHttpClientRequestFilter(RawDataIoTOutputHttpClientSettings clientSettings) {
-		this.username = clientSettings.getUsername();
-		this.password = new String(Base64.getDecoder().decode(clientSettings.getPassword()));
-	}
+@Requires(property = IoTOutputHttpOICClientNormalizedDataSimpleSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Client(id = "normalizeddataiotoutputhttpoicclient", path = "${"
+		+ IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY + ":"
+		+ IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT + "}")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+public interface NormalizedDataIoTOutputHttpOICSimpleClient {
+	@Post(consumes = MediaType.APPLICATION_JSON)
+	public HttpResponse<Void> postNormalizedDataAsJsonToJsonObject(@Body NormalizedDataTransfer normalizedDataTransfer);
 
-	@RequestFilter
-	public void doFilter(MutableHttpRequest<?> request) {
-		log.finer("Adding user auth username=" + this.username);
-		request.basicAuth(this.username, this.password);
-	}
-
-	@EventListener
-	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for RawDataIoTOutputHttpClientRequestFilter username=" + this.username);
-	}
+	@Post(value = "/string", consumes = MediaType.APPLICATION_JSON)
+	public HttpResponse<Void> postNormalizedDataAsJsonToString(@Body NormalizedDataTransfer normalizedDataTransfer);
 }

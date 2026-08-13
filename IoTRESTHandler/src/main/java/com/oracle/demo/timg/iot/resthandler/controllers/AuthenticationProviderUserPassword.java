@@ -34,47 +34,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
+package com.oracle.demo.timg.iot.resthandler.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.security.authentication.AuthenticationFailureReason;
+import io.micronaut.security.authentication.AuthenticationRequest;
+import io.micronaut.security.authentication.AuthenticationResponse;
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
-@Data
-@NoArgsConstructor
-// flag as jackson serdable
-@Serdeable
-public class TimeSeriesDBCredentials {
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-	@JsonProperty(value = "username")
+@Singleton
+@Log
+// create with the context so we can confirm the credentials at startup
+@Context
+public class AuthenticationProviderUserPassword<B> implements HttpRequestAuthenticationProvider<B> {
+	@Property(name = RESTServerProperties.USERNAME, defaultValue = "username")
 	private String username;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-	@JsonProperty(value = "password")
+	@Property(name = RESTServerProperties.PASSWORD, defaultValue = "password")
 	private String password;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-	@JsonProperty(value = "tenant_name")
-	private String tenant_name;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-	@JsonProperty(value = "database_name")
-	private String database_name;
 
-	/**
-	 * a to string that does not display confidential info
-	 * 
-	 * @return
-	 */
-	public String safeToString() {
-		return "TimeSeriesDBCredentials[username" + username + ", password=XXXXX, tennant_name=XXXXX, database_name="
-				+ database_name + "]";
+	@Override
+	public AuthenticationResponse authenticate(@Nullable HttpRequest<B> httpRequest,
+			@NonNull AuthenticationRequest<String, String> authenticationRequest) {
+		String incommingUsername = authenticationRequest.getIdentity();
+		String incommingPassword = authenticationRequest.getSecret();
+		log.info("Checking incomming credentials of " + incommingUsername + "/" + incommingPassword
+				+ " against required credentials of " + username + "/" + password);
+		boolean match = incommingUsername.equals(username) && incommingPassword.equals(password);
+		log.info("Credentials match is " + match);
+		return match ? AuthenticationResponse.success(incommingUsername)
+				: AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Will look for credentials=" + username + "/" + password);
 	}
 }

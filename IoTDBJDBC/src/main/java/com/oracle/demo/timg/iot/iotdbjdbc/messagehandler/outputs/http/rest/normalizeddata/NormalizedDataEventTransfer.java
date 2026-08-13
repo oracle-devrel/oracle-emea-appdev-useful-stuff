@@ -34,30 +34,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rawdata;
+package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata;
 
-import static io.micronaut.http.HttpHeaders.USER_AGENT;
+import com.oracle.demo.timg.iot.iotdbjdbc.aqdata.NormalizedData;
 
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.client.annotation.Client;
-import jakarta.ws.rs.PathParam;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-// needs the credentials
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".username")
-@Requires(property = RawDataIoTOutputHttpClientSettings.PREFIX + ".password")
-@Client(id = "iotoutputhttpclient", path = "${messagehandler.output.rawdata.iotoutputhttpclient:/api/v1/iotdata}")
-@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
-public interface RawDataIoTOutputHttpClient {
-	@Post(value = "/rawdata/string/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAsString(@PathParam("digitaltwinid") String digitaltwinid,
-			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp, @Body String content);
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Serdeable
+public class NormalizedDataEventTransfer {
+	private String contentPath;
+	private String contentType;
+	private String content;
+	private String timeObserved;
 
-	@Post(value = "/rawdata/base64/{digitaltwinid}/{endpoint}/{timestamp}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.TEXT_PLAIN)
-	public boolean postRawDataAsBase64(@PathParam("digitaltwinid") String digitaltwinid,
-			@PathParam("endpoint") String endpoint, @PathParam("timestamp") String timestamp,
-			@Body String base64content);
+	public static NormalizedDataEventTransfer buildNormalizedDataTransfer(NormalizedData input) {
+		return NormalizedDataEventTransfer.builder().contentPath(input.getContentPath())
+				.contentType(input.getContentType()).content(input.getContent()).timeObserved(input.getTimeObserved())
+				.build();
+	}
 }

@@ -34,47 +34,48 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.normalizeddata.timeseriesdb;
+package com.oracle.demo.timg.iot.resthandler.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oracle.demo.timg.iot.resthandler.jsondata.NormalizedDataTransfer;
 
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Consumes;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-@Requires(property = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_ORDER)
-@Data
-@NoArgsConstructor
-// flag as jackson serdable
-@Serdeable
-public class TimeSeriesDBCredentials {
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_USERNAME)
-	@JsonProperty(value = "username")
-	private String username;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_PASSWORD)
-	@JsonProperty(value = "password")
-	private String password;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_TENANCY_OCID)
-	@JsonProperty(value = "tenant_name")
-	private String tenant_name;
-	@Property(name = TimeSeriesDBProperties.TIME_SERIES_PROPERTY_OAUTH_DATABASE_NAME)
-	@JsonProperty(value = "database_name")
-	private String database_name;
+@Controller("/api/v1/iotdata/normalizeddata/oic")
+@Log
+@ExecuteOn(TaskExecutors.BLOCKING)
+@Singleton
+public class NormalizedDataOIC {
 
-	/**
-	 * a to string that does not display confidential info
-	 * 
-	 * @return
-	 */
-	public String safeToString() {
-		return "TimeSeriesDBCredentials[username" + username + ", password=XXXXX, tennant_name=XXXXX, database_name="
-				+ database_name + "]";
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post
+	public void postNormalizedDataAsJson(@Body NormalizedDataTransfer ndt) {
+		String resp = "NormalizedDataOIC jsonobject Received json request with body json object contents of "
+				+ ndt.toString();
+		log.info(resp);
+	}
+
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Secured(SecurityRule.IS_AUTHENTICATED)
+	@Post(value = "/string")
+	public void postNormalizedDataAsString(@Body String body) {
+		String resp = "NormalizedDataOIC jsonobject Received json request with body contents of " + body;
+		log.info(resp);
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Controller built");
 	}
 }

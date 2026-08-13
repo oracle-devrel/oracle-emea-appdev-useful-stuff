@@ -1,0 +1,108 @@
+{
+	"@context": [
+		"dtmi:dtdl:context;3",
+		"dtmi:dtdl:extension:historization;1",
+		"dtmi:dtdl:extension:quantitativeTypes;1",
+		"dtmi:com:oracle:dtdl:extension:validation;1"
+	],
+	"@id": "dtmi:com:oracle:demo:timg:iot:homeassistant:airquality;1",
+	"@type": "Interface",
+	"contents": [
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Quality description",
+			"name": "qualitydescription",
+			"schema": "string"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Quality score",
+			"name": "qualityscore",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Carbon Dioxide parts per million",
+			"name": "co2ppm",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Particulate Matter 2.5 ug/m3",
+			"name": "pm2_5_ugm3",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Nitrogen Oxide index",
+			"name": "noxindex",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized"
+			],
+			"displayName": "Volotile Organic Compounds index",
+			"name": "vocindex",
+			"schema": "double"
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Pressure",
+				"Validated"
+			],
+			"displayName": "Air Pressure",
+			"name": "airpressure",
+			"schema": "double",
+			"unit": "millibar",
+			"minimum": -1,
+			"maximum": 1000000000
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"RelativeHumidity",
+				"Validated"
+			],
+			"displayName": "RelativeHumidity",
+			"name": "relativehumidity",
+			"schema": "double",
+			"unit": "percent",
+			"minimum": -1,
+			"maximum": 100
+		},
+		{
+			"@type": [
+				"Telemetry",
+				"Historized",
+				"Temperature",
+				"Validated"
+			],
+			"displayName": "Temperature",
+			"name": "temperature",
+			"schema": "double",
+			"unit": "degreeCelsius",
+			"minimum": -274,
+			"maximum": 1000000000
+		}
+	]
+}
