@@ -1,0 +1,17 @@
+gateway:
+  identity:
+    name: "HomeAssistantGateway1"
+    devicekey: "hagateway"
+  endpoint:
+    base: "house/homeassistant"
+    gatewaystatssubpath: "gateway/stats"
+    gatewayconfigsubpath: "gateway/config"
+    entitiessubpath: "entities"
+  config:
+    enabled: true
+    publishrate: "3600s"
+    initialdelay: "10s"
+  stats:
+    enabled: true
+    publishrate: "600s"
+    initialdelay: "5s"

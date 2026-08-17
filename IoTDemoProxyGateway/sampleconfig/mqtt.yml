@@ -1,0 +1,35 @@
+mqtt:
+  broker:
+    #host: localhost
+    host: ${private.devicehost}
+    # 8883 for iot service, 1883 for local mosquito
+    #port: 1883
+    port: 8883
+    # mqtt protocol - either tcp for local or ssl for remote
+    #protocol: tcp
+    protocol: ssl
+  client:
+    enabled: true
+    # Unique identifier for this MQTT client
+    # The gateway name, not any device name
+    client-id: ${gateway.identity.name}
+
+    # MQTT broker connection
+    server-uri: ${mqtt.broker.protocol}://${mqtt.broker.host}:${mqtt.broker.port}
+
+    # **GATEWAY** Authentication id (external key as assigned or auto generated at creation)
+    user-name: ${gateway.identity.devicekey}
+    # **GATEWAY** Authentication password
+    password: ${private.mqtt.client.passwordoracle}
+
+    # Optional connection settings
+    clean-session: false
+    automatic-reconnect: true
+    connection-timeout: "PT30s"
+    keep-alive-interval: 60
+
+    will-message:
+      topic: home/homeassistantproxygateway/${gateway.identity.name}
+      payload: Device ${gateway.identity.name} is unavailable
+      qos: 0
+      retained: true
