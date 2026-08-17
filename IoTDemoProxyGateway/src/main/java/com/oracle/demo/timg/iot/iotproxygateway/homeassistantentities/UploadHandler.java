@@ -1,4 +1,4 @@
-/*Copyright (c) 2025 Oracle and/or its affiliates.
+/*Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,36 +34,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
+package com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 
-import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
-
-import io.micronaut.context.annotation.Requires;
-import jakarta.inject.Singleton;
-import lombok.extern.java.Log;
-
-@Singleton
-@Requires(property = PropertyNames.RECORD_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
-@Log
-public class MqttGatewayEventPublisherRecord implements MqttGatewayEventPublisher {
-	@Override
-	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data) {
-		log.info("GatewayEventRecord handling stats " + data);
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data) {
-		log.info("GatewayEventRecord handling config " + data);
-		return null;
-	}
-
-	@Override
-	public String pubisherName() {
-		return "MqttGatewayEventPublisherRecord";
-	}
+public interface UploadHandler {
+	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity);
 }

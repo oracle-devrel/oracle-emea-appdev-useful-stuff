@@ -51,16 +51,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
+@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
 @Requires(property = PropertyNames.GATEWAY_CONFIG_PUBLISH_ENABLED, value = "true", defaultValue = "true")
 @Singleton
 @Log
-public class GatewayConfigDataUploader {
+public class GatewayConfigDataMqttUploader {
 	@Inject
-	private GatewayStats gatewayStats;
+	private GatewayStatsMqttUpload gatewayStats;
 	private final MqttGatewayEventPublisher gatewayEventPublisher;
 
 	@Inject
-	public GatewayConfigDataUploader(Optional<MqttGatewayEventPublisher> gatewayEventPublisherOpt) {
+	public GatewayConfigDataMqttUploader(Optional<MqttGatewayEventPublisher> gatewayEventPublisherOpt) {
 		if (gatewayEventPublisherOpt.isEmpty()) {
 			log.warning("gatewayEventPublisher not found, gateway config data will not be uploaded");
 			gatewayEventPublisher = null;
@@ -72,7 +73,7 @@ public class GatewayConfigDataUploader {
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("GatewayConfigDataUploader starting operation");
+		log.info("GatewayConfigDataMqttUploader starting operation");
 	}
 
 	/*

@@ -49,9 +49,8 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayHAStats;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
-import com.oracle.demo.timg.iot.iotproxygateway.mqtt.MqttUploadHandler;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
@@ -87,19 +86,19 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 	private HomeAssistantHttpClient homeAssistantClient;
 	@ToString.Exclude
 	@Inject
-	private MqttUploadHandler mqttUploadHandler;
+	private UploadHandler uploadHandler;
 	@ToString.Exclude
 	@Inject
 	private ObjectMapper mapper;
 	@ToString.Exclude
 	@Inject
-	private GatewayStats gatewayStats;
+	private GatewayHAStats gatewayHAStats;
 	@ToString.Exclude
 	private Map<String, HomeAssistantState> laststates = new HashMap<>();
 
 	@Inject
 	public HomeAssistantMonitoredEntitySet(@Parameter String name) {
-		log.info("Monitored entity in constructor for " + name);
+		log.fine("Monitored entity in constructor for " + name);
 	}
 
 	@PostConstruct
@@ -141,7 +140,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 		payload.put(IoTEntityData.TIMESTAMP_FIELD_NAME, observationTime.format(formatter));
 		try {
 			log.finer("Uploading payload of HA state is " + payload);
-			mqttUploadHandler.upload(payload, this);
+			uploadHandler.upload(payload, this);
 		} catch (Exception e) {
 			log.info("Monitored entity set " + name + "Exception getting a state or other actions "
 					+ e.getLocalizedMessage());
@@ -189,13 +188,14 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 		try {
 			stateString = homeAssistantClient.getState(entity.getEntityid());
 		} catch (Exception e) {
-			log.warning("Unable to get monitored entity " + this + " because " + e.getLocalizedMessage());
-			gatewayStats.trackFailedHARetrieveCall();
+			log.warning("Unable to get monitored entity " + entity + " in set " + this + " because "
+					+ e.getLocalizedMessage());
+			gatewayHAStats.trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus.CANT_RETRIEVE, this, entity);
 			return null;
 		}
 		if (stateString == null) {
 			log.warning("Returned state of monitored entity " + this + " is null");
-			gatewayStats.trackFailedHARetrieveCall();
+			gatewayHAStats.trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus.NULL_RETRIEVED, this, entity);
 			return null;
 		}
 		log.finer(() -> "Returned state string is :" + stateString);
@@ -204,11 +204,11 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			state = mapper.readValue(stateString, HomeAssistantState.class);
 		} catch (Exception e) {
 			log.warning("Unable to de-serialize the state because " + e.getLocalizedMessage());
-			gatewayStats.trackFailedHARetrieveCall();
+			gatewayHAStats.trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus.CANT_DESERIALIZE, this, entity);
 			return null;
 		}
 		log.fine(() -> "Extracted state is " + state);
-		gatewayStats.trackSucessfullHARetrieveCall();
+		gatewayHAStats.trackSucessfullHARetrieveCall(this, entity);
 		// make sure that we have the relevant times, even if we don't use them here
 		// they may be needed on another pass through
 		if (state.getLast_changed() == null) {

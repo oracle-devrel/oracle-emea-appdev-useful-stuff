@@ -38,7 +38,16 @@ package com.oracle.demo.timg.iot.iotproxygateway;
 
 public class PropertyNames {
 
-	public final static String MQTT_CLIENT_ENABLED = "mqtt.enabled";
+	public final static String RECORD_CLIENT_ENABLED = "record.enabled";
+	public final static String RECORD_OUTPUT_FILE = "record.output.file";
+	public final static String RECORD_OUTPUT_FILE_DEFAULT = "recordeddata.txt";
+	public final static String RECORD_OUTPUT_DIRECTORY = "record.output.directory";
+	public final static String RECORD_OUTPUT_DIRECTORY_DEFAULT = "saved";
+	public final static String RECORD_OUTPUT_PREFIX_WITH_DTG = "record.output.prefixwithdtg";
+	public final static String RECORD_DURATION = "record.duration";
+	public final static String RECORD_EXIT_AFTER_RECORDING_STOP = "record.exitafterrecordingstop";
+
+	public final static String MQTT_CLIENT_UPLOAD_ENABLED = "mqtt.client.enabled";
 	public final static String MQTT_CLIENT_DEVICE_ID = "mqtt.client.client-id";
 	public final static String MQTT_CLIENT_USERNAME = "mqtt.client.user-name";
 	public final static String MQTT_CLIENT_PASSWORD = "mqtt.client.password";

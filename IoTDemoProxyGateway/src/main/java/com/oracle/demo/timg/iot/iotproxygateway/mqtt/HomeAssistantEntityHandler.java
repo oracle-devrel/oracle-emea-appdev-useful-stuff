@@ -1,4 +1,4 @@
-/*Copyright (c) 2025 Oracle and/or its affiliates.
+/*Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -36,37 +36,11 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 
-import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
 
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.mqtt.annotation.v5.MqttPublisher;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
-import jakarta.inject.Singleton;
+public interface HomeAssistantEntityHandler {
+	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity);
 
-@MqttPublisher
-@Singleton
-@Requires(property = PropertyNames.GATEWAY_DEVICE_NAME)
-@Requires(property = PropertyNames.MQTT_CLIENT_DEVICE_ID)
-@Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
-@Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
-@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "true")
-public interface MqttGatewayEventPublisherUpload extends MqttGatewayEventPublisher {
-	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
-			+ PropertyNames.GATEWAY_STATS_ENDPOINT + ":gateway/stats}")
-	// @Topic("house/homeassistant/gateway/stats")
-	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data);
-
-	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
-			+ PropertyNames.GATEWAY_CONFIG_ENDPOINT + ":gateway/config}")
-	// @Topic("house/homeassistant/gateway/config")
-	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data);
 }

@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
-import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
-
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
@@ -64,8 +62,6 @@ public class HomeAssistantMonitoredEntityManager {
 	private final TaskScheduler taskScheduler;
 	@Inject
 	private Collection<HomeAssistantMonitoredEntitySet> monitoredEntitySets;
-	@Inject
-	private GatewayStats gatewayStats;
 	private List<ScheduledFuture<?>> scheduledFutures;
 
 	public HomeAssistantMonitoredEntityManager(@Named(TaskExecutors.SCHEDULED) TaskScheduler taskScheduler) {
@@ -93,6 +89,7 @@ public class HomeAssistantMonitoredEntityManager {
 
 	@EventListener
 	public void shutdown(ShutdownEvent event) {
+		log.info("Stopping all home assistant entity set monitoring");
 		scheduledFutures.stream().forEach(scheduledFuture -> scheduledFuture.cancel(false));
 	}
 }

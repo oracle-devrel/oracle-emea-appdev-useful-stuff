@@ -34,39 +34,42 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
-
-import java.util.concurrent.CompletableFuture;
+package com.oracle.demo.timg.iot.iotproxygateway.gateway;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityRetrieveStatus;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
+import com.oracle.demo.timg.iot.iotproxygateway.recorder.Recorder;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.mqtt.annotation.v5.MqttPublisher;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 
-@MqttPublisher
+@Log
 @Singleton
-@Requires(property = PropertyNames.GATEWAY_DEVICE_NAME)
-@Requires(property = PropertyNames.MQTT_CLIENT_DEVICE_ID)
-@Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
-@Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
-@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
-public interface MqttGatewayEventPublisher {
-	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
-			+ PropertyNames.GATEWAY_STATS_ENDPOINT + ":gateway/stats}")
-	// defaults to "house/homeassistant/gateway/stats"
-	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data);
+@Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
 
-	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
-			+ PropertyNames.GATEWAY_CONFIG_ENDPOINT + ":gateway/config}")
-	// defaults to "house/homeassistant/gateway/config"
-	@ExecuteOn(TaskExecutors.IO)
-	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data);
+public class GatewayStatsRecorder implements GatewayHAStats {
+	private final Recorder recorder;
+
+	@Inject
+	public GatewayStatsRecorder(Recorder recorder) {
+		log.info("In constructor");
+		this.recorder = recorder;
+	}
+
+	@Override
+	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
+			HomeAssistantMonitoredEntity entity) {
+		recorder.recordSucessfullHARetrieveCall(homeAssistantMonitoredEntitySet, entity);
+
+	}
+
+	@Override
+	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
+			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity) {
+		recorder.recordFailedHARetrieveCall(retrieveStatus, homeAssistantMonitoredEntitySet, entity);
+	}
 }
