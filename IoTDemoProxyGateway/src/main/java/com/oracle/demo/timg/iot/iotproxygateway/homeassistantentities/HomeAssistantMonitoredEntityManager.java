@@ -41,7 +41,10 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+
 import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -57,6 +60,8 @@ import lombok.extern.java.Log;
 @Singleton
 @Log
 @Context
+// are we going to retrieve data from home assistant ?
+@Requires(property = PropertyNames.HOME_ASSISTANT_RETRIEVE, value = "true", defaultValue = "false")
 public class HomeAssistantMonitoredEntityManager {
 	@ToString.Exclude
 	private final TaskScheduler taskScheduler;
