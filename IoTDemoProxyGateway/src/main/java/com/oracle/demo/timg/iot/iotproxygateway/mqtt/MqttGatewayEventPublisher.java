@@ -39,6 +39,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.mqtt;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayEventPublisher;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
 
@@ -57,7 +58,7 @@ import jakarta.inject.Singleton;
 @Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
 @Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
 @Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
-public interface MqttGatewayEventPublisher {
+public interface MqttGatewayEventPublisher extends GatewayEventPublisher {
 	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
 			+ PropertyNames.GATEWAY_STATS_ENDPOINT + ":gateway/stats}")
 	// defaults to "house/homeassistant/gateway/stats"

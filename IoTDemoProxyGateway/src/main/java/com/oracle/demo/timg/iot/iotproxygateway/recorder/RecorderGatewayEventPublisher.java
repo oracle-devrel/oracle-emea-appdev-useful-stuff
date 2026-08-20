@@ -34,10 +34,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities;
+package com.oracle.demo.timg.iot.iotproxygateway.recorder;
 
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-public interface UploadHandler {
-	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity);
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayEventPublisher;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+
+import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
+
+@Singleton
+@Log
+@Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
+public class RecorderGatewayEventPublisher implements GatewayEventPublisher {
+	private final Recorder recorder;
+
+	@Inject
+	public RecorderGatewayEventPublisher(Recorder recorder) {
+		log.info("RecorderGatewayEventPublisher In constructor");
+		this.recorder = recorder;
+	}
+
+	@Override
+	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data) {
+		recorder.recordGatewayStatsUploadEvent(data);
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data) {
+		recorder.recordGatewayConfigUploadEvent(data);
+		return null;
+	}
 }

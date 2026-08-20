@@ -14,6 +14,8 @@ import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssist
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -89,8 +91,11 @@ public class Recorder {
 			}
 			log.info("recording data " + recordedDataAsString);
 			try {
-				writer.write(recordedDataAsString);
-				writer.newLine();
+				// synchronized to make sure it's MT safe
+				synchronized (writer) {
+					writer.write(recordedDataAsString);
+					writer.newLine();
+				}
 			} catch (IOException e) {
 				log.warning("Exception recording data to file due to " + e.getLocalizedMessage() + ", data is "
 						+ recordedDataAsString);
@@ -104,7 +109,7 @@ public class Recorder {
 		try {
 			jsonData = mapper.writeValueAsString(ioTEntityData);
 		} catch (IOException e) {
-			log.warning("Problem serialising IoTEntityData to json data, " + e.getLocalizedMessage() + ", stats are "
+			log.warning("Problem serialising IoTEntityData to json data, " + e.getLocalizedMessage() + ", entity is "
 					+ ioTEntityData);
 			return;
 		}
@@ -159,6 +164,32 @@ public class Recorder {
 			return;
 		}
 		recordData(RecordedDataType.HA_RETRIEVE, jsonData);
+	}
+
+	public void recordGatewayStatsUploadEvent(IoTGatewayStatsData data) {
+		log.info("Recording IoTGatewayStatsData " + data);
+		String jsonData;
+		try {
+			jsonData = mapper.writeValueAsString(data);
+		} catch (IOException e) {
+			log.warning("Problem serialising IoTGatewayStatsData to json data, " + e.getLocalizedMessage()
+					+ ", stats are " + data);
+			return;
+		}
+		recordData(RecordedDataType.GATEWAY_STATS_RESET_AND_SEND, jsonData);
+	}
+
+	public void recordGatewayConfigUploadEvent(IoTGatewayConfigData data) {
+		log.info("Recording IoTGatewayConfigData " + data);
+		String jsonData;
+		try {
+			jsonData = mapper.writeValueAsString(data);
+		} catch (IOException e) {
+			log.warning("Problem serialising IoTGatewayConfigData to json data, " + e.getLocalizedMessage()
+					+ ", config is " + data);
+			return;
+		}
+		recordData(RecordedDataType.GATEWAY_CONFIG_SEND, jsonData);
 	}
 
 	@PreDestroy

@@ -54,7 +54,7 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "true")
 
-public class GatewayStatsMqttUpload implements GatewayStats {
+public class GatewayStatsTrackingData { // implements GatewayStats {
 	private GatewayCallTracker sucessfullHARetrieveCalls;
 	private GatewayCallTracker failedHARetrieveCalls;
 	private GatewayCallTracker sucessfullUploadCalls;
@@ -64,7 +64,7 @@ public class GatewayStatsMqttUpload implements GatewayStats {
 	private long sucessfullUploadWindowSeconds;
 	private long failedUploadWindowSeconds;
 
-	public GatewayStatsMqttUpload(
+	public GatewayStatsTrackingData(
 			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration sucessfullHARetrieveWindow,
 			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration failedHARetrieveWindow,
 			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_UPLOAD_WINDOW, defaultValue = "PT10m") Duration sucessfullUploadWindow,
@@ -79,6 +79,7 @@ public class GatewayStatsMqttUpload implements GatewayStats {
 		this.failedUploadWindowSeconds = failedUploadWindow.getSeconds();
 	}
 
+	/* this version is used for live data uploads */
 	public GatewayStatsData getGatewayStatsData() {
 		return GatewayStatsData.builder()
 				.haretrievesuccess(sucessfullHARetrieveCalls.averageCalls(sucessfullHARetrieveWindowSeconds))
@@ -94,26 +95,43 @@ public class GatewayStatsMqttUpload implements GatewayStats {
 				.faileduploadtimewindow(failedUploadWindowSeconds).build();
 	}
 
-	@Override
+	// @Override
 	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
 			HomeAssistantMonitoredEntity entity) {
 		sucessfullHARetrieveCalls.trackCalls();
 	}
 
-	@Override
+	// @Override
 	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
 			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity) {
 		failedHARetrieveCalls.trackCalls();
 	}
 
-	@Override
+	// @Override
 	public void trackSucessfullUploadCall() {
 		sucessfullUploadCalls.trackCalls();
 	}
 
-	@Override
+	// @Override
 	public void trackFailedUploadCall() {
 		failedUploadCalls.trackCalls();
 
+	}
+
+	// @Override
+	public void resetHAStats() {
+		sucessfullHARetrieveCalls.reset();
+		failedHARetrieveCalls.reset();
+	}
+
+	// @Override
+	public void resetUploadStats() {
+		sucessfullUploadCalls.reset();
+		failedUploadCalls.reset();
+	}
+
+	public void resetAllStats() {
+		resetHAStats();
+		resetUploadStats();
 	}
 }

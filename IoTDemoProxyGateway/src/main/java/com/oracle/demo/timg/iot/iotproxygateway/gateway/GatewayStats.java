@@ -36,12 +36,31 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.gateway;
 
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityRetrieveStatus;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
+
 import jakarta.inject.Singleton;
 
 @Singleton
-public interface GatewayStats extends GatewayHAStats {
+public interface GatewayStats {
 
 	public void trackSucessfullUploadCall();
 
 	public void trackFailedUploadCall();
+
+	public void resetUploadStats();
+
+	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
+			HomeAssistantMonitoredEntity entity);
+
+	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
+			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity);
+
+	public void resetHAStats();
+
+	public default void resetAllStats() {
+		resetHAStats();
+		resetUploadStats();
+	}
 }

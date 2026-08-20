@@ -39,8 +39,7 @@ package com.oracle.demo.timg.iot.iotproxygateway.gateway;
 import java.util.Optional;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
-import com.oracle.demo.timg.iot.iotproxygateway.mqtt.MqttGatewayEventPublisher;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.scheduling.TaskExecutors;
@@ -49,21 +48,24 @@ import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
-@Requires(property = PropertyNames.GATEWAY_CONFIG_PUBLISH_ENABLED, value = "true", defaultValue = "true")
+@Requires(property = PropertyNames.GATEWAY_STATS_PUBLISH_ENABLED, value = "true", defaultValue = "true")
 @Singleton
 @Log
-public class GatewayConfigDataMqttUploader {
+public class GatewayStatsDataUploader {
 	@Inject
-	private GatewayStatsMqttUpload gatewayStats;
-	private final MqttGatewayEventPublisher gatewayEventPublisher;
+	private GatewayStatsTrackingData gatewayStats;
+	private GatewayEventPublisher gatewayEventPublisher;
+
+	@Setter
+	private boolean pauseUploads = false;
 
 	@Inject
-	public GatewayConfigDataMqttUploader(Optional<MqttGatewayEventPublisher> gatewayEventPublisherOpt) {
+	public GatewayStatsDataUploader(Optional<GatewayEventPublisher> gatewayEventPublisherOpt) {
 		if (gatewayEventPublisherOpt.isEmpty()) {
-			log.warning("gatewayEventPublisher not found, gateway config data will not be uploaded");
+			log.warning("gatewayEventPublisher not found, gateway stats data will not be uploaded");
 			gatewayEventPublisher = null;
 			return;
 		} else {
@@ -73,31 +75,36 @@ public class GatewayConfigDataMqttUploader {
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("GatewayConfigDataMqttUploader starting operation");
+		log.info("GatewayStatsDataUploader starting operation");
 	}
 
 	/*
 	 * have this use the micronaut scheduler, it's easier
 	 */
-	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_CONFIG + ":1200s}", initialDelay = "${"
-			+ PropertyNames.GATEWAY_CONFIG_INITIAL_DELAY + ":5s}")
+	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_STATS_PUBLISH_RATE + ":120s}", initialDelay = "${"
+			+ PropertyNames.GATEWAY_STATS_INITIAL_DELAY + ":30s}")
 	@ExecuteOn(TaskExecutors.IO)
-	public void processConfiguration() {
+	public void processStats() {
 		// in theory this should not happen unless someone calls the method directly,
 		// but let's do some defensive programming
 		if (gatewayEventPublisher == null) {
+			log.warning("gatewayEventPublisher is null");
 			return;
 		}
-		GatewayConfigData gatewayConfigData = gatewayStats.getGatewayConfigData();
-		IoTGatewayConfigData ioTGatewayConfigData = IoTGatewayConfigData.builder().payload(gatewayConfigData).build();
-		log.fine(() -> "Publishing gateway config " + ioTGatewayConfigData);
+		if (pauseUploads) {
+			log.info("Would have uploaded gateway stats data but pauseUploads is " + pauseUploads);
+			return;
+		}
+		GatewayStatsData gatewayStatsData = gatewayStats.getGatewayStatsData();
+		IoTGatewayStatsData ioTGatewayStatsData = IoTGatewayStatsData.builder().payload(gatewayStatsData).build();
+		log.info(() -> "Publishing gateway stats " + ioTGatewayStatsData);
 		try {
-			gatewayEventPublisher.publishGatewayConfig(ioTGatewayConfigData);
+			gatewayEventPublisher.publishGatewayStats(ioTGatewayStatsData);
 			gatewayStats.trackSucessfullUploadCall();
 		} catch (Exception e) {
-			log.warning("Exception uploading gateway config " + ioTGatewayConfigData + ", " + e.getLocalizedMessage());
+			log.warning("Exception uploading gateway stats " + ioTGatewayStatsData + ", " + e.getLocalizedMessage());
 			gatewayStats.trackFailedUploadCall();
 		}
-
 	}
+
 }

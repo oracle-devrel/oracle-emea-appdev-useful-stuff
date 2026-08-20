@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStats;
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStatsTrackingData;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
-import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.UploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Property;
@@ -58,9 +58,10 @@ import lombok.extern.java.Log;
 @Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
 @Singleton
 @Log
-public class MqttUploadHandler implements UploadHandler {
+public class MqttUploadHandler implements HomeAssistantEntityUploadHandler {
 	@Inject
-	private GatewayStats gatewayStats;
+	private GatewayStatsTrackingData gatewayStats;
+	// private GatewayStats gatewayStats;
 	private final String topicBase;
 	@ToString.Exclude
 	private final MqttHomeAssistantEntityPublisher mqttHomeAssistantEntityPublisher;

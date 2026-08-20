@@ -63,6 +63,10 @@ public class GatewayCallTracker {
 		this.clock = Objects.requireNonNull(clock, "clock");
 	}
 
+	public synchronized void reset() {
+		callTimes.clear();
+	}
+
 	public synchronized void trackCalls() {
 		callTimes.addLast(clock.instant());
 	}

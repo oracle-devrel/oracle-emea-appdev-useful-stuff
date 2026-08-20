@@ -38,6 +38,26 @@ package com.oracle.demo.timg.iot.iotproxygateway;
 
 public class PropertyNames {
 
+	// these modes control the basic operation
+	public final static String OPERATING_MODE = "operatingmodes";
+	public final static String OPERATING_MODE_INPUT = OPERATING_MODE + ".inputmode";
+	public final static String OPERATING_MODE_OUTPUT = OPERATING_MODE + ".outputmode";
+
+	// these control if previously recorded data will be replayed from for upload
+	public final static String HA_REPLAY = "replay";
+	public final static String HA_REPLAY_ENABLED = HA_REPLAY + ".enabled";
+	public final static String HA_REPLAY_INPUT_FILE = HA_REPLAY + ".inputfile";
+	public final static String HA_REPLAY_START_OFFSET = HA_REPLAY + ".replayStartOffset";
+	public final static String HA_REPLAY_MODE = HA_REPLAY + ".mode";
+	public final static String HA_REPLAY_HIGH_SPEED = HA_REPLAY + ".highspeed";
+	public final static String HA_REPLAY_HIGH_SPEED_DURATION = HA_REPLAY_HIGH_SPEED + ".duration";
+	public final static String HA_REPLAY_HIGH_SPEED_DELAY = HA_REPLAY + ".delay";
+	public final static String HA_REPLAY_REALTIME = HA_REPLAY + ".realtime";
+	public final static String HA_REPLAY_REALTIME_DURATION = HA_REPLAY_REALTIME + ".duration";
+
+	// these properties control the recording function (vs the upload function)
+	// note that you should only have recording OR upload active, both are not
+	// supported.
 	public final static String RECORD_CLIENT_ENABLED = "record.enabled";
 	public final static String RECORD_OUTPUT_FILE = "record.output.file";
 	public final static String RECORD_OUTPUT_FILE_DEFAULT = "recordeddata.txt";
@@ -47,12 +67,17 @@ public class PropertyNames {
 	public final static String RECORD_DURATION = "record.duration";
 	public final static String RECORD_EXIT_AFTER_RECORDING_STOP = "record.exitafterrecordingstop";
 
-	public final static String MQTT_CLIENT_UPLOAD_ENABLED = "mqtt.client.enabled";
-	public final static String MQTT_CLIENT_DEVICE_ID = "mqtt.client.client-id";
-	public final static String MQTT_CLIENT_USERNAME = "mqtt.client.user-name";
-	public final static String MQTT_CLIENT_PASSWORD = "mqtt.client.password";
-	public final static String MQTT_CLIENT_SERVER_URI = "mqtt.client.server-uri";
+	// these properties are the mqtt settings for uploading events (live or
+	// recorded)
+	public final static String MQTT_CLIENT = "mqtt.client";
+	public final static String MQTT_CLIENT_UPLOAD_ENABLED = MQTT_CLIENT + ".enabled";
+	public final static String MQTT_CLIENT_DEVICE_ID = MQTT_CLIENT + ".client-id";
+	public final static String MQTT_CLIENT_USERNAME = MQTT_CLIENT + ".user-name";
+	public final static String MQTT_CLIENT_PASSWORD = MQTT_CLIENT + ".password";
+	public final static String MQTT_CLIENT_SERVER_URI = MQTT_CLIENT + ".server-uri";
+	public final static String MQTT_CLIENT_ACTUALLY_DO_UPLOAD = MQTT_CLIENT + ".actuallydoupload";
 
+	// details of the gateway used to upload events
 	public final static String GATEWAY = "gateway";
 	public final static String GATEWAY_IDENTITY = GATEWAY + ".identity";
 	public final static String GATEWAY_DEVICE_NAME = GATEWAY_IDENTITY + ".name";
@@ -63,6 +88,7 @@ public class PropertyNames {
 	public final static String GATEWAY_CONFIG_ENDPOINT = GATEWAY_ENDPOINT + ".gatewayconfig";
 	public final static String GATEWAY_ENTITIES_ENDPOINT = GATEWAY_ENDPOINT + ".entities";
 
+	// configurations stuff for gateway data itself (it's config and stats)
 	public final static String GATEWAY_CONFIG = GATEWAY + ".config";
 	public final static String GATEWAY_CONFIG_PUBLISH_ENABLED = GATEWAY_CONFIG + ".enabled";
 	public final static String GATEWAY_CONFIG_PUBLISH_RATE = GATEWAY_CONFIG + ".publishrate";
@@ -76,7 +102,10 @@ public class PropertyNames {
 	public final static String GATEWAY_STATS_SUCESSFULL_UPLOAD_WINDOW = GATEWAY_STATS + ".sucessfulluploadwindow";
 	public final static String GATEWAY_STATS_FAILED_UPLOAD_WINDOW = GATEWAY_STATS + ".faileduploadwindow";
 
+	// property names to retrieve info from the home assistant instance for live
+	// upload or recording.
 	public final static String HOME_ASSISTANT = "home-assistant";
+	public final static String HOME_ASSISTANT_RETRIEVE = HOME_ASSISTANT + ".retrieve";
 	public final static String HOME_ASSISTANT_MONITORED_ENTITIES_LIST = HOME_ASSISTANT + ".monitored-entities";
 	public final static String HOME_ASSISTANT_API = HOME_ASSISTANT + ".api";
 	public final static String HOME_ASSISTANT_API_AUTH_TOKEN = HOME_ASSISTANT_API + ".auth_token";

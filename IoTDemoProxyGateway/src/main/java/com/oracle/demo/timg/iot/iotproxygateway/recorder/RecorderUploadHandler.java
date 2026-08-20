@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
-import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.UploadHandler;
+import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
 
 import io.micronaut.context.annotation.Requires;
@@ -16,7 +16,7 @@ import lombok.extern.java.Log;
 @Singleton
 @Log
 @Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
-public class RecorderUploadHandler implements UploadHandler {
+public class RecorderUploadHandler implements HomeAssistantEntityUploadHandler {
 	private final Recorder recorder;
 
 	@Inject

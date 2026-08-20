@@ -34,14 +34,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.gateway;
+package com.oracle.demo.timg.iot.iotproxygateway.recorder;
+
+import java.time.Duration;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStatsTrackingData;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityRetrieveStatus;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntitySet;
-import com.oracle.demo.timg.iot.iotproxygateway.recorder.Recorder;
 
+import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -51,25 +54,52 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
 
-public class GatewayStatsRecorder implements GatewayHAStats {
+public class GatewayStatsRecorder extends GatewayStatsTrackingData {
 	private final Recorder recorder;
 
 	@Inject
-	public GatewayStatsRecorder(Recorder recorder) {
+	public GatewayStatsRecorder(Recorder recorder,
+			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration sucessfullHARetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration failedHARetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_UPLOAD_WINDOW, defaultValue = "PT10m") Duration sucessfullUploadWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_UPLOAD_WINDOW, defaultValue = "PT10m") Duration failedUploadWindow) {
+		super(sucessfullHARetrieveWindow, failedHARetrieveWindow, sucessfullUploadWindow, failedUploadWindow);
 		log.info("In constructor");
 		this.recorder = recorder;
 	}
+
+	/*
+	 * @Inject public GatewayStatsRecorder(Recorder recorder){
+	 * log.info("In constructor"); this.recorder = recorder; }
+	 */
 
 	@Override
 	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
 			HomeAssistantMonitoredEntity entity) {
 		recorder.recordSucessfullHARetrieveCall(homeAssistantMonitoredEntitySet, entity);
-
+		super.trackSucessfullHARetrieveCall(homeAssistantMonitoredEntitySet, entity);
 	}
 
 	@Override
 	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
 			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity) {
 		recorder.recordFailedHARetrieveCall(retrieveStatus, homeAssistantMonitoredEntitySet, entity);
+		super.trackFailedHARetrieveCall(retrieveStatus, homeAssistantMonitoredEntitySet, entity);
+	}
+	/*
+	 * @Override public void resetHAStats() { // this does nothing at this point,
+	 * the reset is actually only called by the // high speed replay }
+	 * 
+	 * @Override public void trackSucessfullUploadCall() { // when recording we
+	 * don't actually do uploads }
+	 * 
+	 * @Override public void trackFailedUploadCall() { // when recording we don't
+	 * actually do uploads }
+	 */
+
+	@Override
+	public void resetUploadStats() {
+		// this does nothing at this point, the reset is actually only called by the
+		// high speed replay
 	}
 }
