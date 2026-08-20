@@ -36,8 +36,8 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
 
-import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantMonitoredEntity;
-import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantState;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntity;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantState;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

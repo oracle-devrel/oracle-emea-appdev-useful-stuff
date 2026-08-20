@@ -36,7 +36,7 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
 
-import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayStatsData;
 
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
