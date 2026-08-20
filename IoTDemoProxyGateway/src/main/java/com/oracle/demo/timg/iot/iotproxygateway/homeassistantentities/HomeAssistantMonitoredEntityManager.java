@@ -61,7 +61,7 @@ import lombok.extern.java.Log;
 @Log
 @Context
 // are we going to retrieve data from home assistant ?
-@Requires(property = PropertyNames.HOME_ASSISTANT_RETRIEVE, value = "true", defaultValue = "false")
+@Requires(property = PropertyNames.OPERATING_MODE_INPUT, value = "HOME_ASSISTANT", defaultValue = "HOME_ASSISTANT")
 public class HomeAssistantMonitoredEntityManager {
 	@ToString.Exclude
 	private final TaskScheduler taskScheduler;

@@ -52,7 +52,7 @@ import lombok.extern.java.Log;
 @Data
 @Log
 @Singleton
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "true")
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "MQTT", defaultValue = "MQTT")
 
 public class GatewayStatsTrackingData { // implements GatewayStats {
 	private GatewayCallTracker sucessfullHARetrieveCalls;

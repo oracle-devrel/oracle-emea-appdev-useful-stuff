@@ -57,7 +57,7 @@ import jakarta.inject.Singleton;
 @Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
 @Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
 @Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "MQTT", defaultValue = "MQTT")
 public interface MqttGatewayEventPublisher extends GatewayEventPublisher {
 	@Topic("${" + PropertyNames.GATEWAY_BASE_ENDPOINT + ":house/homeassistant}" + "/" + "${"
 			+ PropertyNames.GATEWAY_STATS_ENDPOINT + ":gateway/stats}")

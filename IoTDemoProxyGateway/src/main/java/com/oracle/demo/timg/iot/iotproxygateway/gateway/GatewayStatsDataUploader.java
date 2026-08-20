@@ -92,12 +92,12 @@ public class GatewayStatsDataUploader {
 			return;
 		}
 		if (pauseUploads) {
-			log.info("Would have uploaded gateway stats data but pauseUploads is " + pauseUploads);
+			log.info(() -> "Would have uploaded gateway stats data but pauseUploads is " + pauseUploads);
 			return;
 		}
 		GatewayStatsData gatewayStatsData = gatewayStats.getGatewayStatsData();
 		IoTGatewayStatsData ioTGatewayStatsData = IoTGatewayStatsData.builder().payload(gatewayStatsData).build();
-		log.info(() -> "Publishing gateway stats " + ioTGatewayStatsData);
+		log.fine(() -> "Publishing gateway stats " + ioTGatewayStatsData);
 		try {
 			gatewayEventPublisher.publishGatewayStats(ioTGatewayStatsData);
 			gatewayStats.trackSucessfullUploadCall();

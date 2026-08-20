@@ -45,7 +45,6 @@ public class PropertyNames {
 
 	// these control if previously recorded data will be replayed from for upload
 	public final static String HA_REPLAY = "replay";
-	public final static String HA_REPLAY_ENABLED = HA_REPLAY + ".enabled";
 	public final static String HA_REPLAY_INPUT_FILE = HA_REPLAY + ".inputfile";
 	public final static String HA_REPLAY_START_OFFSET = HA_REPLAY + ".replayStartOffset";
 	public final static String HA_REPLAY_MODE = HA_REPLAY + ".mode";
@@ -58,19 +57,19 @@ public class PropertyNames {
 	// these properties control the recording function (vs the upload function)
 	// note that you should only have recording OR upload active, both are not
 	// supported.
-	public final static String RECORD_CLIENT_ENABLED = "record.enabled";
-	public final static String RECORD_OUTPUT_FILE = "record.output.file";
+	public final static String RECORD = "record";
+	public final static String RECORD_OUTPUT = RECORD + ".output";
+	public final static String RECORD_OUTPUT_FILE = RECORD_OUTPUT + ".file";
 	public final static String RECORD_OUTPUT_FILE_DEFAULT = "recordeddata.txt";
-	public final static String RECORD_OUTPUT_DIRECTORY = "record.output.directory";
+	public final static String RECORD_OUTPUT_DIRECTORY = RECORD_OUTPUT + ".directory";
 	public final static String RECORD_OUTPUT_DIRECTORY_DEFAULT = "saved";
-	public final static String RECORD_OUTPUT_PREFIX_WITH_DTG = "record.output.prefixwithdtg";
+	public final static String RECORD_OUTPUT_PREFIX_WITH_DTG = RECORD_OUTPUT + ".prefixwithdtg";
 	public final static String RECORD_DURATION = "record.duration";
 	public final static String RECORD_EXIT_AFTER_RECORDING_STOP = "record.exitafterrecordingstop";
 
 	// these properties are the mqtt settings for uploading events (live or
 	// recorded)
 	public final static String MQTT_CLIENT = "mqtt.client";
-	public final static String MQTT_CLIENT_UPLOAD_ENABLED = MQTT_CLIENT + ".enabled";
 	public final static String MQTT_CLIENT_DEVICE_ID = MQTT_CLIENT + ".client-id";
 	public final static String MQTT_CLIENT_USERNAME = MQTT_CLIENT + ".user-name";
 	public final static String MQTT_CLIENT_PASSWORD = MQTT_CLIENT + ".password";
@@ -105,7 +104,6 @@ public class PropertyNames {
 	// property names to retrieve info from the home assistant instance for live
 	// upload or recording.
 	public final static String HOME_ASSISTANT = "home-assistant";
-	public final static String HOME_ASSISTANT_RETRIEVE = HOME_ASSISTANT + ".retrieve";
 	public final static String HOME_ASSISTANT_MONITORED_ENTITIES_LIST = HOME_ASSISTANT + ".monitored-entities";
 	public final static String HOME_ASSISTANT_API = HOME_ASSISTANT + ".api";
 	public final static String HOME_ASSISTANT_API_AUTH_TOKEN = HOME_ASSISTANT_API + ".auth_token";

@@ -52,8 +52,7 @@ import lombok.extern.java.Log;
 
 @Log
 @Singleton
-@Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
-
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "RECORDER")
 public class GatewayStatsRecorder extends GatewayStatsTrackingData {
 	private final Recorder recorder;
 

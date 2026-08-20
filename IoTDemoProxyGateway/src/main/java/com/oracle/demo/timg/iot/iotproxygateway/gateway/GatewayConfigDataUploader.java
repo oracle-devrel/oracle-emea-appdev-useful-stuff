@@ -92,12 +92,12 @@ public class GatewayConfigDataUploader {
 			return;
 		}
 		if (pauseUploads) {
-			log.info("Would have uploaded gateway config data but pauseUploads is " + pauseUploads);
+			log.info(() -> "Would have uploaded gateway config data but pauseUploads is " + pauseUploads);
 			return;
 		}
 		GatewayConfigData gatewayConfigData = gatewayStats.getGatewayConfigData();
 		IoTGatewayConfigData ioTGatewayConfigData = IoTGatewayConfigData.builder().payload(gatewayConfigData).build();
-		log.info(() -> "Publishing gateway config " + ioTGatewayConfigData);
+		log.fine(() -> "Publishing gateway config " + ioTGatewayConfigData);
 		try {
 			gatewayEventPublisher.publishGatewayConfig(ioTGatewayConfigData);
 			gatewayStats.trackSucessfullUploadCall();

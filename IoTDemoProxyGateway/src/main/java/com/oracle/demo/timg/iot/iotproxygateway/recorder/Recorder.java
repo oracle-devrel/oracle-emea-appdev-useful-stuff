@@ -28,7 +28,7 @@ import lombok.extern.java.Log;
 
 @Singleton
 @Log
-@Requires(property = PropertyNames.RECORD_CLIENT_ENABLED, value = "true", defaultValue = "false")
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "RECORDER")
 
 public class Recorder {
 	private final static String DTG_FORMAT = "uuuu-MM-dd'T'HH-mm-ss.SSSSSS-";

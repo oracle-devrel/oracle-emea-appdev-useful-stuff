@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import com.oracle.demo.timg.iot.iotproxygateway.OperatingModeOutput;
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.gateway.GatewayStatsTrackingData;
 import com.oracle.demo.timg.iot.iotproxygateway.homeassistantentities.HomeAssistantEntityUploadHandler;
@@ -55,7 +56,7 @@ import jakarta.inject.Singleton;
 import lombok.ToString;
 import lombok.extern.java.Log;
 
-@Requires(property = PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED, value = "true", defaultValue = "false")
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "MQTT", defaultValue = "MQTT")
 @Singleton
 @Log
 public class MqttUploadHandler implements HomeAssistantEntityUploadHandler {
@@ -75,7 +76,8 @@ public class MqttUploadHandler implements HomeAssistantEntityUploadHandler {
 			@Property(name = PropertyNames.GATEWAY_ENTITIES_ENDPOINT, defaultValue = "entities") String endpointEntities) {
 		log.info("Constructing MqttUploadHandler");
 		if (mqttHomeAssistantEntityPublisherOptional.isEmpty()) {
-			log.info("Uploads to MQTT are turned off " + PropertyNames.MQTT_CLIENT_UPLOAD_ENABLED);
+			log.info("Uploads to MQTT are turned off, this is probabaly a programming bug see property "
+					+ PropertyNames.OPERATING_MODE_OUTPUT + " which could be one of " + OperatingModeOutput.values());
 			mqttHomeAssistantEntityPublisher = null;
 		} else {
 			this.mqttHomeAssistantEntityPublisher = mqttHomeAssistantEntityPublisherOptional.get();
