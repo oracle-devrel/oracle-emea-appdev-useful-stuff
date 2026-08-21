@@ -3,9 +3,9 @@ package com.oracle.demo.timg.iot.iotproxygateway.outputs.none;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayEventPublisher;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.GatewayEventPublisher;
 
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
@@ -26,6 +26,11 @@ public class NoneGatewayEventPublisher implements GatewayEventPublisher {
 	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data) {
 		log.info("None Publishing gateway config data " + data);
 		return null;
+	}
+
+	@Override
+	public String getPublisherName() {
+		return "NoneGatewayEventPublisher";
 	}
 
 }

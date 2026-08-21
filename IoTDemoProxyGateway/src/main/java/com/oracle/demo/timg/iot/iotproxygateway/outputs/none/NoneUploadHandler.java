@@ -3,8 +3,8 @@ package com.oracle.demo.timg.iot.iotproxygateway.outputs.none;
 import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntitySet;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.HomeAssistantEntityUploadHandler;
 
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
@@ -19,6 +19,11 @@ public class NoneUploadHandler implements HomeAssistantEntityUploadHandler {
 	@Override
 	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity) {
 		log.info("None Publishing from entity set " + entity.getName() + " with data " + ioTCoreEvent);
+	}
+
+	@Override
+	public String getName() {
+		return "NoneUploadHandler";
 	}
 
 }

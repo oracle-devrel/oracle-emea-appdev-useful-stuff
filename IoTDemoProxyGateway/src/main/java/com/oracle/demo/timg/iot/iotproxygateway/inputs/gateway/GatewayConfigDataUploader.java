@@ -36,10 +36,9 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
 
-import java.util.Optional;
-
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.GatewayEventPublisher;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.scheduling.TaskExecutors;
@@ -63,19 +62,15 @@ public class GatewayConfigDataUploader {
 	private boolean pauseUploads = false;
 
 	@Inject
-	public GatewayConfigDataUploader(Optional<GatewayEventPublisher> gatewayEventPublisherOpt) {
-		if (gatewayEventPublisherOpt.isEmpty()) {
-			log.warning("gatewayEventPublisher not found, gateway config data will not be uploaded");
-			gatewayEventPublisher = null;
-			return;
-		} else {
-			gatewayEventPublisher = gatewayEventPublisherOpt.get();
-		}
+	public GatewayConfigDataUploader(GatewayEventPublisher gatewayEventPublisher) {
+		this.gatewayEventPublisher = gatewayEventPublisher;
+
 	}
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("GatewayConfigDataUploader starting operation");
+		log.info("GatewayConfigDataUploader starting operation, will send configs to GatewayEventPublisher "
+				+ gatewayEventPublisher.getPublisherName());
 	}
 
 	/*
@@ -85,12 +80,6 @@ public class GatewayConfigDataUploader {
 			+ PropertyNames.GATEWAY_CONFIG_INITIAL_DELAY + ":5s}")
 	@ExecuteOn(TaskExecutors.IO)
 	public void processConfiguration() {
-		// in theory this should not happen unless someone calls the method directly,
-		// but let's do some defensive programming
-		if (gatewayEventPublisher == null) {
-			log.warning("gatewayEventPublisher is null, cant send config");
-			return;
-		}
 		if (pauseUploads) {
 			log.info(() -> "Would have uploaded gateway config data but pauseUploads is " + pauseUploads);
 			return;

@@ -3,9 +3,9 @@ package com.oracle.demo.timg.iot.iotproxygateway.outputs.recorder;
 import java.util.Map;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntitySet;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.HomeAssistantEntityUploadHandler;
 
 import io.micronaut.context.annotation.Requires;
 import jakarta.annotation.PostConstruct;
@@ -36,6 +36,11 @@ public class RecorderUploadHandler implements HomeAssistantEntityUploadHandler {
 		IoTEntityData ioTEntityData = IoTEntityData.builder().devicekey(entity.getDevicekey()).payload(ioTCoreEvent)
 				.build();
 		recorder.recordIoTEntityData(ioTEntityData);
+	}
+
+	@Override
+	public String getName() {
+		return "RecorderUploadHandler";
 	}
 
 }

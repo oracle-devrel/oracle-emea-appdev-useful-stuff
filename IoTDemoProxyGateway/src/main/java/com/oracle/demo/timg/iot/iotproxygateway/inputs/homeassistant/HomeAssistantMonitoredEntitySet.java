@@ -51,6 +51,7 @@ import java.util.stream.LongStream;
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayStatsTrackingData;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.HomeAssistantEntityUploadHandler;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
@@ -104,6 +105,8 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 
 	@PostConstruct
 	void postConstruct() {
+		log.fine(() -> "HomeAssistantMonitoredEntitySet will output to HomeAssistantEntityUploadHandler "
+				+ homeAssistantEntityUploadHandler.getName());
 		log.fine("Configuring initial last states for monitored entity " + this.name);
 		// make sure that all of the entities are valid
 		String problemEntities = monitoredentities.stream().filter(entity -> entity.missingFields())
@@ -195,7 +198,8 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 			return null;
 		}
 		if (stateString == null) {
-			log.warning("Returned state of monitored entity " + this + " is null");
+			log.warning("Returned state of monitored entity " + entity.getName() + " with home assistant entnty id "
+					+ entity.getEntityid() + " in entity set " + this.getName() + " is null");
 			gatewayStats.trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus.NULL_RETRIEVED, this, entity);
 			return null;
 		}

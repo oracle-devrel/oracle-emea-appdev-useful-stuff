@@ -42,9 +42,9 @@ import java.util.Optional;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayStatsTrackingData;
-import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntitySet;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTEntityData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.HomeAssistantEntityUploadHandler;
 import com.oracle.demo.timg.iot.iotproxygateway.outputs.OperatingModeOutput;
 
 import io.micronaut.context.annotation.Property;
@@ -122,5 +122,10 @@ public class MqttUploadHandler implements HomeAssistantEntityUploadHandler {
 		} else {
 			log.info("Uploads disabled for entity " + entity.getName() + " for data " + mappedToJson);
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "MqttUploadHandler";
 	}
 }

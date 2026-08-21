@@ -36,10 +36,9 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
 
-import java.util.Optional;
-
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.GatewayEventPublisher;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.scheduling.TaskExecutors;
@@ -63,19 +62,14 @@ public class GatewayStatsDataUploader {
 	private boolean pauseUploads = false;
 
 	@Inject
-	public GatewayStatsDataUploader(Optional<GatewayEventPublisher> gatewayEventPublisherOpt) {
-		if (gatewayEventPublisherOpt.isEmpty()) {
-			log.warning("gatewayEventPublisher not found, gateway stats data will not be uploaded");
-			gatewayEventPublisher = null;
-			return;
-		} else {
-			gatewayEventPublisher = gatewayEventPublisherOpt.get();
-		}
+	public GatewayStatsDataUploader(GatewayEventPublisher gatewayEventPublisher) {
+		this.gatewayEventPublisher = gatewayEventPublisher;
 	}
 
 	@PostConstruct
 	void postConstruct() {
-		log.info("GatewayStatsDataUploader starting operation");
+		log.info("GatewayStatsDataUploader starting operation, will send stats to GatewayEventPublisher "
+				+ gatewayEventPublisher.getPublisherName());
 	}
 
 	/*

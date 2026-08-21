@@ -1,4 +1,4 @@
-package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
+package com.oracle.demo.timg.iot.iotproxygateway.outputs;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -9,4 +9,6 @@ public interface GatewayEventPublisher {
 	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data);
 
 	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data);
+
+	public String getPublisherName();
 }

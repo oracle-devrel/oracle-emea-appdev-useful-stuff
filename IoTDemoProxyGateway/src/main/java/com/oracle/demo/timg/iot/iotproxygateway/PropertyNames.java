@@ -47,7 +47,6 @@ public class PropertyNames {
 	public final static String HA_REPLAY = "replay";
 	public final static String HA_REPLAY_INPUT_FILE = HA_REPLAY + ".inputfile";
 	public final static String HA_REPLAY_START_OFFSET = HA_REPLAY + ".replayStartOffset";
-	public final static String HA_REPLAY_MODE = HA_REPLAY + ".mode";
 	public final static String HA_REPLAY_HIGH_SPEED = HA_REPLAY + ".highspeed";
 	public final static String HA_REPLAY_HIGH_SPEED_DURATION = HA_REPLAY_HIGH_SPEED + ".duration";
 	public final static String HA_REPLAY_HIGH_SPEED_DELAY = HA_REPLAY + ".delay";

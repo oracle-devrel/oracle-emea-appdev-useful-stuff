@@ -39,9 +39,9 @@ package com.oracle.demo.timg.iot.iotproxygateway.outputs.mqtt;
 import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
-import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayEventPublisher;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
 import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.GatewayEventPublisher;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.mqtt.annotation.Topic;
@@ -70,4 +70,9 @@ public interface MqttGatewayEventPublisher extends GatewayEventPublisher {
 	// defaults to "house/homeassistant/gateway/config"
 	@ExecuteOn(TaskExecutors.IO)
 	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data);
+
+	@Override
+	public default String getPublisherName() {
+		return "MqttGatewayEventPublisher";
+	}
 }

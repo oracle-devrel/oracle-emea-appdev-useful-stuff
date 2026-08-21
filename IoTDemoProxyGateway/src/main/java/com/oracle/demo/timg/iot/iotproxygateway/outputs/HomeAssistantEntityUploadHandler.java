@@ -34,10 +34,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant;
+package com.oracle.demo.timg.iot.iotproxygateway.outputs;
 
 import java.util.Map;
 
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntitySet;
+
 public interface HomeAssistantEntityUploadHandler {
 	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity);
+
+	public String getName();
 }
