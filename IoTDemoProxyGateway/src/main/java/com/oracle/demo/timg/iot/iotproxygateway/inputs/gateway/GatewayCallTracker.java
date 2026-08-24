@@ -67,18 +67,42 @@ public class GatewayCallTracker {
 		callTimes.clear();
 	}
 
+	public synchronized void trackCalls(Instant instant) {
+		if (instant == null) {
+			callTimes.addLast(clock.instant());
+		} else {
+			callTimes.addLast(instant);
+		}
+	}
+
 	public synchronized void trackCalls() {
-		callTimes.addLast(clock.instant());
+		trackCalls(null);
 	}
 
 	public synchronized int callCount() {
-		pruneCallsBefore(clock.instant());
+		return callCount(null);
+	}
+
+	public synchronized int callCount(Instant instant) {
+		if (instant == null) {
+			pruneCallsBefore(clock.instant());
+		} else {
+			pruneCallsBefore(instant);
+		}
 		return callTimes.size();
 	}
 
 	public synchronized double averageCalls(long periodSeconds) {
 		validatePeriodSeconds(periodSeconds);
 		pruneCallsBefore(clock.instant());
+
+		double windowSeconds = trackingWindow.getSeconds() + trackingWindow.getNano() / 1_000_000_000.0;
+		return callTimes.size() * periodSeconds / windowSeconds;
+	}
+
+	public synchronized double averageCalls(long periodSeconds, Instant instant) {
+		validatePeriodSeconds(periodSeconds);
+		pruneCallsBefore(instant);
 
 		double windowSeconds = trackingWindow.getSeconds() + trackingWindow.getNano() / 1_000_000_000.0;
 		return callTimes.size() * periodSeconds / windowSeconds;

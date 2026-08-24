@@ -37,6 +37,7 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
 
 import java.time.Duration;
+import java.time.Instant;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityRetrieveStatus;
@@ -54,7 +55,7 @@ import lombok.extern.java.Log;
 @Singleton
 @Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "MQTT", defaultValue = "MQTT")
 
-public class GatewayStatsTrackingData { // implements GatewayStats {
+public class GatewayStatsTrackingData {
 	private GatewayCallTracker sucessfullHARetrieveCalls;
 	private GatewayCallTracker failedHARetrieveCalls;
 	private GatewayCallTracker sucessfullUploadCalls;
@@ -95,36 +96,40 @@ public class GatewayStatsTrackingData { // implements GatewayStats {
 				.faileduploadtimewindow(failedUploadWindowSeconds).build();
 	}
 
-	// @Override
+	// these are used for the high speed data when the window will be adjusted based
+	// on the high speed rate
+	public GatewayStatsData getGatewayStatsData(Instant instant) {
+		return GatewayStatsData.builder()
+				.haretrievesuccess(sucessfullHARetrieveCalls.averageCalls(sucessfullHARetrieveWindowSeconds, instant))
+				.haretrievefail(failedHARetrieveCalls.averageCalls(failedHARetrieveWindowSeconds, instant))
+				.uploadsuccess(sucessfullUploadCalls.averageCalls(sucessfullUploadWindowSeconds, instant))
+				.uploadfail(failedUploadCalls.averageCalls(failedUploadWindowSeconds, instant)).build();
+	}
+
 	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
 			HomeAssistantMonitoredEntity entity) {
 		sucessfullHARetrieveCalls.trackCalls();
 	}
 
-	// @Override
 	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
 			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity) {
 		failedHARetrieveCalls.trackCalls();
 	}
 
-	// @Override
 	public void trackSucessfullUploadCall() {
 		sucessfullUploadCalls.trackCalls();
 	}
 
-	// @Override
 	public void trackFailedUploadCall() {
 		failedUploadCalls.trackCalls();
 
 	}
 
-	// @Override
 	public void resetHAStats() {
 		sucessfullHARetrieveCalls.reset();
 		failedHARetrieveCalls.reset();
 	}
 
-	// @Override
 	public void resetUploadStats() {
 		sucessfullUploadCalls.reset();
 		failedUploadCalls.reset();
