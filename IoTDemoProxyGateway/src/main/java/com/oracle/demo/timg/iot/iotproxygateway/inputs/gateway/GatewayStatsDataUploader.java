@@ -90,6 +90,13 @@ public class GatewayStatsDataUploader {
 			return;
 		}
 		GatewayStatsData gatewayStatsData = gatewayStats.getGatewayStatsData();
+		publishGatewayStats(gatewayStatsData);
+	}
+
+	/**
+	 * @param gatewayStatsData
+	 */
+	public void publishGatewayStats(GatewayStatsData gatewayStatsData) {
 		IoTGatewayStatsData ioTGatewayStatsData = IoTGatewayStatsData.builder().payload(gatewayStatsData).build();
 		log.fine(() -> "Publishing gateway stats " + ioTGatewayStatsData);
 		try {

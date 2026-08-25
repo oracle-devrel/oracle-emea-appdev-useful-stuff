@@ -111,9 +111,20 @@ public class GatewayStatsTrackingData {
 		sucessfullHARetrieveCalls.trackCalls();
 	}
 
+	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
+			HomeAssistantMonitoredEntity entity, Instant instant) {
+		sucessfullHARetrieveCalls.trackCalls(instant);
+	}
+
 	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
 			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity) {
 		failedHARetrieveCalls.trackCalls();
+	}
+
+	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
+			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity,
+			Instant instant) {
+		failedHARetrieveCalls.trackCalls(instant);
 	}
 
 	public void trackSucessfullUploadCall() {

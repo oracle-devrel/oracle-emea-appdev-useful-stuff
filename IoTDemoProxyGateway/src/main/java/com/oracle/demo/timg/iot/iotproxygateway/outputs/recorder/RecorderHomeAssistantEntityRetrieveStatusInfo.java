@@ -52,7 +52,7 @@ import lombok.extern.java.Log;
 @Log
 @Serdeable
 @Builder
-public class EntityInfo {
+public class RecorderHomeAssistantEntityRetrieveStatusInfo {
 	@NonNull
 	private HomeAssistantEntityRetrieveStatus retrieveStatus;
 	@NonNull

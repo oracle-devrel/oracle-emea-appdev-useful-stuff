@@ -110,7 +110,6 @@ public class GatewayCallTracker {
 
 	private void pruneCallsBefore(Instant now) {
 		Instant cutoff = now.minus(trackingWindow);
-
 		while (!callTimes.isEmpty() && callTimes.peekFirst().isBefore(cutoff)) {
 			callTimes.removeFirst();
 		}

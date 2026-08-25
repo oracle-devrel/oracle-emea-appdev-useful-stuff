@@ -17,9 +17,9 @@ import lombok.Data;
 public class RecordedData {
 	// get the UTC TZ once to speed things later
 	@JsonIgnore
-	private final static ZoneId UTCTZ = ZoneId.of("UTC");
+	public final static ZoneId UTCTZ = ZoneId.of("UTC");
 	@JsonIgnore
-	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+	public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
 	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
 	@Builder.Default
 	private ZonedDateTime recordTimestamp = ZonedDateTime.now(UTCTZ);

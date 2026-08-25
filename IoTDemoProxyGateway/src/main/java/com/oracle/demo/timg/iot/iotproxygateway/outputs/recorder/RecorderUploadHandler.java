@@ -35,7 +35,7 @@ public class RecorderUploadHandler implements HomeAssistantEntityUploadHandler {
 	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity) {
 		IoTEntityData ioTEntityData = IoTEntityData.builder().devicekey(entity.getDevicekey()).payload(ioTCoreEvent)
 				.build();
-		recorder.recordIoTEntityData(ioTEntityData);
+		recorder.recordIoTEntityData(ioTEntityData, entity.getName());
 	}
 
 	@Override

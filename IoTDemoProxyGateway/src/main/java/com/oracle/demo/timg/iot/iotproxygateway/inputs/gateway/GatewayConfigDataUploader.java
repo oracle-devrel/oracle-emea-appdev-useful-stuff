@@ -85,6 +85,14 @@ public class GatewayConfigDataUploader {
 			return;
 		}
 		GatewayConfigData gatewayConfigData = gatewayStats.getGatewayConfigData();
+		publishGatewayConfig(gatewayConfigData);
+
+	}
+
+	/**
+	 * @param gatewayConfigData
+	 */
+	public void publishGatewayConfig(GatewayConfigData gatewayConfigData) {
 		IoTGatewayConfigData ioTGatewayConfigData = IoTGatewayConfigData.builder().payload(gatewayConfigData).build();
 		log.fine(() -> "Publishing gateway config " + ioTGatewayConfigData);
 		try {
@@ -94,6 +102,5 @@ public class GatewayConfigDataUploader {
 			log.warning("Exception uploading gateway config " + ioTGatewayConfigData + ", " + e.getLocalizedMessage());
 			gatewayStats.trackFailedUploadCall();
 		}
-
 	}
 }

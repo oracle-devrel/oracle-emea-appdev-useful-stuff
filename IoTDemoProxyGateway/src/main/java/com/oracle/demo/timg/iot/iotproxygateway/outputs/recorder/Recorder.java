@@ -103,14 +103,16 @@ public class Recorder {
 		}
 	}
 
-	public void recordIoTEntityData(@NonNull IoTEntityData ioTEntityData) {
-		log.info("Recording IoTEntityData " + ioTEntityData);
+	public void recordIoTEntityData(@NonNull IoTEntityData ioTEntityData, @NonNull String entitySetName) {
+		log.info("Recording with entity set name " + entitySetName + " and IoTEntityData " + ioTEntityData);
+		RecorderHomeAssistantEntitySetInfo recorderHomeAssistantEntitySetInfo = RecorderHomeAssistantEntitySetInfo
+				.builder().entitySetName(entitySetName).ioTEntityData(ioTEntityData).build();
 		String jsonData;
 		try {
-			jsonData = mapper.writeValueAsString(ioTEntityData);
+			jsonData = mapper.writeValueAsString(recorderHomeAssistantEntitySetInfo);
 		} catch (IOException e) {
-			log.warning("Problem serialising IoTEntityData to json data, " + e.getLocalizedMessage() + ", entity is "
-					+ ioTEntityData);
+			log.warning("Problem serialising RecorderHomeAssistantEntitySetInfo to json data, "
+					+ e.getLocalizedMessage() + ", entity set data " + recorderHomeAssistantEntitySetInfo);
 			return;
 		}
 		recordData(RecordedDataType.ENTITY, jsonData);
@@ -136,14 +138,15 @@ public class Recorder {
 	public void recordSucessfullHARetrieveCall(@NonNull HomeAssistantMonitoredEntitySet entitySet,
 			@NonNull HomeAssistantMonitoredEntity entity) {
 		log.info("Recording sucessfull HA entity call for " + entity + " in set " + entitySet.getName());
-		EntityInfo entityInfo = EntityInfo.builder().retrieveStatus(HomeAssistantEntityRetrieveStatus.RETRIEVED)
+		RecorderHomeAssistantEntityRetrieveStatusInfo recorderHomeAssistantEntityretrieveStatusInfo = RecorderHomeAssistantEntityRetrieveStatusInfo
+				.builder().retrieveStatus(HomeAssistantEntityRetrieveStatus.RETRIEVED)
 				.entitySetName(entitySet.getName()).entityid(entity.getEntityid()).build();
 		String jsonData;
 		try {
-			jsonData = mapper.writeValueAsString(entityInfo);
+			jsonData = mapper.writeValueAsString(recorderHomeAssistantEntityretrieveStatusInfo);
 		} catch (IOException e) {
 			log.warning("Problem serialising Sucessfull HA call data to json data, " + e.getLocalizedMessage()
-					+ ", entity info is " + entityInfo);
+					+ ", entity info is " + recorderHomeAssistantEntityretrieveStatusInfo);
 			return;
 		}
 		recordData(RecordedDataType.HA_RETRIEVE, jsonData);
@@ -153,14 +156,15 @@ public class Recorder {
 			@NonNull HomeAssistantMonitoredEntitySet entitySet, @NonNull HomeAssistantMonitoredEntity entity) {
 		log.info("Recording failed HA entity call due to " + retrieveStatus + " for " + entity + " in set "
 				+ entitySet.getName());
-		EntityInfo entityInfo = EntityInfo.builder().retrieveStatus(retrieveStatus).entitySetName(entitySet.getName())
+		RecorderHomeAssistantEntityRetrieveStatusInfo recorderHomeAssistantEntityretrieveStatusInfo = RecorderHomeAssistantEntityRetrieveStatusInfo
+				.builder().retrieveStatus(retrieveStatus).entitySetName(entitySet.getName())
 				.entityid(entity.getEntityid()).build();
 		String jsonData;
 		try {
-			jsonData = mapper.writeValueAsString(entityInfo);
+			jsonData = mapper.writeValueAsString(recorderHomeAssistantEntityretrieveStatusInfo);
 		} catch (IOException e) {
 			log.warning("Problem serialising failed HA call data to json data, " + e.getLocalizedMessage()
-					+ ", entity info is " + entityInfo);
+					+ ", entity info is " + recorderHomeAssistantEntityretrieveStatusInfo);
 			return;
 		}
 		recordData(RecordedDataType.HA_RETRIEVE, jsonData);
