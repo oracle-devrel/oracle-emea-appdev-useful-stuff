@@ -64,6 +64,7 @@ public class PropertyNames {
 	public final static String RECORD_OUTPUT_DIRECTORY_DEFAULT = "saved";
 	public final static String RECORD_OUTPUT_PREFIX_WITH_DTG = RECORD_OUTPUT + ".prefixwithdtg";
 	public final static String RECORD_DURATION = "record.duration";
+	public final static String RECORD_START_AT = "record.startat";
 	public final static String RECORD_EXIT_AFTER_RECORDING_STOP = "record.exitafterrecordingstop";
 
 	// these properties are the mqtt settings for uploading events (live or
