@@ -34,28 +34,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant;
 
-import java.util.Map;
+import lombok.experimental.StandardException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
-
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+@StandardException
+public class MissingEntitiesException extends Exception {
+	private static final long serialVersionUID = -2629852085814797150L;
 }

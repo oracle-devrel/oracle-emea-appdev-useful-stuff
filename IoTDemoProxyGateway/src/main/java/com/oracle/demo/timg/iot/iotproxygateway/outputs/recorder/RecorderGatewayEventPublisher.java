@@ -34,28 +34,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.outputs.recorder;
 
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayConfigData;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTGatewayStatsData;
+import com.oracle.demo.timg.iot.iotproxygateway.outputs.GatewayEventPublisher;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.extern.java.Log;
 
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+@Singleton
+@Log
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "RECORDER")
+public class RecorderGatewayEventPublisher implements GatewayEventPublisher {
+	private final Recorder recorder;
+
+	@Inject
+	public RecorderGatewayEventPublisher(Recorder recorder) {
+		log.info("RecorderGatewayEventPublisher In constructor");
+		this.recorder = recorder;
+	}
+
+	@Override
+	public CompletableFuture<Void> publishGatewayStats(IoTGatewayStatsData data) {
+		recorder.recordGatewayStatsUploadEvent(data);
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Void> publishGatewayConfig(IoTGatewayConfigData data) {
+		recorder.recordGatewayConfigUploadEvent(data);
+		return null;
+	}
+
+	@Override
+	public String getPublisherName() {
+		return "RecorderGatewayEventPublisher";
+	}
 }

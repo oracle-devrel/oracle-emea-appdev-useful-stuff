@@ -34,28 +34,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
 
-import java.util.Map;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityRetrieveStatus;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntity;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantMonitoredEntitySet;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.inject.Singleton;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+@Singleton
+public interface GatewayStats {
 
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+	public void trackSucessfullUploadCall();
+
+	public void trackFailedUploadCall();
+
+	public void resetUploadStats();
+
+	public void trackSucessfullHARetrieveCall(HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet,
+			HomeAssistantMonitoredEntity entity);
+
+	public void trackFailedHARetrieveCall(HomeAssistantEntityRetrieveStatus retrieveStatus,
+			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet, HomeAssistantMonitoredEntity entity);
+
+	public void resetHAStats();
+
+	public default void resetAllStats() {
+		resetHAStats();
+		resetUploadStats();
+	}
 }

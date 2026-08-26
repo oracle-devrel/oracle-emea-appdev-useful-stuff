@@ -34,28 +34,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway;
 
-import java.util.Map;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
 import lombok.ToString;
 
 @Data
 @Serdeable
 @Builder
-public class IoTEntityData {
+public class GatewayConfigData {
+	// get the UTC TZ once to speed things later
 	@ToString.Exclude
 	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+	private final static ZoneId utcTz = ZoneId.of("UTC");
+	// note that for Indirectly connected devices the timestamp must be within the
+	// payload sub object as the current configuration of the gateway envelope means
+	// that's all that's passed on to the indirectly connected devices
+	// for the telemetry on the gateway itself then we can get to the envelope
+	// attributes before the contentRoot is applied (if there is one and its not $)
+	// so we can if we want we can have the timestamp at the outer (envelope) level
+	// or within the payload,
+	@Builder.Default
+	@JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX")
+	private ZonedDateTime timestamp = ZonedDateTime.now(utcTz);
+	private Long successfullharetrievetimewindow;
+	private Long failedharetrievetimewindow;
+	private Long successfulluploadtimewindow;
+	private Long faileduploadtimewindow;
 }

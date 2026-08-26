@@ -34,28 +34,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant;
 
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.oracle.demo.timg.iot.iotproxygateway.iotdata.IoTType;
 
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
+import lombok.extern.java.Log;
 
 @Data
+@NoArgsConstructor
+@Log
 @Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+public class HomeAssistantMonitoredEntity {
+	private String name;
+	private String entityid;
+	private IoTType iottype;
+	private String fieldname;
+	private SendMode sendmode = SendMode.ALWAYS; // default to always as it's the broadest option
+	private boolean dontsendifunavailable = true;
+
+	public boolean missingFields() {
+		return (name == null) || (entityid == null) || (iottype == null);
+	}
 }

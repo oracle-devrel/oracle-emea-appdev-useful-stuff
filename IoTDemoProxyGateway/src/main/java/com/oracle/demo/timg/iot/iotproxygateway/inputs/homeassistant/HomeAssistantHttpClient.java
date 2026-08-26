@@ -34,28 +34,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant;
 
-import java.util.Map;
+import static io.micronaut.http.HttpHeaders.USER_AGENT;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+@Client(id = "homeassistant", value = "${" + PropertyNames.HOME_ASSISTANT_API_URL + "}", path = "/api")
+@Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+@Requires(property = PropertyNames.HOME_ASSISTANT_API_AUTH_TOKEN)
+public interface HomeAssistantHttpClient {
+	@Get("/states/{entityid}")
+	// @Error(exception = ReadTimeoutException.class)
+	public String getState(@PathVariable(name = "entityid") String entityid) throws HttpClientException;
+
 }

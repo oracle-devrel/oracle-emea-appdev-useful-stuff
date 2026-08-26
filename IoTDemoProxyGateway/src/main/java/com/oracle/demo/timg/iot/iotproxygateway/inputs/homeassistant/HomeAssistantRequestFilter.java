@@ -1,4 +1,4 @@
-/*Copyright (c) 2026 Oracle and/or its affiliates.
+/*Copyright (c) 2025 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,28 +34,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant;
 
-import java.util.Map;
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.http.annotation.ClientFilter;
+import io.micronaut.http.annotation.RequestFilter;
+import jakarta.inject.Inject;
+import lombok.extern.java.Log;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+@ClientFilter(patterns = "/api/**")
+@Requires(property = PropertyNames.HOME_ASSISTANT_API_AUTH_TOKEN)
+@Log
+public class HomeAssistantRequestFilter {
 
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+	private String authToken;
+
+	@Inject
+	public HomeAssistantRequestFilter(@Property(name = PropertyNames.HOME_ASSISTANT_API_AUTH_TOKEN) String authToken) {
+		this.authToken = authToken;
+	}
+
+	@RequestFilter
+	public void doFilter(MutableHttpRequest<?> request) {
+		log.finer("Adding auth header ");
+		request.bearerAuth(authToken);
+		log.finer("Adding content type header ");
+		request.contentType(MediaType.APPLICATION_JSON_TYPE);
+		log.finer(() -> "request uri " + request.getUri().toASCIIString());
+		log.finer(() -> "request path " + request.getPath());
+		log.finer(() -> "request params = " + request.getParameters().asMap().toString());
+		log.finer(() -> "request headers = " + request.getHeaders().asMap().toString());
+		log.finer(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
+	}
 }

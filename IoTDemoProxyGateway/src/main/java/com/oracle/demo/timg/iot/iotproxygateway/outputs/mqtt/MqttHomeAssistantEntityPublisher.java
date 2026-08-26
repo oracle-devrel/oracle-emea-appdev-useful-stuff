@@ -1,4 +1,4 @@
-/*Copyright (c) 2026 Oracle and/or its affiliates.
+/*Copyright (c) 2025 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -34,28 +34,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.outputs.mqtt;
 
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.mqtt.annotation.Topic;
+import io.micronaut.mqtt.annotation.v5.MqttPublisher;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
+import jakarta.inject.Singleton;
 
-@Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+@MqttPublisher
+@Singleton
+@Requires(property = PropertyNames.GATEWAY_DEVICE_NAME)
+@Requires(property = PropertyNames.MQTT_CLIENT_DEVICE_ID)
+@Requires(property = PropertyNames.MQTT_CLIENT_USERNAME)
+@Requires(property = PropertyNames.MQTT_CLIENT_PASSWORD)
+@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
+@Requires(property = PropertyNames.MQTT_CLIENT_SERVER_URI)
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "MQTT", defaultValue = "MQTT")
+public interface MqttHomeAssistantEntityPublisher {
+	// @Topic("house/homeassistant/entities")
+	@ExecuteOn(TaskExecutors.IO)
+	public CompletableFuture<Void> publishHomeAssistantData(@Topic String topic, String data);
 }

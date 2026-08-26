@@ -34,28 +34,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.oracle.demo.timg.iot.iotproxygateway.iotdata;
+package com.oracle.demo.timg.iot.iotproxygateway.outputs.none;
 
-import java.util.Map;
+import java.time.Duration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
+import com.oracle.demo.timg.iot.iotproxygateway.inputs.gateway.GatewayStatsTrackingData;
 
-import io.micronaut.serde.annotation.Serdeable;
-import lombok.Builder;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Singleton;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.extern.java.Log;
 
 @Data
-@Serdeable
-@Builder
-public class IoTEntityData {
-	@ToString.Exclude
-	@JsonIgnore
-	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
-	// this MUST be nonnull so that IoT can identify it as data that the gateway is
-	// acting as a proxy for
-	@NonNull
-	private String devicekey;
-	private Map<String, Object> payload;
+@Log
+@Singleton
+@Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "NONE")
+
+public class NoneGatewayStatsTrackingData extends GatewayStatsTrackingData {
+
+	public NoneGatewayStatsTrackingData(
+			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration sucessfullHARetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_RETRIEVE_WINDOW, defaultValue = "PT10m") Duration failedHARetrieveWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_SUCESSFULL_UPLOAD_WINDOW, defaultValue = "PT10m") Duration sucessfullUploadWindow,
+			@Property(name = PropertyNames.GATEWAY_STATS_FAILED_UPLOAD_WINDOW, defaultValue = "PT10m") Duration failedUploadWindow) {
+		super(sucessfullHARetrieveWindow, failedHARetrieveWindow, sucessfullUploadWindow, failedUploadWindow);
+	}
+
+	@Override
+	public void trackSucessfullUploadCall() {
+		// this does nothing as there is no upload
+	}
+
+	@Override
+	public void trackFailedUploadCall() {
+		// this does nothing as there is no upload
+	}
 }
