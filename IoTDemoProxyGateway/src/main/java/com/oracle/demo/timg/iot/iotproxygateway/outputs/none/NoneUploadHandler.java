@@ -17,8 +17,10 @@ import lombok.extern.java.Log;
 public class NoneUploadHandler implements HomeAssistantEntityUploadHandler {
 
 	@Override
-	public void upload(Map<String, Object> ioTCoreEvent, HomeAssistantMonitoredEntitySet entity) {
-		log.info("None Publishing from entity set " + entity.getName() + " with data " + ioTCoreEvent);
+	public void upload(Map<String, Object> ioTCoreEvent,
+			HomeAssistantMonitoredEntitySet homeAssistantMonitoredEntitySet) {
+		log.info("None Publishing from home assistant entity set " + homeAssistantMonitoredEntitySet.getName()
+				+ " with key " + homeAssistantMonitoredEntitySet.getDevicekey() + " with data " + ioTCoreEvent);
 	}
 
 	@Override

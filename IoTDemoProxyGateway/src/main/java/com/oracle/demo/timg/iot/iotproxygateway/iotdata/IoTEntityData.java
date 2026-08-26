@@ -43,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.ToString;
 
 @Data
@@ -52,6 +53,9 @@ public class IoTEntityData {
 	@ToString.Exclude
 	@JsonIgnore
 	public final static String TIMESTAMP_FIELD_NAME = "timestamp";
+	// this MUST be nonnull so that IoT can identify it as data that the gateway is
+	// acting as a proxy for
+	@NonNull
 	private String devicekey;
 	private Map<String, Object> payload;
 }

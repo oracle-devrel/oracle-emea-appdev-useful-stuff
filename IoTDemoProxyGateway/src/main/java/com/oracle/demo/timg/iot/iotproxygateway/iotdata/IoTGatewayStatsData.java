@@ -46,6 +46,9 @@ import lombok.Data;
 @Serdeable
 @Builder
 public class IoTGatewayStatsData {
+	// this is deliberately forced to be null so that the IoT can differentiate from
+	// events relating to the gateway (in this case it's stats) and those that the
+	// gateway is acting as a proxy for
 	private final String devicekey = null;
 	private GatewayStatsData payload;
 }

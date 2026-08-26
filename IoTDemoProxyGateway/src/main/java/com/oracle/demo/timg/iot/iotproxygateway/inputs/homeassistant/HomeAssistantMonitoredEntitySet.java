@@ -70,7 +70,8 @@ import lombok.extern.java.Log;
 public class HomeAssistantMonitoredEntitySet implements Runnable {
 	// get the UTC TZ once to speed things later
 	private final static ZoneId UTC_TZ = ZoneId.of("UTC");
-	private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX");
+	public final static String PAYLOAD_TIMESTAMP_FORMAT_STRING = "uuuu-MM-dd'T'HH:mm:ss.SSSSSSXXX";
+	public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PAYLOAD_TIMESTAMP_FORMAT_STRING);
 	private final static ZonedDateTime EPOCH_TIME = Instant.EPOCH.atZone(UTC_TZ);
 	private final static HomeAssistantState EPOCH_HA_STATE = HomeAssistantState.builder().last_changed(EPOCH_TIME)
 			.last_reported(EPOCH_TIME).last_updated(EPOCH_TIME).build();

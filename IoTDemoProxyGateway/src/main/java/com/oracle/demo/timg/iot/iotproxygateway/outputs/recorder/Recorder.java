@@ -6,7 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
@@ -31,7 +32,8 @@ import lombok.extern.java.Log;
 @Requires(property = PropertyNames.OPERATING_MODE_OUTPUT, value = "RECORDER")
 
 public class Recorder {
-	private final static String DTG_FORMAT = "uuuu-MM-dd'T'HH-mm-ss.SSSSSS-";
+	public final static ZoneId UTCTZ = ZoneId.of("UTC");
+	private final static String DTG_FORMAT = "uuuu-MM-dd'T'HH-mm-ss.SSSSSSX-";
 	private final ObjectMapper mapper;
 	private final String outputLocation;
 	private final Instant stopRecordingAt;
@@ -48,7 +50,7 @@ public class Recorder {
 			@Property(name = PropertyNames.RECORD_EXIT_AFTER_RECORDING_STOP, defaultValue = "true") boolean exitAfterRecordingStop)
 			throws IOException {
 		this.mapper = mapper;
-		String prefix = prefixwithdtg ? LocalDateTime.now().format(DateTimeFormatter.ofPattern(DTG_FORMAT)) : "";
+		String prefix = prefixwithdtg ? ZonedDateTime.now(UTCTZ).format(DateTimeFormatter.ofPattern(DTG_FORMAT)) : "";
 		this.outputLocation = outputDirectory + File.separator + prefix + outputFileName;
 		try {
 			this.writer = new BufferedWriter(new FileWriter(this.outputLocation));
