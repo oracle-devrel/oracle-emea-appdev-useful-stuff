@@ -120,19 +120,27 @@ public class Recorder {
 				log.info("Unable to parse provided start tine of recordingStart because " + e.getLocalizedMessage());
 				throw e;
 			}
-			this.active = false;
-
-			Duration timeUntilStartingRecording = Duration.between(Instant.now(), recordingStartZDT);
-			log.info("Will stop recording " + recordDuration + " after " + recordingStart + " which is in "
-					+ timeUntilStartingRecording);
-			this.stopRecordingAt = recordingStartZDT.plus(recordDuration);
-			// schedule the start
-			executor = Executors.newSingleThreadScheduledExecutor();
-			executor.schedule(() -> {
-				log.info("Reached recording start time, making recording active");
-				active = true;
-				executor.shutdown();
-			}, timeUntilStartingRecording.toNanos(), TimeUnit.NANOSECONDS);
+			// check if the provided start time is in the past, if so ignore it
+			if (recordingStartZDT.isBefore(ZonedDateTime.now(UTCTZ))) {
+				log.info("The provided recording start time of " + recordingStart
+						+ " is on the past, recording will start immediately and finish in " + recordDuration);
+				this.stopRecordingAt = ZonedDateTime.now(UTCTZ).plus(recordDuration);
+				this.active = true;
+			} else {
+				// the start time is actually in the future
+				this.active = false;
+				Duration timeUntilStartingRecording = Duration.between(Instant.now(), recordingStartZDT);
+				log.info("Will stop recording " + recordDuration + " after " + recordingStart + " which is in "
+						+ timeUntilStartingRecording);
+				this.stopRecordingAt = recordingStartZDT.plus(recordDuration);
+				// schedule the start
+				executor = Executors.newSingleThreadScheduledExecutor();
+				executor.schedule(() -> {
+					log.info("Reached recording start time, making recording active");
+					active = true;
+					executor.shutdown();
+				}, timeUntilStartingRecording.toNanos(), TimeUnit.NANOSECONDS);
+			}
 		}
 		this.exitAfterRecordingStop = exitAfterRecordingStop;
 	}
