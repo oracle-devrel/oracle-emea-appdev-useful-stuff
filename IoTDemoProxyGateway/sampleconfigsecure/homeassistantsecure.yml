@@ -1,0 +1,3 @@
+home-assistant:
+  api:
+    auth_token: "<Your home assistant auth token, go to your profile in HA, then security tab, then long-lived access tokens - see HA documentaion "

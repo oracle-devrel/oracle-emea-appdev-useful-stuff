@@ -1,3 +1,0 @@
-homeAssistant:
-  api:
-    auth_token: "<your HA auth token>"
