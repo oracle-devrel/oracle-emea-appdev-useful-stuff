@@ -9,6 +9,7 @@ mqtt:
     #protocol: tcp
     protocol: ssl
   client:
+    # replaced with output mode enabled: true
     # Unique identifier for this MQTT client
     # The gateway name, not any device name
     client-id: ${gateway.identity.name}

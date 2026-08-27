@@ -1,11 +1,10 @@
 home-assistant:
-  api:
-    auth_token: "<your HA token>"
-    port: <Your HA port, might be 80 or 8123>
-    host: <Your HA servers IP address, sometimes homeassistant.local will work>
+  api:  
+    port: 8123
+    host: <your home assistant IP or hostname>
     protocol: "http"
     url: ${home-assistant.api.protocol}://${home-assistant.api.host}:${home-assistant.api.port}
-  monitored-entities:
+  monitored-entity-sets:
   - name: "HomeBatteryManualReserve"
     doupload: true
     initaldelay: "PT3s"
@@ -348,7 +347,7 @@ home-assistant:
     endpoint: "airqualityruuvi"
     monitoredentities:
     - name: "Lounge Air Quality Score"
-      entityid: "sensor.ruuvi_air_3ee7_indoor_air_quality_score"
+      entityid: "sensor.ruuvi_air_lounge_indoor_air_quality_score"
       iottype: "NUMBER"
       fieldname: "qualityscore"
       sendmode: "ALWAYS"

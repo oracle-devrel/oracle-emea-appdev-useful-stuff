@@ -9,9 +9,9 @@ gateway:
     entitiessubpath: "entities"
   config:
     enabled: true
-    publishrate: "3600s"
-    initialdelay: "10s"
+    publishrate: "1200s"
+    initialdelay: "5s"
   stats:
     enabled: true
-    publishrate: "600s"
-    initialdelay: "5s"
+    publishrate: "60s"
+    initialdelay: "60s"
