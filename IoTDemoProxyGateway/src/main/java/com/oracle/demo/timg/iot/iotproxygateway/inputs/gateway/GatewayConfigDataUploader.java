@@ -76,7 +76,7 @@ public class GatewayConfigDataUploader {
 	/*
 	 * have this use the micronaut scheduler, it's easier
 	 */
-	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_CONFIG + ":1200s}", initialDelay = "${"
+	@Scheduled(fixedRate = "${" + PropertyNames.GATEWAY_CONFIG_PUBLISH_RATE + ":1200s}", initialDelay = "${"
 			+ PropertyNames.GATEWAY_CONFIG_INITIAL_DELAY + ":5s}")
 	@ExecuteOn(TaskExecutors.IO)
 	public void processConfiguration() {
