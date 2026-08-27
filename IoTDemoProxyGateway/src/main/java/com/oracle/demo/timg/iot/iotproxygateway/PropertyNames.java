@@ -104,7 +104,7 @@ public class PropertyNames {
 	// property names to retrieve info from the home assistant instance for live
 	// upload or recording.
 	public final static String HOME_ASSISTANT = "home-assistant";
-	public final static String HOME_ASSISTANT_MONITORED_ENTITIES_LIST = HOME_ASSISTANT + ".monitored-entities";
+	public final static String HOME_ASSISTANT_MONITORED_ENTITY_SETS_LIST = HOME_ASSISTANT + ".monitored-entity-sets";
 	public final static String HOME_ASSISTANT_API = HOME_ASSISTANT + ".api";
 	public final static String HOME_ASSISTANT_API_AUTH_TOKEN = HOME_ASSISTANT_API + ".auth_token";
 	public final static String HOME_ASSISTANT_API_PROTOCOL = HOME_ASSISTANT_API + ".protocol";
