@@ -66,7 +66,7 @@ import lombok.extern.java.Log;
 @Data
 @NoArgsConstructor
 @Log
-@EachProperty(value = PropertyNames.HOME_ASSISTANT_MONITORED_ENTITIES_LIST, primary = "name", list = true)
+@EachProperty(value = PropertyNames.HOME_ASSISTANT_MONITORED_ENTITY_SETS_LIST, primary = "name", list = true)
 public class HomeAssistantMonitoredEntitySet implements Runnable {
 	// get the UTC TZ once to speed things later
 	private final static ZoneId UTC_TZ = ZoneId.of("UTC");
@@ -76,12 +76,12 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 	private final static HomeAssistantState EPOCH_HA_STATE = HomeAssistantState.builder().last_changed(EPOCH_TIME)
 			.last_reported(EPOCH_TIME).last_updated(EPOCH_TIME).build();
 	private String name;
-	private Boolean doupload;
+	private Boolean doupload = true;
 	private Duration initaldelay = Duration.ofSeconds(5);
 	private Duration retrievalrate = Duration.ofSeconds(10);
 	private String devicekey;
 	private String endpoint;
-	private TimestampMode timestampMode = TimestampMode.LATEST;
+	private TimestampMode timestampmode = TimestampMode.LATEST;
 	private List<HomeAssistantMonitoredEntity> monitoredentities;
 	@ToString.Exclude
 	@Inject
@@ -166,7 +166,7 @@ public class HomeAssistantMonitoredEntitySet implements Runnable {
 							instant.getNano() / 1_000);
 				});
 		// based on our comparison type calculate the actual microseconds value
-		Long sortedTsOpt = switch (timestampMode) {
+		Long sortedTsOpt = switch (timestampmode) {
 		case AVERAGE -> Math.round(entityTimeAsLong.average().orElse(0));
 		case EARLIEST -> entityTimeAsLong.min().orElse(0);
 		case LATEST -> entityTimeAsLong.max().orElse(0);

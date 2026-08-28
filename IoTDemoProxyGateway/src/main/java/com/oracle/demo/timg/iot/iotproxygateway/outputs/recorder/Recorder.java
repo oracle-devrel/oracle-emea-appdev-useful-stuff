@@ -1,3 +1,39 @@
+/*Copyright (c) 2026 Oracle and/or its affiliates.
+
+The Universal Permissive License (UPL), Version 1.0
+
+Subject to the condition set forth below, permission is hereby granted to any
+person obtaining a copy of this software, associated documentation and/or data
+(collectively the "Software"), free of charge and under any and all copyright
+rights in the Software, and any and all patent rights owned or freely
+licensable by each licensor hereunder covering either (i) the unmodified
+Software as contributed to or provided by such licensor, or (ii) the Larger
+Works (as defined below), to deal in both
+
+(a) the Software, and
+(b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+one is included with the Software (each a "Larger Work" to which the Software
+is contributed by such licensors),
+
+without restriction, including without limitation the rights to copy, create
+derivative works of, display, perform, and distribute the Software and make,
+use, sell, offer for sale, import, export, have made, and have sold the
+Software and the Larger Work(s), and to sublicense the foregoing rights on
+either these or other terms.
+
+This license is subject to the following condition:
+The above copyright notice and either this complete permission notice or at
+a minimum a reference to the UPL must be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
 package com.oracle.demo.timg.iot.iotproxygateway.outputs.recorder;
 
 import java.io.BufferedWriter;
@@ -9,6 +45,11 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.oracle.demo.timg.iot.iotproxygateway.PropertyNames;
 import com.oracle.demo.timg.iot.iotproxygateway.inputs.homeassistant.HomeAssistantEntityRetrieveStatus;
@@ -33,13 +74,18 @@ import lombok.extern.java.Log;
 
 public class Recorder {
 	public final static ZoneId UTCTZ = ZoneId.of("UTC");
-	private final static String DTG_FORMAT = "uuuu-MM-dd'T'HH-mm-ss.SSSSSSX-";
+	private final static String DTG_FORMAT = "uuuu-MM-dd'T'HH-mm-ss.SSSSSSX";
+
+	private final static String PREFIX_DTG_FORMAT = DTG_FORMAT + "-";
 	private final ObjectMapper mapper;
 	private final String outputLocation;
-	private final Instant stopRecordingAt;
+	private final ZonedDateTime stopRecordingAt;
 	private final boolean exitAfterRecordingStop;
 	private BufferedWriter writer;
 	private boolean active = false;
+	private ZonedDateTime recordStart;
+	private boolean recording = true;
+	private ScheduledExecutorService executor;
 
 	@Inject
 	public Recorder(ObjectMapper mapper,
@@ -47,10 +93,12 @@ public class Recorder {
 			@Property(name = PropertyNames.RECORD_OUTPUT_DIRECTORY, defaultValue = PropertyNames.RECORD_OUTPUT_DIRECTORY_DEFAULT) String outputDirectory,
 			@Property(name = PropertyNames.RECORD_OUTPUT_PREFIX_WITH_DTG, defaultValue = "true") boolean prefixwithdtg,
 			@Property(name = PropertyNames.RECORD_DURATION, defaultValue = "60m") Duration recordDuration,
+			@Property(name = PropertyNames.RECORD_START_AT) Optional<String> recordStartStringOpt,
 			@Property(name = PropertyNames.RECORD_EXIT_AFTER_RECORDING_STOP, defaultValue = "true") boolean exitAfterRecordingStop)
 			throws IOException {
 		this.mapper = mapper;
-		String prefix = prefixwithdtg ? ZonedDateTime.now(UTCTZ).format(DateTimeFormatter.ofPattern(DTG_FORMAT)) : "";
+		String prefix = prefixwithdtg ? ZonedDateTime.now(UTCTZ).format(DateTimeFormatter.ofPattern(PREFIX_DTG_FORMAT))
+				: "";
 		this.outputLocation = outputDirectory + File.separator + prefix + outputFileName;
 		try {
 			this.writer = new BufferedWriter(new FileWriter(this.outputLocation));
@@ -59,10 +107,42 @@ public class Recorder {
 			log.info("Can't open recorder output file " + outputFileName + " because " + e.getLocalizedMessage());
 			throw e;
 		}
-		log.info("Will stop recording in " + recordDuration);
-		this.stopRecordingAt = Instant.now().plus(recordDuration);
+		if (recordStartStringOpt.isEmpty()) {
+			log.info("No start time provided, will stop recording in " + recordDuration);
+			this.stopRecordingAt = ZonedDateTime.now(UTCTZ).plus(recordDuration);
+			this.active = true;
+		} else {
+			String recordingStart = recordStartStringOpt.get();
+			ZonedDateTime recordingStartZDT;
+			try {
+				recordingStartZDT = ZonedDateTime.parse(recordingStart, DateTimeFormatter.ofPattern(DTG_FORMAT));
+			} catch (DateTimeParseException e) {
+				log.info("Unable to parse provided start tine of recordingStart because " + e.getLocalizedMessage());
+				throw e;
+			}
+			// check if the provided start time is in the past, if so ignore it
+			if (recordingStartZDT.isBefore(ZonedDateTime.now(UTCTZ))) {
+				log.info("The provided recording start time of " + recordingStart
+						+ " is on the past, recording will start immediately and finish in " + recordDuration);
+				this.stopRecordingAt = ZonedDateTime.now(UTCTZ).plus(recordDuration);
+				this.active = true;
+			} else {
+				// the start time is actually in the future
+				this.active = false;
+				Duration timeUntilStartingRecording = Duration.between(Instant.now(), recordingStartZDT);
+				log.info("Will stop recording " + recordDuration + " after " + recordingStart + " which is in "
+						+ timeUntilStartingRecording);
+				this.stopRecordingAt = recordingStartZDT.plus(recordDuration);
+				// schedule the start
+				executor = Executors.newSingleThreadScheduledExecutor();
+				executor.schedule(() -> {
+					log.info("Reached recording start time, making recording active");
+					active = true;
+					executor.shutdown();
+				}, timeUntilStartingRecording.toNanos(), TimeUnit.NANOSECONDS);
+			}
+		}
 		this.exitAfterRecordingStop = exitAfterRecordingStop;
-		active = true;
 	}
 
 	private void recordData(@NonNull RecordedDataType type, @NonNull String jsonData) {
@@ -71,7 +151,7 @@ public class Recorder {
 			return;
 		} else {
 			// check the timestamps
-			if (Instant.now().isAfter(stopRecordingAt)) {
+			if (ZonedDateTime.now(UTCTZ).isAfter(stopRecordingAt)) {
 				log.info("Current time is after stop recording time, stopping");
 				// stop the recording and close the output
 				stopRecording();

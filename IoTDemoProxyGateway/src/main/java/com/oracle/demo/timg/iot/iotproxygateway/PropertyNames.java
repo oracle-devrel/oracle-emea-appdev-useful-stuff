@@ -64,6 +64,7 @@ public class PropertyNames {
 	public final static String RECORD_OUTPUT_DIRECTORY_DEFAULT = "saved";
 	public final static String RECORD_OUTPUT_PREFIX_WITH_DTG = RECORD_OUTPUT + ".prefixwithdtg";
 	public final static String RECORD_DURATION = "record.duration";
+	public final static String RECORD_START_AT = "record.startat";
 	public final static String RECORD_EXIT_AFTER_RECORDING_STOP = "record.exitafterrecordingstop";
 
 	// these properties are the mqtt settings for uploading events (live or
@@ -103,7 +104,7 @@ public class PropertyNames {
 	// property names to retrieve info from the home assistant instance for live
 	// upload or recording.
 	public final static String HOME_ASSISTANT = "home-assistant";
-	public final static String HOME_ASSISTANT_MONITORED_ENTITIES_LIST = HOME_ASSISTANT + ".monitored-entities";
+	public final static String HOME_ASSISTANT_MONITORED_ENTITY_SETS_LIST = HOME_ASSISTANT + ".monitored-entity-sets";
 	public final static String HOME_ASSISTANT_API = HOME_ASSISTANT + ".api";
 	public final static String HOME_ASSISTANT_API_AUTH_TOKEN = HOME_ASSISTANT_API + ".auth_token";
 	public final static String HOME_ASSISTANT_API_PROTOCOL = HOME_ASSISTANT_API + ".protocol";

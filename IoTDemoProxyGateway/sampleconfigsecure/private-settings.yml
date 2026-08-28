@@ -1,6 +1,0 @@
-private:
-  devicehost: "<your IoT instances devicehost>"
-  mqtt:
-    client:
-      brokeroracle: ${private.devicehost}
-      passwordoracle: "<your mqtt GW password>"

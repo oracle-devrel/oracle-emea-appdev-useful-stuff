@@ -1,0 +1,6 @@
+private:
+  devicehost: "vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com"
+  mqtt:
+    client:
+      brokeroracle: ${private.devicehost}
+      passwordoracle: "ImAnI0TS3cr3tD0ntShar3M3"
