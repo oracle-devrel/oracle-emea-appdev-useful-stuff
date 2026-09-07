@@ -36,8 +36,6 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
-import java.util.Base64;
-
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple.IoTOutputHttpOICClientNormalizedDataSimpleSettings;
 
 import io.micronaut.context.annotation.Property;
@@ -51,40 +49,35 @@ import lombok.extern.java.Log;
 
 // enabled if sending to OIC
 @Requires(property = IoTOutputHttpOICClientNormalizedDataSimpleSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "OAUTH2")
 // needs a endpoint
 @ClientFilter(patterns = { "${" + IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY + ":"
 		+ IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT + "}/**" })
 @Log
-public class IoTOutputHttpOICClientNormalizedDataRequestFilter {
+public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 	@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT
 			+ "/**")
 	private String patternPath;
-	private final String username;
-	private final String password;
+	private final OICOAuthApplicationTokenRetriever oauthTokenRetriever;
 
 	@Inject
-	public IoTOutputHttpOICClientNormalizedDataRequestFilter(
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.USERNAME_PROPERTY, defaultValue = "") String username,
-			@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
-		if ((username == null) || (username.length() == 0)) {
-			this.username = null;
-		} else {
-			this.username = username;
-		}
-		if (passwordBase64.length() > 0) {
-			this.password = new String(Base64.getDecoder().decode(passwordBase64));
-		} else {
-			this.password = "";
-		}
+	public IoTOutputHttpOICClientNormalizedDataOauthRequestFilter(
+			OICOAuthApplicationTokenRetriever oauthTokenRetriever) {
+		this.oauthTokenRetriever = oauthTokenRetriever;
 	}
 
 	@RequestFilter
-	public void doFilter(MutableHttpRequest<?> request) {
+	public void doFilter(MutableHttpRequest<?> request) throws IDCSOAuthTokenRetrievalException {
 		log.info("Filter authenticated");
-		if (username != null) {
-			log.info(() -> "Adding user auth username=" + this.username);
-			request.basicAuth(this.username, this.password);
+		String token;
+		try {
+			token = oauthTokenRetriever.getToken();
+		} catch (IDCSOAuthTokenRetrievalException e) {
+			log.severe("Unable to get OAuth token for OIC, " + e.getLocalizedMessage());
+			throw e;
 		}
+		request.bearerAuth(token);
+		log.info(() -> "Added OAuth token");
 		log.info(() -> "Request uri " + request.getUri().toASCIIString());
 		log.info(() -> "Request path " + request.getPath());
 		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
@@ -94,7 +87,7 @@ public class IoTOutputHttpOICClientNormalizedDataRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataRequestFilter username=" + this.username
+		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataBasicRequestFilter username=" + this.username
 				+ ", password=" + password + " pattern =" + patternPath);
 	}
 }
