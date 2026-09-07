@@ -38,8 +38,10 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requ
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
+import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.client.exceptions.HttpClientException;
@@ -73,12 +75,23 @@ public class OICOAuthApplicationTokenRetriever {
 	private final String oauthScope;
 	private final String credentialsBase64;
 
+	@Getter
+	private LocalDateTime currentTokenRenewTime = null;
+
+	private String currentToken = null;
+	@Getter
+	private String tokenType;
+	private final BeanProvider<OICOAuthTokenRequester> authTokenRequesterProvider;
+	private OICOAuthTokenRequester authTokenRequester;
+
 	@Inject
-	public OICOAuthApplicationTokenRetriever(
+	public OICOAuthApplicationTokenRetriever(BeanProvider<OICOAuthTokenRequester> authTokenRequesterProvider,
 			@Property(name = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_ID) String clientId,
 			@Property(name = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SECRET) String clientSecret,
 			@Property(name = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SCOPE) String scope,
-			@Property(name = IoTOutputHttpClientCommonFilterSettings.OAUTH_GRANT_TYPE, defaultValue = GRANT_TYPE_DEFAULT) String grantType) {
+			@Property(name = IoTOutputHttpClientCommonFilterSettings.OAUTH_GRANT_TYPE, defaultValue = GRANT_TYPE_DEFAULT) String grantType)
+			throws IllegalArgumentException {
+		this.authTokenRequesterProvider = authTokenRequesterProvider;
 		this.oauthClientId = clientId;
 		this.oauthClientSecret = clientSecret;
 		this.oauthScope = scope;
@@ -86,16 +99,6 @@ public class OICOAuthApplicationTokenRetriever {
 		String credentials = oauthClientId + ":" + oauthClientSecret;
 		credentialsBase64 = AUTH_BASIC + " " + Base64.getEncoder().encodeToString(credentials.getBytes());
 	}
-
-	@Getter
-	private LocalDateTime currentTokenRenewTime = null;
-
-	private String currentToken = null;
-	@Getter
-	private String tokenType;
-
-	@Inject
-	private OICOAuthTokenRequester authTokenRequester;
 
 	/**
 	 * for testing only
@@ -137,8 +140,19 @@ public class OICOAuthApplicationTokenRetriever {
 	}
 
 	@PostConstruct
-	public void postConstruct() {
+	public void postConstruct() throws IDCSOAuthTokenRetrievalException {
+		if (authTokenRequesterProvider.isPresent()) {
+			authTokenRequester = authTokenRequesterProvider.get();
+			log.info("Retrieved token provider");
+		} else {
+			log.severe("Could not get the OIC token retreiever http client, will not be able to add oauth credentials");
+			throw new IllegalArgumentException(
+					"Could not get the OIC token retreiever http client, will not be able to add oauth credentials");
+		}
 		log.info("Startup event received for OICOAuthApplicationTokenRetriever scope=" + oauthScope + ", grantType="
 				+ oauthGrantType);
+		log.info("Retrieving initial token");
+		getToken();
+		log.info("Token will expire at " + currentTokenRenewTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 	}
 }
