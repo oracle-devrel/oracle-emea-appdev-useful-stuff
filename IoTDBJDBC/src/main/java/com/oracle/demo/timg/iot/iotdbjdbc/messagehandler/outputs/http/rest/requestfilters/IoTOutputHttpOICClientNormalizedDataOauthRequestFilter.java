@@ -36,6 +36,8 @@ SOFTWARE.
  */
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
+import java.time.format.DateTimeFormatter;
+
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple.IoTOutputHttpOICClientNormalizedDataSimpleSettings;
 
 import io.micronaut.context.annotation.Property;
@@ -87,7 +89,8 @@ public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataBasicRequestFilter username=" + this.username
-				+ ", password=" + password + " pattern =" + patternPath);
+		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataOAuthRequestFilter token type="
+				+ oauthTokenRetriever.getTokenType() + ", renewal time="
+				+ oauthTokenRetriever.getCurrentTokenRenewTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 	}
 }
