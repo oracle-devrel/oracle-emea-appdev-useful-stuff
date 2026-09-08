@@ -47,6 +47,7 @@ import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 // enabled if sending to OIC
@@ -57,6 +58,8 @@ import lombok.extern.java.Log;
 @ClientFilter(patterns = { "${" + IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
 		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT + "}/**" })
 @Log
+@Singleton
+
 public class IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter {
 	@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT
 			+ "/**")
@@ -96,7 +99,7 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.info("Post Construct for IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter username=" + this.username
-				+ ", password=" + password + " pattern =" + patternPath);
+		log.info("Post Construct for IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter username="
+				+ this.username + ", password=" + password + " pattern =" + patternPath);
 	}
 }

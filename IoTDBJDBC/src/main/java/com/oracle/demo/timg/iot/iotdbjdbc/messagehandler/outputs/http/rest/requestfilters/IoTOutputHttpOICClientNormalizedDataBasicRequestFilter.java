@@ -47,6 +47,7 @@ import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 // enabled if sending to OIC
@@ -56,6 +57,7 @@ import lombok.extern.java.Log;
 @ClientFilter(patterns = { "${" + IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY + ":"
 		+ IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT + "}/**" })
 @Log
+@Singleton
 public class IoTOutputHttpOICClientNormalizedDataBasicRequestFilter {
 	@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT
 			+ "/**")

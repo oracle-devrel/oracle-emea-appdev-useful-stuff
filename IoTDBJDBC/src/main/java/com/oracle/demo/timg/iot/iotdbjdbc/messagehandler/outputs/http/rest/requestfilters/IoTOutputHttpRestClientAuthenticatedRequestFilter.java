@@ -49,6 +49,7 @@ import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 // needs a endpoint
@@ -59,6 +60,7 @@ import lombok.extern.java.Log;
 		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":"
 				+ IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_DEFAULT + "}" + "/authenticated/**" })
 @Log
+@Singleton
 public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
 	private final String username;
 	private final String password;

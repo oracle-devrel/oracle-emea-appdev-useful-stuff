@@ -45,9 +45,11 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientException;
+import jakarta.inject.Singleton;
 
 @Client(id = "oicoauthtoken")
 @Header(name = USER_AGENT, value = "Micronaut HTTP Client")
+@Singleton
 public interface OICOAuthTokenRequester {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_FORM_URLENCODED)
