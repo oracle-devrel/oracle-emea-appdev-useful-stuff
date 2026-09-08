@@ -37,9 +37,11 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
 import java.time.format.DateTimeFormatter;
+import java.util.MissingResourceException;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple.IoTOutputHttpOICClientNormalizedDataSimpleSettings;
 
+import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpResponse;
@@ -65,12 +67,13 @@ public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 	@Property(name = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientNormalizedDataSimpleSettings.TARGET_PATH_DEFAULT
 			+ "/**")
 	private String patternPath;
-	private final OICOAuthApplicationTokenRetriever oauthTokenRetriever;
+	private BeanProvider<OICOAuthApplicationTokenRetriever> oauthTokenRetrieverProvider;
+	private OICOAuthApplicationTokenRetriever oauthTokenRetriever;
 
 	@Inject
 	public IoTOutputHttpOICClientNormalizedDataOauthRequestFilter(
-			OICOAuthApplicationTokenRetriever oauthTokenRetriever) {
-		this.oauthTokenRetriever = oauthTokenRetriever;
+			BeanProvider<OICOAuthApplicationTokenRetriever> oauthTokenRetrieverProvider) {
+		this.oauthTokenRetrieverProvider = oauthTokenRetrieverProvider;
 	}
 
 	@RequestFilter
@@ -95,6 +98,15 @@ public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
+		if (oauthTokenRetrieverProvider.isResolvable()) {
+			oauthTokenRetriever = oauthTokenRetrieverProvider.get();
+			log.info("IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter retrieved oauthTokenRetriever");
+		} else {
+			log.severe(
+					"IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter oauthTokenRetrieverProvider cannot be resolved, attempts to use the oauth will fail");
+			throw new MissingResourceException("Can't locate the bean OICOAuthApplicationTokenRetriever",
+					OICOAuthApplicationTokenRetriever.class.getName(), null);
+		}
 		log.info("Post Construct for IoTOutputHttpOICClientNormalizedDataOAuthRequestFilter token type="
 				+ oauthTokenRetriever.getTokenType() + ", renewal time="
 				+ oauthTokenRetriever.getCurrentTokenRenewTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
