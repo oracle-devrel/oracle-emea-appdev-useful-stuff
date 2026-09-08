@@ -54,7 +54,7 @@ import lombok.extern.java.Log;
 
 // enabled if sending to OIC
 @Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
-@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "OAUTH2")
+@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "OAUTH2", defaultValue = "BASIC")
 
 // needs a endpoint
 @ClientFilter(patterns = { "${" + IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
