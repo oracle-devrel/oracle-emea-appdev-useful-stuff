@@ -37,13 +37,11 @@ SOFTWARE.
 package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requestfilters;
 
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.CompletableFuture;
 
 import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicsimple.IoTOutputHttpOICClientNormalizedDataSimpleSettings;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpRequest;
@@ -76,14 +74,13 @@ public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 	}
 
 	@RequestFilter
-	public CompletableFuture<@Nullable HttpResponse<?>> doFilter(MutableHttpRequest<?> request) {
+	public HttpResponse<?> doFilter(MutableHttpRequest<?> request) {
 		String token;
 		try {
 			token = oauthTokenRetriever.getToken();
 		} catch (IDCSOAuthTokenRetrievalException e) {
 			log.severe("Unable to get OAuth token for OIC, " + e.getLocalizedMessage());
-			HttpResponse<?> resp = HttpResponse.status(HttpStatus.FORBIDDEN, "Can't get oauth token");
-			return CompletableFuture.completedFuture(resp);
+			return HttpResponse.status(HttpStatus.FORBIDDEN, "Can't get oauth token");
 		}
 		request.bearerAuth(token);
 		log.info(() -> "Added OAuth token");
@@ -93,7 +90,7 @@ public class IoTOutputHttpOICClientNormalizedDataOauthRequestFilter {
 		log.info(() -> "Request headers = " + request.getHeaders().asMap().toString());
 		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
 		// it all went OK, tell the code to carry on
-		return CompletableFuture.completedFuture(null);
+		return null;
 	}
 
 	@PostConstruct
