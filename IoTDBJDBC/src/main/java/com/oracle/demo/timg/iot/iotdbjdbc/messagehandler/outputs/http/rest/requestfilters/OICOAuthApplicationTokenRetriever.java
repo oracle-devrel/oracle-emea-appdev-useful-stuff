@@ -52,7 +52,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 
 @Singleton
-@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "OAUTH2")
+@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "OAUTH2", defaultValue = "BASIC")
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_ID)
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SECRET)
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SCOPE)
