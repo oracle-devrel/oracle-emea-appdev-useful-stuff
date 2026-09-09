@@ -89,11 +89,11 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 		}
 		request.bearerAuth(token);
 		log.info(() -> "Added OAuth token");
-		log.info(() -> "Request uri " + request.getUri().toASCIIString());
-		log.info(() -> "Request path " + request.getPath());
-		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
-		log.info(() -> "Request headers = " + request.getHeaders().asMap().toString());
-		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
+		log.finer(() -> "Request uri " + request.getUri().toASCIIString());
+		log.finer(() -> "Request path " + request.getPath());
+		log.finer(() -> "Request params = " + request.getParameters().asMap().toString());
+		log.finer(() -> "Request headers = " + request.getHeaders().asMap().toString());
+		log.finer(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
 	@PostConstruct
