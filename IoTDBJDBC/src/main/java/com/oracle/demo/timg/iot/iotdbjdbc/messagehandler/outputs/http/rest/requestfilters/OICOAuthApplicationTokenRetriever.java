@@ -44,8 +44,9 @@ import java.util.Base64;
 import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
-import jakarta.annotation.PostConstruct;
+import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.Getter;
@@ -56,7 +57,6 @@ import lombok.extern.java.Log;
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_ID)
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SECRET)
 @Requires(property = IoTOutputHttpClientCommonFilterSettings.OAUTH_CLIENT_SCOPE)
-
 @Log
 public class OICOAuthApplicationTokenRetriever {
 	// this basically automates the following request (the text below applies
@@ -139,8 +139,8 @@ public class OICOAuthApplicationTokenRetriever {
 		return currentToken;
 	}
 
-	@PostConstruct
-	public void postConstruct() throws IDCSOAuthTokenRetrievalException {
+	@EventListener
+	public void startup(StartupEvent event) throws IDCSOAuthTokenRetrievalException {
 		if (authTokenRequesterProvider.isPresent()) {
 			authTokenRequester = authTokenRequesterProvider.get();
 			log.info("Retrieved token provider");

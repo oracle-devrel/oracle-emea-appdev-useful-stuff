@@ -44,11 +44,13 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.norma
 import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -75,6 +77,7 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 	public IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter(
 			BeanProvider<OICOAuthApplicationTokenRetriever> oauthTokenRetrieverProvider) {
 		this.oauthTokenRetrieverProvider = oauthTokenRetrieverProvider;
+		log.info("IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter completed constructor");
 	}
 
 	@RequestFilter
@@ -99,6 +102,11 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 
 	@PostConstruct
 	public void postConstruct() {
+		log.info("IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter completed postConstruct");
+	}
+
+	@EventListener
+	public void startUp(StartupEvent event) {
 		if (oauthTokenRetrieverProvider.isResolvable()) {
 			oauthTokenRetriever = oauthTokenRetrieverProvider.get();
 			log.info("IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter retrieved oauthTokenRetriever");
@@ -111,6 +119,5 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 		log.info("Post Construct for IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter token type="
 				+ oauthTokenRetriever.getTokenType() + ", renewal time="
 				+ oauthTokenRetriever.getCurrentTokenRenewTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-
 	}
 }
