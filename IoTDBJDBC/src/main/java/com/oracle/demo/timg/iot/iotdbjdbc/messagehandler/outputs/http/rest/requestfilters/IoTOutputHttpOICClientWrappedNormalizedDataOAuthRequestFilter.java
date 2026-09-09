@@ -45,8 +45,6 @@ import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
@@ -81,13 +79,13 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 	}
 
 	@RequestFilter
-	public HttpResponse<?> doFilter(MutableHttpRequest<?> request) {
+	public void doFilter(MutableHttpRequest<?> request) {
 		String token;
 		try {
 			token = oauthTokenRetriever.getToken();
 		} catch (IDCSOAuthTokenRetrievalException e) {
 			log.severe("Unable to get OAuth token for OIC, " + e.getLocalizedMessage());
-			return HttpResponse.status(HttpStatus.FORBIDDEN, "Can't get oauth token");
+			return;
 		}
 		request.bearerAuth(token);
 		log.info(() -> "Added OAuth token");
@@ -96,8 +94,6 @@ public class IoTOutputHttpOICClientWrappedNormalizedDataOAuthRequestFilter {
 		log.info(() -> "Request params = " + request.getParameters().asMap().toString());
 		log.info(() -> "Request headers = " + request.getHeaders().asMap().toString());
 		log.info(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
-		// it all went OK, tell the code to carry on
-		return null;
 	}
 
 	@PostConstruct
