@@ -44,9 +44,8 @@ import java.util.Base64;
 import io.micronaut.context.BeanProvider;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.client.exceptions.HttpClientException;
-import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.Getter;
@@ -139,8 +138,20 @@ public class OICOAuthApplicationTokenRetriever {
 		return currentToken;
 	}
 
-	@EventListener
-	public void startup(StartupEvent event) throws IDCSOAuthTokenRetrievalException {
+	@PostConstruct
+	public void postConstruct() throws IDCSOAuthTokenRetrievalException {
+		getAuthTokenRequester();
+		log.info("Startup event received for OICOAuthApplicationTokenRetriever scope=" + oauthScope + ", grantType="
+				+ oauthGrantType);
+		log.info("Retrieving initial token");
+		getToken();
+		log.info("Token will expire at " + currentTokenRenewTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+	}
+
+	/**
+	 * @throws IllegalArgumentException
+	 */
+	private void getAuthTokenRequester() throws IllegalArgumentException {
 		if (authTokenRequesterProvider.isPresent()) {
 			authTokenRequester = authTokenRequesterProvider.get();
 			log.info("Retrieved token provider");
@@ -149,10 +160,5 @@ public class OICOAuthApplicationTokenRetriever {
 			throw new IllegalArgumentException(
 					"Could not get the OIC token retreiever http client, will not be able to add oauth credentials");
 		}
-		log.info("Startup event received for OICOAuthApplicationTokenRetriever scope=" + oauthScope + ", grantType="
-				+ oauthGrantType);
-		log.info("Retrieving initial token");
-		getToken();
-		log.info("Token will expire at " + currentTokenRenewTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 	}
 }
