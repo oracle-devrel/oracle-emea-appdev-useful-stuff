@@ -45,6 +45,7 @@ import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
 import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 // only load if expressly enabled
@@ -59,6 +60,8 @@ import lombok.extern.java.Log;
 		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":"
 				+ IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_DEFAULT + "}" + "/unauthenticated/**" })
 @Log
+@Singleton
+
 public class IoTOutputHttpRestClientUnauthenticatedRequestFilter {
 
 	@RequestFilter

@@ -96,6 +96,13 @@ public class NormalizedDataHttpOICSimpleOutput implements NormalizedDataMessageH
 		} catch (HttpClientException e) {
 			log.warning(
 					"HttpOICClient exception making call postNormalizedDataAsJsonToXXXX - " + e.getLocalizedMessage());
+			e.printStackTrace();
+			NormalizedData[] returnResp = new NormalizedData[1];
+			returnResp[0] = input;
+			return returnResp;
+		} catch (Exception e) {
+			log.warning("Exception making call postNormalizedDataAsJsonToXXXX - " + e.getLocalizedMessage());
+			e.printStackTrace();
 			NormalizedData[] returnResp = new NormalizedData[1];
 			returnResp[0] = input;
 			return returnResp;

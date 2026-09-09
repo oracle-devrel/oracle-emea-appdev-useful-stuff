@@ -38,37 +38,39 @@ package com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.requ
 
 import java.util.Base64;
 
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.generalrest.IoTOutputHttpRestClientNormalizedDataSettings;
-import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.rawdata.IoTOutputHttpRestClientRawDataSettings;
+import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.normalizeddata.oicwrappeddata.IoTOutputHttpOICClientWrappedNormalizedDataSettings;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.event.StartupEvent;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.ClientFilter;
 import io.micronaut.http.annotation.RequestFilter;
-import io.micronaut.runtime.event.annotation.EventListener;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
+// enabled if sending to OIC
+@Requires(property = IoTOutputHttpOICClientWrappedNormalizedDataSettings.ENABLED_PROPERTY, value = "true", defaultValue = "false")
+@Requires(property = IoTOutputHttpClientCommonFilterSettings.AUTH_TYPE, value = "BASIC", defaultValue = "BASIC")
+
 // needs a endpoint
-@Requires(condition = IoTOutputHttpRestClientEnableRequestFilter.class)
-@ClientFilter(patterns = {
-		"${" + IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
-				+ IoTOutputHttpRestClientNormalizedDataSettings.TARGET_PATH_DEFAULT + "}" + "/authenticated/**",
-		"${" + IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_PROPERTY + ":"
-				+ IoTOutputHttpRestClientRawDataSettings.TARGET_PATH_DEFAULT + "}" + "/authenticated/**" })
+@ClientFilter(patterns = { "${" + IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY + ":"
+		+ IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT + "}/**" })
 @Log
 @Singleton
-public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
+
+public class IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter {
+	@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_PROPERTY, defaultValue = IoTOutputHttpOICClientWrappedNormalizedDataSettings.TARGET_PATH_DEFAULT
+			+ "/**")
+	private String patternPath;
 	private final String username;
 	private final String password;
 
 	@Inject
-	public IoTOutputHttpRestClientAuthenticatedRequestFilter(
-			@Property(name = IoTOutputHttpClientCommonFilterSettings.USERNAME_PROPERTY, defaultValue = "") String username,
-			@Property(name = IoTOutputHttpClientCommonFilterSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
+	public IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter(
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.USERNAME_PROPERTY, defaultValue = "") String username,
+			@Property(name = IoTOutputHttpOICClientWrappedNormalizedDataSettings.PASSWORD_BASE64_PROPERTY, defaultValue = "") String passwordBase64) {
 		if ((username == null) || (username.length() == 0)) {
 			this.username = null;
 		} else {
@@ -95,9 +97,9 @@ public class IoTOutputHttpRestClientAuthenticatedRequestFilter {
 		log.finer(() -> "Request body " + request.getBody(String.class).orElse("No body set"));
 	}
 
-	@EventListener
-	public void onStartup(StartupEvent event) {
-		log.info("Startup event received for IoTOutputHttpRestClientAuthenticatedRequestFilter username="
-				+ this.username);
+	@PostConstruct
+	public void postConstruct() {
+		log.info("Post Construct for IoTOutputHttpOICClientWrappedNormalizedDataBasicRequestFilter username="
+				+ this.username + ", password=" + password + " pattern =" + patternPath);
 	}
 }

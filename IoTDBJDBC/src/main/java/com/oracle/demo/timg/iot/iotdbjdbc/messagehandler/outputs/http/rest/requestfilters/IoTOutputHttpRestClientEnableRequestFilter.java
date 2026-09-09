@@ -5,10 +5,24 @@ import com.oracle.demo.timg.iot.iotdbjdbc.messagehandler.outputs.http.rest.rawda
 
 import io.micronaut.context.condition.Condition;
 import io.micronaut.context.condition.ConditionContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
 
 @Log
+@Singleton
 public class IoTOutputHttpRestClientEnableRequestFilter implements Condition {
+
+	@Inject
+	public IoTOutputHttpRestClientEnableRequestFilter() {
+		log.info("IoTOutputHttpRestClientEnableRequestFilter In constructor");
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		log.info("IoTOutputHttpRestClientEnableRequestFilter In post construct");
+	}
 
 	@Override
 	public boolean matches(ConditionContext context) {

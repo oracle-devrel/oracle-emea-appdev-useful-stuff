@@ -87,21 +87,30 @@ public class WrappedNormalizedDataHttpOICOutput implements NormalizedDataMessage
 	public NormalizedData[] processNormalizedData(NormalizedData input) throws Exception {
 		log.info(() -> "NormalizedData is " + input);
 		HttpResponse<Void> result;
-		NormalizedDataMetadataTransfer normalizedDataTransfer = NormalizedDataMetadataTransfer.buildTransfer(input,
-				deviceModelInstancesCache);
+		NormalizedDataMetadataTransfer normalizedDataWithMetadataTransfer = NormalizedDataMetadataTransfer
+				.buildTransfer(input, deviceModelInstancesCache);
 		try {
 			if (sendtojsonobject) {
 				log.info(() -> "Making OIC call, Sending wrapped json to json object with content of "
-						+ normalizedDataTransfer);
-				result = wrappedHttpOicClient.postWrappedNormalizedDataAsJsonToJsonObject(normalizedDataTransfer);
+						+ normalizedDataWithMetadataTransfer);
+				result = wrappedHttpOicClient
+						.postWrappedNormalizedDataAsJsonToJsonObject(normalizedDataWithMetadataTransfer);
 			} else {
 				log.info(() -> "Making OIC call, Sending wrapped json to string with content of "
-						+ normalizedDataTransfer);
-				result = wrappedHttpOicClient.postWrappedNormalizedDataAsJsonToString(normalizedDataTransfer);
+						+ normalizedDataWithMetadataTransfer);
+				result = wrappedHttpOicClient
+						.postWrappedNormalizedDataAsJsonToString(normalizedDataWithMetadataTransfer);
 			}
 		} catch (HttpClientException e) {
 			log.warning("HttpOICClient exception making call postWrappedNormalizedDataAsJsonToXXXX - "
 					+ e.getLocalizedMessage());
+			e.printStackTrace();
+			NormalizedData[] returnResp = new NormalizedData[1];
+			returnResp[0] = input;
+			return returnResp;
+		} catch (Exception e) {
+			log.warning("Exception making call postWrappedNormalizedDataAsJsonToXXXX - " + e.getLocalizedMessage());
+			e.printStackTrace();
 			NormalizedData[] returnResp = new NormalizedData[1];
 			returnResp[0] = input;
 			return returnResp;
