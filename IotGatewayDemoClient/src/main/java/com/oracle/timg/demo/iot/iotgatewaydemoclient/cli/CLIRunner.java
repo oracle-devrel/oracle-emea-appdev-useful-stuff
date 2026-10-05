@@ -9,7 +9,6 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.oracle.bmc.identity.model.Compartment;
 import com.oracle.bmc.iot.model.DigitalTwinInstance;
 import com.oracle.bmc.iot.model.IotDomain;
@@ -34,6 +33,7 @@ import timgutilities.textio.ChoiceDescriptionData;
 import timgutilities.textio.RunnableCommand;
 import timgutilities.textio.TextIOUtils;
 import timgutilities.textio.TextIOUtils.NUM_TYPE;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Singleton
 public class CLIRunner implements Runnable {

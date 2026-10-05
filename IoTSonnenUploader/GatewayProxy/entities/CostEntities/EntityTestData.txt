@@ -13,7 +13,7 @@ export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
 mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyCnsmdCstTdy\"}"
 
 To get the most recent normalized data for instance ElectricityConsumedCostToday
-oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7nuemmls3okty6toxd54h5pmvsvhaaeb56hfjozbl7n3q
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7qt2oqphcjit5rlps2c75o7f7aao3lt6bqudff3oz4b5q
 
 
 
@@ -28,7 +28,7 @@ export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
 mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"CrntLctrctyRtPrKwhCnsmd\"}"
 
 To get the most recent normalized data for instance CurrentElecticityRatePerKwhConsumed
-oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7t5jnohp7tzrgsk3lfuw7d7u4xrklhwmjdsyidetie6wa
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7etr62nqa5dvoeyof6ruqpq7nfalv2fyt5mht64slar2q
 
 
 
@@ -43,4 +43,4 @@ export CURRENT_TS=`date -u +"%Y-%m-%dT%H:%M:%S"`.`date +%N | cut -b 1-6`Z
 mqttx pub -t house/homeassistant/entities/cost -ct application/json -u hagateway -P ImAnI0TS3cr3tD0ntShar3M3 -h vc3vlnfuwezrc.device.iot.uk-london-1.oci.oraclecloud.com -p 8883 -m "{\"payload\": {\"cost\": 2.15, \"timestamp\": \"$CURRENT_TS\"}, \"devicekey\":\"LctrctyTtlChrgsTdy\"}"
 
 To get the most recent normalized data for instance ElectricityTotalChargesToday
-oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7km64yxjsrl3ifm5y2gtotbuai25hj6mizosgta3riava
+oci iot digital-twin-instance get-content --digital-twin-instance-id  ocid1.iotdigitaltwininstance.oc1.uk-london-1.amaaaaaauevftmr7lmgqc3czepdirjj7km6y3b3ykmnbbs64dwimed4b2tbq

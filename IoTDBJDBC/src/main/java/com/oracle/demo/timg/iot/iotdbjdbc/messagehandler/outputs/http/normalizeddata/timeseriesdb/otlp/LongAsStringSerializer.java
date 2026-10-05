@@ -68,7 +68,6 @@ public class LongAsStringSerializer implements Serializer<Long>, Deserializer<Lo
 		}
 	}
 
-	@Override
 	public boolean allowNull() {
 		return true;
 	}
