@@ -40,21 +40,21 @@ SOFTWARE. -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.oracle.demo.timg.iot.iotdbjdbc</groupId>
 	<artifactId>IoTDBJDBC</artifactId>
-	<version>0.0.1</version>
+	<version>0.2.1</version>
 	<packaging>${packaging}</packaging>
 
 	<parent>
 		<groupId>io.micronaut.platform</groupId>
 		<artifactId>micronaut-parent</artifactId>
-		<version>4.10.17</version>
+		<version>5.2.1</version>
 	</parent>
 
 	<properties>
 		<packaging>jar</packaging>
-		<jdk.version>21</jdk.version>
-		<release.version>21</release.version>
+		<jdk.version>25</jdk.version>
+		<release.version>25</release.version>
 		<version.ocisdk>3.92.0</version.ocisdk>
-		<version.lombok>1.18.46</version.lombok>
+		<version.lombok>1.18.48</version.lombok>
 		<version.slf4j>2.0.7</version.slf4j>
 		<!-- Oracle JDBC 23ai line (set to the latest approved version) -->
 		<version.ojdbc>23.26.2.0.0</version.ojdbc>
@@ -112,7 +112,7 @@ SOFTWARE. -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<!--<version>${version.lombok}</version>-->
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>	<!-- SLF4J is a logging
 		facade that let's us change the actual logger
 		used 

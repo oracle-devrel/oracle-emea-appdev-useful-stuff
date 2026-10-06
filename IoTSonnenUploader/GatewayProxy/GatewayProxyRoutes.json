@@ -3,19 +3,21 @@
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"stats\"}",
 		"description": "Home Assistant gateway statistics",
 		"payload-mapping": {
-			"$.haretrievesuccess": "$.haretrievesuccess",
-			"$.haretrievefail": "$.haretrievefail",
-			"$.uploadsuccess": "$.uploadsuccess",
-			"$.uploadfail": "$.uploadfail"
+			"$.haretrievesuccess": "$.payload.haretrievesuccess",
+			"$.haretrievefail": "$.payload.haretrievefail",
+			"$.uploadsuccess": "$.payload.uploadsuccess",
+			"$.uploadfail": "$.payload.uploadfail"
 		},
 		"reference-payload": {
 			"dataFormat": "JSON",
 			"data": {
-				"timestamp": "2026-07-10T16:09:18.934Z",
-				"haretrievesuccess": 54.5,
-				"haretrievefail": 0.5,
-				"uploadsuccess": 53.5,
-				"uploadfail": 1.5
+				"payload": {
+					"timestamp": "2026-07-10T16:09:18.934Z",
+					"haretrievesuccess": 54.5,
+					"haretrievefail": 0.5,
+					"uploadsuccess": 53.5,
+					"uploadfail": 1.5
+				}
 			}
 		}
 	},
@@ -23,19 +25,21 @@
 		"condition": "${endpoint(1) == \"house\" and endpoint(2) == \"homeassistant\" and endpoint(3) == \"gateway\" and endpoint(4) == \"config\"}",
 		"description": "Home Assistant gateway configuration",
 		"payload-mapping": {
-			"$.successfullharetrievetimewindow": "$.successfullharetrievetimewindow",
-			"$.failedharetrievetimewindow": "$.failedharetrievetimewindow",
-			"$.successfulluploadtimewindow": "$.successfulluploadtimewindow",
-			"$.faileduploadtimewindow": "$.faileduploadtimewindow"
+			"$.successfullharetrievetimewindow": "$.payload.successfullharetrievetimewindow",
+			"$.failedharetrievetimewindow": "$.payload.failedharetrievetimewindow",
+			"$.successfulluploadtimewindow": "$.payload.successfulluploadtimewindow",
+			"$.faileduploadtimewindow": "$.payload.faileduploadtimewindow"
 		},
 		"reference-payload": {
 			"dataFormat": "JSON",
 			"data": {
-				"timestamp": "2026-07-10T16:09:18.934Z",
-				"successfullharetrievetimewindow": 10,
-				"failedharetrievetimewindow": 11,
-				"successfulluploadtimewindow": 12,
-				"faileduploadtimewindow": 13
+				"payload":{
+					"timestamp": "2026-07-10T16:09:18.934Z",
+					"successfullharetrievetimewindow": 10,
+					"failedharetrievetimewindow": 11,
+					"successfulluploadtimewindow": 12,
+					"faileduploadtimewindow": 13
+				}
 			}
 		}
 	}

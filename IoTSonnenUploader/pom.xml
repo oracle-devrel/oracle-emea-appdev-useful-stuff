@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2025 Oracle and/or its affiliates.
+<!-- Copyright (c) 2026 Oracle and/or its affiliates.
 
 The Universal Permissive License (UPL), Version 1.0
 
@@ -39,25 +39,25 @@ SOFTWARE. -->
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.oracle.demo.timg.iot</groupId>
   <artifactId>iotsonnenuploader</artifactId>
-  <version>0.0.1</version>
+  <version>0.2.1</version>
   <packaging>${packaging}</packaging>
 
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.10.14</version>
+    <version>5.2.1</version>
   </parent>
   <properties>
     <packaging>jar</packaging>
-    <jdk.version>21</jdk.version>
-    <release.version>21</release.version>
+    <jdk.version>25</jdk.version>
+    <release.version>25</release.version>
     <!--<micronaut.version>4.10.14</micronaut.version>-->
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
     <micronaut.aot.packageName>com.oracle.demo.timg.iot.iotsonnenuploader.aot.generated</micronaut.aot.packageName>
     <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
     <micronaut.runtime>netty</micronaut.runtime>
     <exec.mainClass>com.oracle.demo.timg.iot.iotsonnenuploader.Application</exec.mainClass>
-	<lombok.version>1.18.46</lombok.version>
+	<lombok.version>1.18.48</lombok.version>
   </properties>
 
   <repositories>
@@ -136,7 +136,7 @@ SOFTWARE. -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<!--<version>${lombok.version}</version>-->
+			<scope>provided</scope>
 		</dependency>
   </dependencies>
   <build>

@@ -16,6 +16,6 @@
 	"envelope-mapping": {
 		"timeObserved": "$.payload.timestamp",
 		"target": "$.devicekey",
-		"contentRoot": "$.payload"
+		"contentRoot": "$"
 	}
 }
