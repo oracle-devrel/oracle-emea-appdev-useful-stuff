@@ -37,9 +37,7 @@ SOFTWARE.
 package com.oracle.timg.demo.iot.demogateway.eventdatatransformer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
@@ -48,6 +46,9 @@ import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Singleton
 @Requires(property = "gateway.eventdatatransformer.xmlinputtojsonoutput.enabled", value = "true", defaultValue = "false")
@@ -68,7 +69,7 @@ public class EventDataTransformerXmlInputToJsonOutput implements EventDataTransf
 		JsonNode node;
 		try {
 			node = xmlMapper.readTree(receivedEventData);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new EventDataIncommingFormatException(
 					"Can't parse the incomming XML data due to " + e.getLocalizedMessage(), e);
 		}
