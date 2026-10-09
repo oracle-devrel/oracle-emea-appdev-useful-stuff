@@ -82,7 +82,6 @@ public class NormalizedDataConsolidator implements NormalizedDataMessageHandler,
 		// try to get it if from the inprogress map
 		NormalizedDataLastUpdatedTimestamp oldNormalizedDataLastUpdatedTimestamp;
 		log.info("Looking for existing message under " + key);
-		;
 		synchronized (inProgressMessages) {
 			oldNormalizedDataLastUpdatedTimestamp = inProgressMessages.get(key);
 		}
@@ -115,9 +114,13 @@ public class NormalizedDataConsolidator implements NormalizedDataMessageHandler,
 			inProgressMessages.put(key, new NormalizedDataLastUpdatedTimestamp(inputNormalizedData));
 		}
 		synchronized (pendingOnwardNormalizedData) {
-			NormalizedData[] pendingNormalizedData = new NormalizedData[pendingOnwardNormalizedData.size()];
-			pendingNormalizedData = pendingOnwardNormalizedData.toArray(pendingNormalizedData);
+			int pendingMessagesSize = pendingOnwardNormalizedData.size();
+			log.info(() -> "There are " + pendingMessagesSize + " messages inthe pending queue");
+			NormalizedData[] pendingNormalizedData = new NormalizedData[pendingMessagesSize];
+			pendingOnwardNormalizedData.toArray(pendingNormalizedData);
+			log.info(() -> "The pending messages array is " + pendingNormalizedData);
 			pendingOnwardNormalizedData.clear();
+			log.info("Cleared the pending messages queue");
 			return pendingNormalizedData;
 		}
 	}
