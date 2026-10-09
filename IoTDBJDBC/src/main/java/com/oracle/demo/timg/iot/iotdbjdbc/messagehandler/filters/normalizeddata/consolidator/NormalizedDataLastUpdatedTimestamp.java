@@ -120,7 +120,9 @@ public class NormalizedDataLastUpdatedTimestamp {
 	}
 
 	public static String getKey(NormalizedData normalizedData) {
-		return normalizedData.getDigitalTwinInstanceId();// + "/" + normalizedData.getContentPath();
+		// we can't get the endpoint used for the upload at the moment, so for now just
+		// use the ocid
+		return normalizedData.getDigitalTwinInstanceId();
 	}
 
 	/**
@@ -178,9 +180,9 @@ public class NormalizedDataLastUpdatedTimestamp {
 	 * @param normalizedData
 	 */
 	public void updateWith(String contentPathOfValue, OracleJsonValue value) {
-		log.info(() -> "Adding key " + contentPathOfValue + " with value " + value);
+		log.finer(() -> "Adding key " + contentPathOfValue + " with value " + value);
 		if (jsonObject.containsKey(contentPathOfValue)) {
-			log.severe("Rejecting attempt to add duplicate content path of " + contentPathOfValue
+			log.warning("Rejecting attempt to add duplicate content path of " + contentPathOfValue
 					+ " to Normalized data event for instance key " + generatedKey + " with observed time of "
 					+ timeObserved);
 		} else {
