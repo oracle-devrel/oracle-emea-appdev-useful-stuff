@@ -84,7 +84,7 @@ public class NormalizedDataLastUpdatedTimestamp {
 	}
 
 	public static String getKey(NormalizedData normalizedData) {
-		return normalizedData.getDigitalTwinInstanceId() + "/" + normalizedData.getContentPath();
+		return normalizedData.getDigitalTwinInstanceId();// + "/" + normalizedData.getContentPath();
 	}
 
 	/**

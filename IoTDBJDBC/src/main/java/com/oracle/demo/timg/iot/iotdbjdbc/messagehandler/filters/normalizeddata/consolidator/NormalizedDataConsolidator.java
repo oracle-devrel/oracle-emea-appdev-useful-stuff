@@ -81,6 +81,8 @@ public class NormalizedDataConsolidator implements NormalizedDataMessageHandler,
 		String key = NormalizedDataLastUpdatedTimestamp.getKey(inputNormalizedData);
 		// try to get it if from the inprogress map
 		NormalizedDataLastUpdatedTimestamp oldNormalizedDataLastUpdatedTimestamp;
+		log.info("Looking for existing message under " + key);
+		;
 		synchronized (inProgressMessages) {
 			oldNormalizedDataLastUpdatedTimestamp = inProgressMessages.get(key);
 		}
@@ -102,6 +104,7 @@ public class NormalizedDataConsolidator implements NormalizedDataMessageHandler,
 				synchronized (pendingOnwardNormalizedData) {
 					pendingOnwardNormalizedData.add(oldNormalizedDataLastUpdatedTimestamp.retrieveNormalizedData());
 				}
+
 				inProgressMessages.put(key, new NormalizedDataLastUpdatedTimestamp(inputNormalizedData));
 			}
 		} else {
@@ -163,7 +166,8 @@ public class NormalizedDataConsolidator implements NormalizedDataMessageHandler,
 				Map.Entry<String, NormalizedDataLastUpdatedTimestamp> entry = i.next();
 				if (entry.getValue().lastUpdatedBefore(transferOlderThan)) {
 					synchronized (pendingOnwardNormalizedData) {
-						log.info(() -> "Message " + entry.getValue() + " is outside the retain window, sending on");
+						log.info(() -> "Message " + entry.getValue()
+								+ " is outside the retain window, adding to outgoing list for later transmission");
 						pendingOnwardNormalizedData.add(entry.getValue().retrieveNormalizedData());
 					}
 					i.remove();
