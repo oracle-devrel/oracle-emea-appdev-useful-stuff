@@ -188,10 +188,10 @@ public class DeviceModelInstancesCache {
 				String modelId = rs.getString(MODEL_ID_COLUMN_NAME);
 				String modelName = rs.getString(MODEL_NAME_COLUMN_NAME);
 				modelIdToModelName.put(modelId, modelName);
-				log.info("Added id " + modelId + " to name " + modelName + " mapping");
+				log.finer(() -> "Added id " + modelId + " to name " + modelName + " mapping");
 				if ((modelName != null) && (!modelName.isBlank())) {
 					modelNameToModelId.put(modelName, modelId);
-					log.info("Adding name " + modelName + " to id " + modelId + " mapping");
+					log.finer(() -> "Adding name " + modelName + " to id " + modelId + " mapping");
 				}
 				log.finer(() -> "Loaded model " + modelName + " with id " + modelId);
 			}
@@ -373,17 +373,18 @@ public class DeviceModelInstancesCache {
 							+ ", duplicates are not added");
 				} else {
 					instanceDisplayNameToInstanceId.put(instanceDisplayName, instanceIdExistingInstance);
-					log.info("Added instance name " + instanceDisplayName + " to instanceId "
+					log.finer(() -> "Added instance name " + instanceDisplayName + " to instanceId "
 							+ instanceIdExistingInstance + " mapping");
 				}
-				log.info("Added instance id " + instanceIdExistingInstance + " named " + instanceDisplayName
+				log.finer(() -> "Added instance id " + instanceIdExistingInstance + " named " + instanceDisplayName
 						+ " to modelId " + modelIdExistingInstance + " mapping");
 				instanceIdToModelName.put(instanceIdExistingInstance, modelName);
-				log.info("Added instance id " + instanceIdExistingInstance + " to modelName " + modelName + " mapping");
+				log.finer(() -> "Added instance id " + instanceIdExistingInstance + " to modelName " + modelName
+						+ " mapping");
 				instanceIdToExternalKey.put(instanceIdExistingInstance, externalKeyExistingInstance);
-				log.info("Added instance id " + instanceIdExistingInstance + " to externalKey "
+				log.finer(() -> "Added instance id " + instanceIdExistingInstance + " to externalKey "
 						+ externalKeyExistingInstance + " mapping");
-				log.finer(() -> "Loaded instance " + instanceIdExistingInstance + " with model id "
+				log.fine(() -> "Loaded instance " + instanceIdExistingInstance + " with model id "
 						+ modelIdExistingInstance + " which mapes to model name " + modelName);
 			}
 		} catch (SQLException e) {
