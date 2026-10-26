@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.oracle.bmc.identity.model.Compartment;
@@ -30,9 +29,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import timgutilities.textio.ChoiceDescription;
 import timgutilities.textio.ChoiceDescriptionData;
+import timgutilities.textio.NumberInputOption;
 import timgutilities.textio.RunnableCommand;
 import timgutilities.textio.TextIOUtils;
-import timgutilities.textio.TextIOUtils.NUM_TYPE;
+import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 @Singleton
@@ -226,21 +226,22 @@ public class CLIRunner implements Runnable {
 	}
 
 	private RepeatInfo getRepeatInfo(StandardModelTestData testData) throws IOException {
-		int count = TextIOUtils.getInt("Please enter how many events you want to send", NUM_TYPE.RANGE, 2, 100);
+		int count = TextIOUtils.getInt("Please enter how many events you want to send", NumberInputOption.RANGE, 2,
+				100);
 		double timewindow = TextIOUtils
 				.getDouble("Please enter the number of seconds (can be part seconds) over which to send the " + count
-						+ " events (this is 1st to last event)", NUM_TYPE.AT_OR_ABOVE, 0.01, 1000);
+						+ " events (this is 1st to last event)", NumberInputOption.AT_OR_ABOVE, 0.01, 1000);
 		long delay = Math.round((timewindow * 1000) / (count - 1));
 		int currentEnd = TextIOUtils.getInt(
 				"Please enter the current charge percentage at the end of the repeat (the current value is "
 						+ testData.currentBatteryCapacityPercentage + ")",
-				NUM_TYPE.RANGE, 0, 100, testData.currentBatteryCapacityPercentage);
+				NumberInputOption.RANGE, 0, 100, testData.currentBatteryCapacityPercentage);
 		double currentDelta = ((double) (currentEnd - testData.currentBatteryCapacityPercentage))
 				/ ((double) (count - 1));
 		int reserveEnd = TextIOUtils.getInt(
 				"Please enter the reserved charge percentage at the end of the repeat (the current value is "
 						+ testData.reservedBatteryCapacityPercentage + ")",
-				NUM_TYPE.RANGE, 0, 100, testData.reservedBatteryCapacityPercentage);
+				NumberInputOption.RANGE, 0, 100, testData.reservedBatteryCapacityPercentage);
 		double reserveDelta = ((double) (reserveEnd - testData.reservedBatteryCapacityPercentage))
 				/ ((double) (count - 1));
 		return new RepeatInfo(count, delay, currentDelta, reserveDelta);
@@ -302,14 +303,14 @@ public class CLIRunner implements Runnable {
 		case JSON:
 			try {
 				payloadToSend = jsonMapper.writeValueAsString(node);
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				throw new Exception("Problem converting object node to JSON - " + e.getLocalizedMessage());
 			}
 			break;
 		case XML:
 			try {
 				payloadToSend = xmlMapper.writeValueAsString(node);
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				throw new Exception("Problem converting object node to XML - " + e.getLocalizedMessage());
 			}
 			break;
@@ -358,12 +359,12 @@ public class CLIRunner implements Runnable {
 	private StandardModelTestData getStandardModelTestData(String prompt) throws IOException {
 		TextIOUtils.doOutput(prompt);
 		int currentBatteryCapacityPercentage = TextIOUtils.getInt("Please enter the currentBatteryCapacityPercentage",
-				NUM_TYPE.RANGE, 0, 100);
+				NumberInputOption.RANGE, 0, 100);
 		int operatingMode = TextIOUtils.getInt(
 				"Please enter the numeric operating mode, supported values are 1 (Manual), 2(Automatic - Self Consumption), 6(Battery-Module-Extension (30%)) and 10(Time-Of-Use) all others will be mapped to unknown in the adapter",
-				NUM_TYPE.RANGE, 1, 10);
+				NumberInputOption.RANGE, 1, 10);
 		int reservedBatteryCapacityPercentage = TextIOUtils.getInt("Please enter the reservedBatteryCapacityPercentage",
-				NUM_TYPE.RANGE, 0, 100);
+				NumberInputOption.RANGE, 0, 100);
 		String comment = TextIOUtils.getString("Please enter your comment on this entry", "");
 		return new StandardModelTestData(currentBatteryCapacityPercentage, operatingMode,
 				reservedBatteryCapacityPercentage, comment);
